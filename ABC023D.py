@@ -6,3 +6,4 @@ for i in range(N):
     H.append(h)
     S.append(s)
 print(H)
+print(S)
