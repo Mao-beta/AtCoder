@@ -52,12 +52,23 @@ def cmb_mod(n, r, m):
     return fact[n] * inv[r] * inv[n-r] % m
 
 
+#素因数分解
+def prime_fact(n):
+    root = int(math.sqrt(n))
+    prime_dict = {}
+    for i in range(2, root+1):
+        cnt = 0
+        while n % i == 0:
+            cnt += 1
+            n = n // i
+        if cnt:
+            prime_dict[i] = cnt
+    if n != 1:
+        prime_dict[n] = 1
+    return prime_dict
+
+
 def main():
-    edges = [[2, 3], [3, 1], [4, 1]]
-    N = make_adjlist_d(5, edges)
-    print(N)
-    N = make_adjlist_nond(5, edges)
-    print(cmb(1000, 500) % MOD)
     pass
 
 
