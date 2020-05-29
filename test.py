@@ -33,6 +33,15 @@ def cmb(n, r):
     return math.factorial(n) // math.factorial(r) // math.factorial(n-r)
 
 
+def pow_mod(base, exp, m):
+    if exp == 1:
+        return base % m
+    elif exp % 2:
+        return pow_mod(base, exp-1, m) * base % m
+    else:
+        return pow_mod(base, exp//2, m) ** 2 % m
+
+
 def main():
     edges = [[2, 3], [3, 1], [4, 1]]
     N = make_adjlist_d(5, edges)
