@@ -1,4 +1,4 @@
-class UnionFind():
+class UnionFind:
     def __init__(self, n):
         #親要素のノード番号を格納　xが根のとき-(サイズ)を格納
         self.par = [-1 for i in range(n)]
