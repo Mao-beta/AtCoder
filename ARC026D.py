@@ -38,40 +38,26 @@ def cmb(n, r):
 
 def main():
     N, M = NMI()
-    roads = [NLI() for _ in range(M)]
+    roads = [NLI() + [0] for _ in range(M)]
 
     ng = 0
     ok = 10**12
 
     for _ in range(100):
         mid = (ng+ok) / 2
-        tmp_roads = copy.deepcopy(roads)
-        for i, road in enumerate(tmp_roads):
-            tmp_roads[i].append(mid*road[3] - road[2])
+        for i, road in enumerate(roads):
+            roads[i][4] = mid*road[3] - road[2]
 
-        tmp_roads = sorted(tmp_roads, key=lambda x: x[4], reverse=True)
-
-        cum = 0
-        idx_r = 0
-        for i, road in enumerate(tmp_roads):
-            cum += road[4]
-            if cum < 0:
-                idx_r = i
-                break
-        if cum >= 0:
-            idx_r = N
-
+        tmp_roads = sorted(roads, key=lambda x: x[4], reverse=True)
         union = UnionFind(N)
         ans = 0
-        for edge in tmp_roads[:idx_r]:
+        for edge in tmp_roads:
             x, y, t, c, budget = edge
-            if not union.is_same(x, y) or budget >= 0:
+            if not union.is_same(x, y) or budget > 0:
                 union.unite(x, y)
                 ans += budget
 
-        town_cnt = union.size(0)
-
-        if town_cnt == N:
+        if ans >= 0:
             ok = mid
         else:
             ng = mid
