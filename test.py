@@ -33,23 +33,16 @@ def cmb(n, r):
     return math.factorial(n) // math.factorial(r) // math.factorial(n-r)
 
 
-def pow_mod(base, exp, m):
-    if exp == 1:
-        return base % m
-    elif exp % 2:
-        return pow_mod(base, exp-1, m) * base % m
-    else:
-        return pow_mod(base, exp//2, m) ** 2 % m
+def combinations_mod(n, r, mod=1000000007):
+    """Returns nCr in mod."""
+    r = min(r, n - r)
+    combs = 1
+    for i, j in zip(range(n - r + 1, n + 1), range(1, r + 1)):
+        combs *= (i % mod) * pow(j, mod - 2, mod)
+        combs %= mod
+    return combs
 
 
-
-def cmb_mod(n, r, m):
-    fact = [1] * (n+1)
-    inv = [1] * (n+1)
-    for i in range(1, n+1):
-        fact[i] *= fact[i-1] * i % m
-        inv[i] *= inv[i-1] * pow(i, m-2, m) % m
-    return fact[n] * inv[r] * inv[n-r] % m
 
 
 #素因数分解
