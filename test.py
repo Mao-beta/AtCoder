@@ -69,7 +69,7 @@ def prime_fact(n):
 
 
 # K以下の積を満たす部分列の長さの最大値を得る尺取り法
-def syakutori(array, K):
+def syakutori_mul(array, K):
     n = len(array)
     l, r = 0, 0
     mul = 1
@@ -85,6 +85,20 @@ def syakutori(array, K):
             mul = mul // array[l]
     return res
 
+
+# 狭義単調増加列のカウント
+def syakutori_acc(array):
+    n = len(array)
+    r = 1
+    res = 0
+    for l in range(n):
+        while 0 < r < n and (r <= l or array[r] > array[r-1]):
+            r += 1
+        res += r-l
+        if l == r:
+            r += 1
+
+    return res
 
 
 def main():
