@@ -52,6 +52,7 @@ def main():
         print(r-l+1)
         exit()
 
+
     ll = A[N//2-1]
     lr = A[N//2]
     rl = B[N//2-1]
