@@ -1,20 +1,36 @@
-import heapq
-S = input()
-cum = [0 for _ in range(len(S))]
-dict = {}
-length = len(S)
-n = 0
-for i in range(1,length+1):
-    n = n + int(S[-i]) * 10**(i-1)
-    cum[i-1] = n % 2019
-    dict[cum[i-1]] = 0
+import sys
+import math
+from collections import deque
+from collections import Counter
 
-for c in cum:
-    dict[c] += 1
-ans = 0
-for k, v in dict.items():
-    if k == 0:
-        ans += v
-    ans += v * (v-1) // 2
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
 
-print(ans)
+#nCr
+def cmb(n, r):
+    return math.factorial(n) // math.factorial(r) // math.factorial(n - r)
+
+
+def main():
+    S = SI()
+    l = len(S)
+    T = [0] * (l+1)
+    inv_S = S[::-1]
+    for i, s in enumerate(inv_S):
+        s = int(s)
+        T[i+1] = (T[i] + s * pow(10, i, 2019)) % 2019
+    C = Counter(Counter(T).values())
+    ans = 0
+    for n, x in C.items():
+        if n == 1: continue
+        ans += cmb(n, 2) * x
+    print(ans)
+
+
+if __name__ == "__main__":
+    main()
