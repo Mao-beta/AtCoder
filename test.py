@@ -94,6 +94,19 @@ def syakutori_acc(array):
     return res
 
 
+""" 2*n bit全探索テンプレ
+    for case in range(2**n):
+        test = ""
+        for i in range(n):
+            if (case >> i) & 1:
+                test = "1" + test
+            else:
+                test = "0" + test
+        print(test)
+"""
+
+
+
 def main():
     pass
 
