@@ -133,6 +133,14 @@ def pow_matrix(A, n, mod=10**9+7):
         return mul_matrix(tA, A, mod)
 
 
+# 配列から累積和を返す
+def make_cumulative(A):
+    C = [0] * (len(A) + 1)
+    for i, a in enumerate(A):
+        i += 1
+        C[i] = C[i - 1] + a
+    return C
+
 
 def main():
     A = [[2,0,0],[0,1,0],[0,0,1]]
