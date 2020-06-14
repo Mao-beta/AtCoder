@@ -14,14 +14,14 @@ SI = lambda: input()
 def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 #隣接リスト 1-order
-def make_adjlist_d(n, edges):
+def make_adjlist_nond(n, edges):
     res = [[] for _ in range(n+1)]
     for edge in edges:
         res[edge[0]].append(edge[1])
         res[edge[1]].append(edge[0])
     return res
 
-def make_adjlist_nond(n, edges):
+def make_adjlist_d(n, edges):
     res = [[] for _ in range(n+1)]
     for edge in edges:
         res[edge[0]].append(edge[1])
@@ -105,11 +105,38 @@ def syakutori_acc(array):
         print(test)
 """
 
+# 正方行列の積 mod
+def mul_matrix(A, B, mod=10**9+7):
+    size = len(A)
+    ans = [[0] * size for _ in range(size)]
+    for h in range(size):
+        for w in range(size):
+            for i in range(size):
+                ans[h][w] += A[h][i] * B[i][w] % mod
+                ans[h][w] %= mod
+    return ans
+
+# 正方行列の累乗 mod
+def pow_matrix(A, n, mod=10**9+7):
+    if n == 1:
+        size = len(A)
+        E = [[0] * size for _ in range(size)]
+        for i in range(size):
+            E[i][i] = 1
+        return mul_matrix(A, E, mod)
+
+    if n % 2 == 0:
+        tA = pow_matrix(A, n//2, mod)
+        return mul_matrix(tA, tA, mod)
+    else:
+        tA = pow_matrix(A, n-1, mod)
+        return mul_matrix(tA, A, mod)
+
 
 
 def main():
-    pass
-
+    A = [[2,0,0],[0,1,0],[0,0,1]]
+    print(pow_matrix(A,1000000))
 
 if __name__ == "__main__":
     main()
