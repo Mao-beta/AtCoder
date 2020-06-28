@@ -10,8 +10,14 @@ NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
 
+alp_to_num = {chr(i+97): i for i in range(26)}
+ALP_to_num = {chr(i+97).upper(): i for i in range(26)}
+num_to_alp = {i: chr(i+97) for i in range(26)}
+num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
+
 
 def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
+
 
 #隣接リスト 1-order
 def make_adjlist_nond(n, edges):
