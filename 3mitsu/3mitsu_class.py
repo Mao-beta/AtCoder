@@ -144,6 +144,9 @@ class Gameboard:
     def add_score(self, p_id, rnd, turn):
         self.Players[p_id].score_his[rnd] += turn
 
+    def set_round(self, rnd):
+        self.now_round = rnd
+
     # 出力系統
     def output_all_card_his(self):
         for p_id in range(self.total_player_num):
@@ -187,20 +190,23 @@ class Gameboard:
 
 
 # 入力受付
-def command_card(total_player_num):
+def command_card(Game):
+    total_player_num = Game.total_player_num
     user_input = input("'X X X'の形でカード入力してください: ")
     try:
         res = list(map(int, user_input.split()))
     except:
         print("Error: 'X X X'の形で入力してください")
-        return command_card(total_player_num)
+        return command_card(Game)
 
-    if len(res) != total_player_num:
+    if len(res) == 1 and int(res[0]) < 0:
+        return res[0]
+    elif len(res) != total_player_num:
         print("Error: 人数は{0}人です".format(total_player_num))
-        return command_card(total_player_num)
+        return command_card(Game)
     elif min(res) < 0 or max(res) > 2:
         print("Error: 入力は0から2までです")
-        return command_card(total_player_num)
+        return command_card(Game)
     else:
         print(res)
         return res
@@ -232,11 +238,24 @@ def main():
     # mainloop
     while end_flag == False:
         # 使用するカード入力
-        cards_inputs = command_card(TOTAL_PLAYER_NUM)
+        cards_inputs = command_card(Game)
+
+        # -nが入力されたらnラウンド戻す
+        if type(cards_inputs) is int:
+            print("負の単一数が入力されました、ラウンドを戻します")
+            next_round = Game.get_round() + cards_inputs
+            if 1 <= next_round <= MAX_ROUND:
+                Game.set_round(next_round)
+                print("次はラウンド{0}".format(next_round))
+            else:
+                print("行き先のラウンドは範囲外です")
+                print("次はラウンド{0}".format(Game.get_round()))
+            continue
+
         cards = [Mitsu[x] for x in cards_inputs]
         # 仕事フェイズ
         Game.working_phase(cards)
-        print(Game.get_round())
+        print("ラウンド：" + str(Game.get_round()))
 
         # debug用出力処理
         Game.debug_output()
