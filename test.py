@@ -2,22 +2,29 @@ import sys
 import math
 from collections import deque
 
+# 再帰の深さ設定
 sys.setrecursionlimit(1000000)
+# 剰余初期化
 MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
+# 入力
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
 
+# アルファベットと数字の対応
 alp_to_num = {chr(i+97): i for i in range(26)}
 ALP_to_num = {chr(i+97).upper(): i for i in range(26)}
 num_to_alp = {i: chr(i+97) for i in range(26)}
 num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
 
 
-def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
-
+# グリッドの初期化　縦、横、初期値
+def make_grid_int(h, w, num): return [[int(num)] * w for _ in range(h)]
+def make_grid_bool(h, w, bool): return [[bool] * w for _ in range(h)]
 
 #隣接リスト 1-order
 def make_adjlist_nond(n, edges):
@@ -34,11 +41,11 @@ def make_adjlist_d(n, edges):
     return res
 
 
-#nCr
+# nCr 要math
 def cmb(n, r):
     return math.factorial(n) // math.factorial(r) // math.factorial(n-r)
 
-
+# nCrの剰余
 def combinations_mod(n, r, mod=1000000007):
     """Returns nCr in mod."""
     r = min(r, n - r)
@@ -49,9 +56,7 @@ def combinations_mod(n, r, mod=1000000007):
     return combs
 
 
-
-
-#素因数分解
+# Nの素因数分解を辞書で返す
 def prime_fact(n):
     root = int(math.sqrt(n))
     prime_dict = {}
@@ -100,7 +105,7 @@ def syakutori_acc(array):
     return res
 
 
-""" 2*n bit全探索テンプレ
+""" 2**n bit全探索テンプレ
     for case in range(2**n):
         test = ""
         for i in range(n):
