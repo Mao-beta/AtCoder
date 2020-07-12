@@ -45,15 +45,29 @@ def make_adjlist_d(n, edges):
 def cmb(n, r):
     return math.factorial(n) // math.factorial(r) // math.factorial(n-r)
 
-# nCrの剰余
-def combinations_mod(n, r, mod=1000000007):
-    """Returns nCr in mod."""
-    r = min(r, n - r)
-    combs = 1
-    for i, j in zip(range(n - r + 1, n + 1), range(1, r + 1)):
-        combs *= (i % mod) * pow(j, mod - 2, mod)
-        combs %= mod
-    return combs
+# # nCrの剰余
+# def combinations_mod(n, r, mod=1000000007):
+#     """Returns nCr in mod."""
+#     r = min(r, n - r)
+#     combs = 1
+#     for i, j in zip(range(n - r + 1, n + 1), range(1, r + 1)):
+#         combs *= (i % mod) * pow(j, mod - 2, mod)
+#         combs %= mod
+#     return combs
+
+
+# 二項係数計算用　階乗と逆元の初期化
+def combination_mod_initialize(n, MOD=10**9+7):
+    fac = [1]*(n+1)
+    inv = [1]*(n+1)
+    for i in range(1, n+1):
+        fac[i] = fac[i-1] * i % MOD
+        inv[i] = inv[i-1] * pow(i, -1, MOD) % MOD
+    return fac, inv
+
+# 二項係数　高速
+def combination_mod(n, r, fac, inv, mod=10**9+7):
+    return fac[n] * inv[r] * inv[n-r]
 
 
 # Nの素因数分解を辞書で返す
