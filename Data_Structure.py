@@ -33,12 +33,56 @@ class SegTree:
 		self.segfunc = segfunc
 		self.ide_ele = ide_ele
 		self.num = 1 << (n-1).bit_length()
+		self.tree = [ide_ele] * 2 * self.num
+		# 配列の値を葉にセットする
+		for i in range(n):
+			self.tree[self.num + i] = init_val[i]
+		# 構築
+		for i in range(self.num - 1, 0, -1):
+			self.tree[i] = self.segfunc(self.tree[2*i], self.tree[2*i+1])
 
+	def update(self, k, x):
+		"""
+		k番目の値をxに更新
+		:param k: index(0-index)
+		:param x: update value
+		"""
+		k += self.num
+		self.tree[k] = x
+		while k > 1:
+			self.tree[k>>1] = self.segfunc(self.tree[k], self.tree[k ^ 1])
+			k >>= 1
+
+	def query(self, l, r):
+		"""
+		[l, r)のsegfuncしたものを得る
+		:param l: 0-index
+		:param r: 0-index
+		:return:
+		"""
+		res = self.ide_ele
+		l += self.num
+		r += self.num
+		while l < r:
+			if l & 1:
+				res = self.segfunc(res, self.tree[l])
+				l += 1
+			if r & 1:
+				res = self.segfunc(res, self.tree[r-1])
+			l >>= 1
+			r >>= 1
+		return res
 
 
 
 def main():
-	pass
+	a = [14, 5, 9, 13, 7, 12, 11, 1, 7, 8]
+
+	seg = SegTree(a, segfunc, ide_ele)
+
+	print(seg.query(0, 8))
+	seg.update(5, 0)
+	print(seg.query(0, 8))
 
 
 if __name__ == "__main__":
