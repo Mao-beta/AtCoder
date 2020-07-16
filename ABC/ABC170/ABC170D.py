@@ -40,23 +40,22 @@ def main():
     A = NLI()
     A = sorted(A)
 
-    hurui = [0] * (10**7)
-    prev = 0
-    ex = set()
+    ma = A[-1]
+    hurui = [0] * (ma + 10)
     for a in A:
-        hurui[a] = 1
-        if prev == a:
-            ex.add(a)
-        prev = a
-    for i in range(1010):
-        if hurui[i] == 0:
-            continue
-        j = 2
-        while j * i <= 10**6 + 100:
-            hurui[i*j] = 0
-            j += 1
+        if hurui[a] == 0:
+            hurui[a] = 1
+        else:
+            hurui[a] = 10
 
-    print(sum(hurui) - len(ex))
+    for a in A:
+        if hurui[a] == 0:
+            continue
+
+        for i in range(a*2, ma+10, a):
+            hurui[i] = 0
+
+    print(hurui.count(1))
 
 
 
