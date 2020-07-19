@@ -16,10 +16,10 @@ def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 # SegTreeの関数
 def segfunc(x, y):
-    return min(x, y)
+    return x | y
 # 単位元
 # min->inf, max->-inf, add->0, mul->1
-ide_ele = float("inf")
+ide_ele = set()
 
 # セグメント木
 class SegTree:
@@ -74,15 +74,26 @@ class SegTree:
         return res
 
 
-
 def main():
-    a = [14, 5, 9, 13, 7, 12, 11, 1, 7, 8]
+    N = NI()
+    S = SI()
+    Q = NI()
+    querys = [list(SI().split()) for _ in range(Q)]
+    S_sets = []
+    for s in S:
+        tmp = set()
+        tmp.add(s)
+        S_sets.append(tmp)
 
-    seg = SegTree(a, segfunc, ide_ele)
+    segtree = SegTree(S_sets, segfunc, ide_ele)
 
-    print(seg.query(0, 8))
-    seg.update(5, 0)
-    print(seg.query(0, 8))
+    for query in querys:
+        if query[0] == "1":
+            segtree.update(int(query[1]) - 1, {query[2]})
+        else:
+            l, r = int(query[1])-1, int(query[2])
+            print(len(segtree.query(l, r)))
+
 
 
 if __name__ == "__main__":
