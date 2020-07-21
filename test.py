@@ -70,6 +70,7 @@ def combination_mod(n, r, fac, inv, mod=10**9+7):
     return fac[n] * inv[r] * inv[n-r]
 
 
+
 # Nの素因数分解を辞書で返す
 def prime_fact(n):
     root = int(math.sqrt(n))
