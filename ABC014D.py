@@ -14,65 +14,6 @@ SI = lambda: input()
 def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 
-# SegTreeの関数
-def segfunc(x, y):
-    return min(x, y)
-# 単位元
-# min->inf, max->-inf, add->0, mul->1
-ide_ele = float("inf")
-
-# セグメント木
-class SegTree:
-    """
-    init(init_val, segfunc, ide_ele): 配列init_valで初期化、構築
-    update(k, x): k番目の値をxに更新
-    query(l, r): 区間[l, r)をsegfuncしたものを返す
-    """
-    def __init__(self, init_val, segfunc, ide_ele):
-        n = len(init_val)
-        self.segfunc = segfunc
-        self.ide_ele = ide_ele
-        self.num = 1 << (n-1).bit_length()
-        self.tree = [ide_ele] * 2 * self.num
-        # 配列の値を葉にセットする
-        for i in range(n):
-            self.tree[self.num + i] = init_val[i]
-        # 構築
-        for i in range(self.num - 1, 0, -1):
-            self.tree[i] = self.segfunc(self.tree[2*i], self.tree[2*i+1])
-
-    def update(self, k, x):
-        """
-        k番目の値をxに更新
-        :param k: index(0-index)
-        :param x: update value
-        """
-        k += self.num
-        self.tree[k] = x
-        while k > 1:
-            self.tree[k>>1] = self.segfunc(self.tree[k], self.tree[k ^ 1])
-            k >>= 1
-
-    def query(self, l, r):
-        """
-        [l, r)のsegfuncしたものを得る
-        :param l: 0-index
-        :param r: 0-index
-        :return:
-        """
-        res = self.ide_ele
-        l += self.num
-        r += self.num
-        while l < r:
-            if l & 1:
-                res = self.segfunc(res, self.tree[l])
-                l += 1
-            if r & 1:
-                res = self.segfunc(res, self.tree[r-1])
-            l >>= 1
-            r >>= 1
-        return res
-
 
 class LCATree:
     def __init__(self, n, edges, root):
@@ -83,8 +24,8 @@ class LCATree:
         :param root: 根
         """
         self.n = n
-        self.max_double = len(bin(self.n))  # 最大何回ダブリングで遡るか およそlog2(n)
-        self.adj = self.make_adjlist_nond(self.n, edges)  # 隣接リスト
+        self.max_double = len(bin(self.n)) # 最大何回ダブリングで遡るか およそlog2(n)
+        self.adj = self.make_adjlist_nond(self.n, edges) # 隣接リスト
         self.root = root
         # parent[i][x]はxから2^i回根の方向に上った点 -1ならその親が存在しない
         self.parent = [[-1] * (self.n + 1) for _ in range(self.max_double)]
@@ -107,8 +48,8 @@ class LCATree:
 
         for d in range(self.max_double):
             if d == 0: continue
-            pre_par = self.parent[d - 1]
-            for i in range(self.n + 1):
+            pre_par = self.parent[d-1]
+            for i in range(self.n+1):
                 if pre_par[i] < 0:
                     self.parent[d][i] = -1
                     continue
@@ -128,7 +69,7 @@ class LCATree:
             dx, dy = dy, dx
         gap_d = dx - dy
         # 同じ高さまで引き上げる
-        for i in range(self.max_double + 1):
+        for i in range(self.max_double+1):
             if (gap_d >> i) & 1:
                 x = self.parent[i][x]
         # 引き上げた結果同じ所ならそこがLCA
@@ -137,7 +78,7 @@ class LCATree:
 
         # xとyを同時にダブリングで引き上げる
         # ジャンプ先の地点が異なるならOK、同じならジャンプ幅を半分にする
-        for i in range(self.max_double - 1, -1, -1):
+        for i in range(self.max_double-1, -1, -1):
             if self.parent[i][x] != self.parent[i][y]:
                 x = self.parent[i][x]
                 y = self.parent[i][y]
@@ -154,13 +95,16 @@ class LCATree:
 
 
 def main():
-    a = [14, 5, 9, 13, 7, 12, 11, 1, 7, 8]
+    N = NI()
+    edges = [NLI() for _ in range(N-1)]
+    Q = NI()
+    querys = [NLI() for _ in range(Q)]
 
-    seg = SegTree(a, segfunc, ide_ele)
+    tree = LCATree(N, edges, 1)
 
-    print(seg.query(0, 8))
-    seg.update(5, 0)
-    print(seg.query(0, 8))
+    for a, b in querys:
+        LCA = tree.get_LCA(a, b)
+        print(tree.depth[a] + tree.depth[b] - tree.depth[LCA]*2 + 1)
 
 
 if __name__ == "__main__":
