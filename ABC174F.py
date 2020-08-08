@@ -1,6 +1,6 @@
 import sys
 import math
-from collections import deque
+from collections import defaultdict
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -14,78 +14,67 @@ SI = lambda: input()
 def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 
-# SegTreeの関数
-def segfunc(x, y):
-    return x | y
-# 単位元
-# min->inf, max->-inf, add->0, mul->1
-ide_ele = set()
+class BIT():
+    def __init__(self, n):
+        """
+        1-index
+        sum -> i番目までの和
+        add -> i番目にxを足す
+        :param n:
+        """
+        self.n = n
+        self.data = [0]*(n+1)
+        self.each = [0]*(n+1)
 
-# セグメント木
-class SegTree:
-    """
-    init(init_val, segfunc, ide_ele): 配列init_valで初期化、構築
-    update(k, x): k番目の値をxに更新
-    query(l, r): 区間[l, r)をsegfuncしたものを返す
-    """
-    def __init__(self, init_val, segfunc, ide_ele):
-        n = len(init_val)
-        self.segfunc = segfunc
-        self.ide_ele = ide_ele
-        self.num = 1 << (n-1).bit_length()
-        self.tree = [ide_ele] * 2 * self.num
-        # 配列の値を葉にセットする
-        for i in range(n):
-            self.tree[self.num + i] = init_val[i]
-        # 構築
-        for i in range(self.num - 1, 0, -1):
-            self.tree[i] = self.segfunc(self.tree[2*i], self.tree[2*i+1])
+    def sum(self, i):
+        s = 0
+        while i > 0:
+            s += self.data[i]
+            i -= i & -i
+        return s
 
-    def update(self, k, x):
-        """
-        k番目の値をxに更新
-        :param k: index(0-index)
-        :param x: update value
-        """
-        k += self.num
-        self.tree[k] = x
-        while k > 1:
-            self.tree[k>>1] = self.segfunc(self.tree[k], self.tree[k ^ 1])
-            k >>= 1
+    def add(self, i, x):
+        self.each[i] += x
+        while i <= self.n:
+            self.data[i] += x
+            i += i & -i
 
-    def query(self, l, r):
-        """
-        [l, r)のsegfuncしたものを得る
-        :param l: 0-index
-        :param r: 0-index
-        :return:
-        """
-        res = self.ide_ele
-        l += self.num
-        r += self.num
-        while l < r:
-            if l & 1:
-                res = self.segfunc(res, self.tree[l])
-                l += 1
-            if r & 1:
-                res = self.segfunc(res, self.tree[r-1])
-            l >>= 1
-            r >>= 1
-        return res
+    def __str__(self):
+        return str(self.each)
 
 
 
 def main():
     N, Q = NMI()
-    C = NLI()
-    CS = [{c} for c in C]
-    querys = [NLI() for _ in range(Q)]
-    segtree = SegTree(CS, segfunc, ide_ele)
+    C = [0]+NLI()
+    d_querys = [[i]+NLI() for i in range(Q)]
+    querys = defaultdict(list)
+    for qi, ql, qr in d_querys:
+        querys[qr].append((qi, ql))
 
-    for l, r in querys:
-        l -= 1
-        r -= 1
-        print(len(segtree.query(l, r+1)))
+    ans = [0] * Q
+    last_index = [-1] * (N+1)
+    index_dict = defaultdict(list)
+    tree = BIT(N)
+
+    for i, color in enumerate(C):
+        if color == 0: continue
+        idx = last_index[color]
+        if idx != -1:
+            index_dict[i].append((idx, i))
+        last_index[color] = i
+        tree.add(i, 1)
+
+    for i in range(1, N+1):
+        for idx, _ in index_dict[i]:
+            tree.add(idx, -1)
+        for qi, ql in querys[i]:
+            ans[qi] = tree.sum(i) - tree.sum(ql-1)
+
+    for a in ans:
+        print(a)
+
+
 
 
 if __name__ == "__main__":
