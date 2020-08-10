@@ -22,10 +22,10 @@ def main():
     ABC_dirs = glob.glob("ABC*[!py]")
     ARC_dirs = glob.glob("ARC*[!py]")
     AGC_dirs = glob.glob("AGC*[!py]")
-    PAST_files = glob.glob("**/PAST*.py", recursive=True)
-    print(PAST_files)
-    for f in PAST_files:
-        contest = "PAST"
+    ABC_files = glob.glob("**/ABC*.py", recursive=True)
+    print(ABC_files)
+    for f in ABC_files:
+        contest = "ABC"
         if not os.path.exists(contest):
             os.mkdir(contest)
         shutil.move(f, contest)
