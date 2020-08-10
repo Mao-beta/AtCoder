@@ -74,6 +74,35 @@ class SegTree:
         return res
 
 
+class BIT():
+    def __init__(self, n):
+        """
+        1-index
+        sum -> i番目までの和
+        add -> i番目にxを足す
+        :param n:
+        """
+        self.n = n
+        self.data = [0]*(n+1)
+        self.each = [0]*(n+1)
+
+    def sum(self, i):
+        s = 0
+        while i > 0:
+            s += self.data[i]
+            i -= i & -i
+        return s
+
+    def add(self, i, x):
+        self.each[i] += x
+        while i <= self.n:
+            self.data[i] += x
+            i += i & -i
+
+    def __str__(self):
+        return str(self.each)
+
+
 class LCATree:
     def __init__(self, n, edges, root):
         """
