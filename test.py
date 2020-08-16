@@ -182,14 +182,44 @@ class MyFraction:
         self.numerator = a // g
         self.denominator = b // g
 
-    def __str__(self):
+    def __add__(self, other):
+        Fa_n, Fa_d = self.get_nd()
+        Fb_n, Fb_d = other.get_nd()
+        F_n = Fa_d * Fb_n + Fa_n * Fb_d
+        F_d = Fa_d * Fb_d
+        return MyFraction(F_n, F_d)
+
+    def __sub__(self, other):
+        Fa_n, Fa_d = self.get_nd()
+        Fb_n, Fb_d = other.get_nd()
+        F_n = - Fa_d * Fb_n + Fa_n * Fb_d
+        F_d = Fa_d * Fb_d
+        return MyFraction(F_n, F_d)
+
+    def __mul__(self, other):
+        Fa_n, Fa_d = self.get_nd()
+        Fb_n, Fb_d = other.get_nd()
+        F_n = Fa_n * Fb_n
+        F_d = Fa_d * Fb_d
+        return MyFraction(F_n, F_d)
+
+    def __truediv__(self, other):
+        Fa_n, Fa_d = self.get_nd()
+        Fb_d, Fb_n = other.get_nd()
+        F_n = Fa_n * Fb_n
+        F_d = Fa_d * Fb_d
+        return MyFraction(F_n, F_d)
+
+    def __repr__(self):
         return "{0}/{1}".format(self.numerator, self.denominator)
 
+    def get_nd(self):
+        return (self.numerator, self.denominator)
 
 
 def main():
-    A = [[2,0,0],[0,1,0],[0,0,1]]
-    print(pow_matrix(A,1000000))
+    print(MyFraction(1,2) / MyFraction(1, 4) + MyFraction(-2, 1))
+
 
 if __name__ == "__main__":
     main()
