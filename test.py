@@ -26,7 +26,7 @@ num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
 def make_grid_int(h, w, num): return [[int(num)] * w for _ in range(h)]
 def make_grid_bool(h, w, bool): return [[bool] * w for _ in range(h)]
 
-#隣接リスト 1-order
+#隣接リスト 1-index
 def make_adjlist_nond(n, edges):
     res = [[] for _ in range(n+1)]
     for edge in edges:
@@ -166,6 +166,25 @@ def make_cumulative(A):
         i += 1
         C[i] = C[i - 1] + a
     return C
+
+
+# 有理数クラス
+class MyFraction:
+    def __init__(self, a, b):
+        assert b != 0, "分母が0です"
+
+        if b < 0:
+            a, b = -a, -b
+        if a == 0:
+            b = 1
+
+        g = math.gcd(a, b)
+        self.numerator = a // g
+        self.denominator = b // g
+
+    def __str__(self):
+        return "{0}/{1}".format(self.numerator, self.denominator)
+
 
 
 def main():
