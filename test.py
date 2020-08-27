@@ -120,6 +120,33 @@ def syakutori_acc(array):
     return res
 
 
+"""
+# 尺取り法テンプレ
+def syakutori(array):
+    n = len(array)
+    r = 1
+    # 戻り値の初期値
+    res = 0
+
+    # 左端を全探索
+    for l in range(n):
+        # 頑張って右端を伸ばす部分 常に満たしたい条件をwhileで指定
+        while 「満たしたい条件」:
+            if r >= n:
+                break
+            r += 1
+
+        # 区間の長さに応じて何かをする
+        res += 「何らかの値」
+
+        # 左端が追い付いたときに右端をずらす
+        if l == r:
+            r += 1
+
+    return res
+"""
+
+
 """ 2**n bit全探索テンプレ
     for case in range(2**n):
         test = ""
