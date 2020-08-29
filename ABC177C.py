@@ -11,19 +11,16 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
-#隣接リスト 1-index
-def make_adjlist_nond(n, edges):
-    res = [[] for _ in range(n+1)]
-    for edge in edges:
-        res[edge[0]].append(edge[1])
-        res[edge[1]].append(edge[0])
-    return res
+def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 
 def main():
-    N, M = NMI()
-    F = [NLI() for _ in range(M)]
-
+    N = NI()
+    A = NLI()
+    A = [a%MOD for a in A]
+    s = sum(A)
+    ss = sum([a**2%MOD for a in A])
+    print((s**2-ss)%MOD * pow(2, -1, MOD) %MOD)
 
 
 if __name__ == "__main__":
