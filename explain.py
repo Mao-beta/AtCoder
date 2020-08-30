@@ -23,6 +23,29 @@ def make_adjlist_nond(n, edges):
 def main():
     N, M = NMI()
     F = [NLI() for _ in range(M)]
+    tree = make_adjlist_nond(N, F)
+
+    ans = 0
+    seen = [0] * (N + 1)
+    for start in range(1, N+1):
+        que = deque()
+        que.append(start)
+
+        seen[start] = 1
+        fri_cnt = 1
+        while que:
+            now = que.popleft()
+
+            for goto in tree[now]:
+                if seen[goto]:
+                    continue
+                seen[goto] = 1
+                fri_cnt += 1
+                que.append(goto)
+        ans = max(fri_cnt, ans)
+    print(ans)
+
+
 
 
 

@@ -45,7 +45,7 @@ class UnionFind:
     def all_group_members(self):
         return {r: self.members(r) for r in self.roots()}
 
-    def __str__(self):
+    def __repr__(self):
         return '\n'.join('{}: {}'.format(r, self.members(r)) for r in self.roots())
 
 
