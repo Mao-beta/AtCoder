@@ -22,7 +22,7 @@ def combination_mod_initialize(n, MOD=10**9+7):
     inv = [1]*(n+1)
     for i in range(1, n+1):
         fac[i] = fac[i-1] * i % MOD
-        inv[i] = inv[i-1] * pow(i, -1, MOD) % MOD
+        inv[i] = inv[i-1] * pow(i, MOD-2, MOD) % MOD
     return fac, inv
 
 # 二項係数　高速
