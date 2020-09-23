@@ -5,6 +5,7 @@ from collections import deque
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
+INF = 10 ** 20
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
@@ -167,131 +168,62 @@ class BellmanFord():
         return False
 
 
-class mf_graph:
-    def __init__(self, n=0):
-        self._n = n
-        self.g = [[] for _ in range(n)]
-        self.pos = []
+class Dinic:
+    """ 最大流(Dinic) """
+    INF = 10 ** 20
 
-    def add_edge(self, frm, to, cap):
-        m = len(self.pos)
-        e1 = mf_graph._edge(to, cap)
-        e2 = mf_graph._edge(frm, 0)
-        e1.rev = e2
-        e2.rev = e1
-        self.pos.append(e1)
-        self.g[frm].append(e1)
-        self.g[to].append(e2)
-        return m
+    def __init__(self, n):
+        self.n = n
+        self.links = [[] for _ in range(n)]
+        self.depth = None
+        self.progress = None
 
-    class edge:
-        def __init__(self, frm, to, cap, flow):
-            self.frm = frm
-            self.to = to
-            self.cap = cap
-            self.flow = flow
+    def add_link(self, _from, to, cap):
+        self.links[_from].append([cap, to, len(self.links[to])])
+        self.links[to].append([0, _from, len(self.links[_from]) - 1])
 
-        def __iter__(self):
-            yield self.frm
-            yield self.to
-            yield self.cap
-            yield self.flow
+    def bfs(self, s):
+        from collections import deque
 
-    def get_edge(self, i):
-        e1 = self.pos[i]
-        e2 = e1.rev
-        return mf_graph.edge(e2.to, e1.to, e1.cap + e2.cap, e2.cap)
+        depth = [-1] * self.n
+        depth[s] = 0
+        q = deque([s])
+        while q:
+            v = q.popleft()
+            for cap, to, rev in self.links[v]:
+                if cap > 0 and depth[to] < 0:
+                    depth[to] = depth[v] + 1
+                    q.append(to)
+        self.depth = depth
 
-    def edges(self):
-        return [self.get_edge(i) for i in range(len(self.pos))]
+    def dfs(self, v, t, flow):
+        if v == t:
+            return flow
+        links_v = self.links[v]
+        for i in range(self.progress[v], len(links_v)):
+            self.progress[v] = i
+            cap, to, rev = link = links_v[i]
+            if cap == 0 or self.depth[v] >= self.depth[to]:
+                continue
+            d = self.dfs(to, t, min(flow, cap))
+            if d == 0:
+                continue
+            link[0] -= d
+            self.links[to][rev][0] += d
+            return d
+        return 0
 
-    def change_edge(self, i, new_cap, new_flow):
-        e = self.pos[i]
-        e.cap = new_cap - new_flow
-        e.rev.cap = new_flow
-
-    def flow(self, s, t, flow_limit=0XFFFFFFFFFFFFFFF):
-        g = self.g
+    def max_flow(self, s, t):
         flow = 0
-        while flow < flow_limit:
-            level = [-1] * self._n
-            level[s] = 0
-            que = [None] * self._n
-            ql = 0
-            qr = 1
-            que[0] = s
-            unreached = True
-            while unreached and ql < qr:
-                v = que[ql]
-                ql += 1
-                for e in g[v]:
-                    to = e.to
-                    if e.cap and level[to] < 0:
-                        level[to] = level[v] + 1
-                        if to == t:
-                            unreached = False
-                            break
-                        que[qr] = to
-                        qr += 1
-            if unreached:
+        while True:
+            self.bfs(s)
+            if self.depth[t] < 0:
                 return flow
-            ptr = [len(es) for es in g]
-            stack = []
-            v = t
-            up = flow_limit - flow
-            res = 0
-            while True:
-                if v == s or not ptr[v]:
-                    if v == s:
-                        res = up
-                    while stack:
-                        tmp = res
-                        e, up, res = stack.pop()
-                        e.cap -= tmp
-                        e.rev.cap += tmp
-                        res += tmp
-                        if res < up:
-                            v = e.to
-                            break
-                    else:
-                        flow += res
-                        break
-                i = ptr[v]
-                while i:
-                    i -= 1
-                    e = g[v][i]
-                    if level[e.to] == level[v] - 1 and e.rev.cap:
-                        ptr[v] = i
-                        stack.append((e.rev, up, res))
-                        v = e.to
-                        up = min(up, e.rev.cap)
-                        res = 0
-                        break
-                else:
-                    ptr[v] = i
-        return flow
-
-    def min_cut(self, s):
-        visited = [False] * self._n
-        que = [None] * self._n
-        ql = 0
-        qr = 1
-        que[0] = s
-        visited[s] = True
-        while ql < qr:
-            p = que[ql]
-            ql += 1
-            for e in self.g[p]:
-                if e.cap and not visited[e.to]:
-                    visited[e.to] = True
-                    que[qr] = e.to
-                    qr += 1
-        return visited
-
-    class _edge:
-        def __init__(self, to, cap):
-            self.to = to
-            self.cap = cap
+            self.progress = [0] * self.n
+            current_flow = self.dfs(s, t, INF)
+            while current_flow > 0:
+                flow += current_flow
+                current_flow = self.dfs(s, t, INF)
 
 
 def main():

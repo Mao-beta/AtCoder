@@ -7,6 +7,7 @@ sys.setrecursionlimit(1000000)
 # 剰余初期化
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
+INF = 10 ** 20
 
 # 入力
 input = lambda: sys.stdin.readline().strip()
@@ -20,6 +21,16 @@ alp_to_num = {chr(i+97): i for i in range(26)}
 ALP_to_num = {chr(i+97).upper(): i for i in range(26)}
 num_to_alp = {i: chr(i+97) for i in range(26)}
 num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
+
+
+def compress(S):
+    """ 座標圧縮 """
+
+    zipped, unzipped = {}, {}
+    for i, a in enumerate(sorted(S)):
+        zipped[a] = i
+        unzipped[i] = a
+    return zipped, unzipped
 
 
 # グリッドの初期化　縦、横、初期値
