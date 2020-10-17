@@ -285,6 +285,33 @@ class MinCostFlow:
         return res
 
 
+def Salesman(dist, need_return):
+    """
+    巡回セールスマン問題、始点0から全ノードを回る最短経路を返す
+    :param dist: N^2の隣接行列
+    :param need_return: 始点に帰ってくるかどうか
+    :return:
+    """
+    N = len(dist)
+    INF = 10**20
+    dp = [[INF]*(1<<N) for _ in range(N)]
+    dp[0][1] = 0
+
+    for S in range(1<<N):
+        for i in range(N):
+            if dp[i][S] == INF: continue
+            for k in range(1, N):
+                if (S>>k) & 1 == 0:
+                    dp[k][S + 2**k] = min(dp[i][S] + dist[i][k], dp[k][S + 2**k])
+
+    ans = INF
+    for i in range(1, N):
+        if need_return:
+            ans = min(dp[i][(1<<N)-1] + dist[i][0], ans)
+        else:
+            ans = min(dp[i][(1 << N) - 1], ans)
+    return ans
+
 
 def main():
     pass
