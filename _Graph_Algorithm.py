@@ -314,8 +314,15 @@ def Salesman(dist, need_return):
 
 
 def main():
-    pass
+    N = NI()
+    P = [NLI() for _ in range(N)]
+    dist = [[10**20]*N for _ in range(N)]
+    for i, p in enumerate(P):
+        for j, q in enumerate(P):
+            cost = abs(p[0] - q[0]) + abs(p[1] - q[1]) + max(0, q[2] - p[2])
+            dist[i][j] = cost
 
+    print(Salesman(dist, True))
 
 if __name__ == "__main__":
     main()
