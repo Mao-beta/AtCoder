@@ -123,6 +123,45 @@ def syakutori(array):
         print(test)
 """
 
+""" 幅優先探索テンプレ
+    H, Wのgridで始点から終点までの歩数を数えるだけ
+    要deque　壁は'#'
+    
+    H = 100
+    W = 100
+    start = (0, 0)
+
+    queue = deque()
+    queue.append(start)
+    steps = [[-1] * W for _ in range(H)]
+    steps[start[0]][start[1]] = 0
+
+    dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    while queue:
+        now_h, now_w = queue.popleft()
+        now_step = steps[now_h][now_w]
+
+        for dh, dw in dirs:
+            goto_h = now_h + dh
+            goto_w = now_w + dw
+            goto_step = now_step + 1
+
+            if goto_h < 0 or goto_h >= H or goto_w < 0 or goto_w >= W:
+                continue
+            if 0 <= steps[goto_h][goto_w] <= goto_step:
+                continue
+            if grid[goto_h][goto_w] == "#":
+                continue
+
+            queue.append((goto_h, goto_w))
+            steps[goto_h][goto_w] = goto_step
+
+    print(*steps, sep="\n")
+"""
+
+
+
 # 正方行列の積 mod
 def mul_matrix(A, B, mod=10**9+7):
     size = len(A)
