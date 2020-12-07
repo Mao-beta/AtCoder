@@ -4,6 +4,7 @@ import os
 import glob
 import shutil
 from collections import deque
+from pathlib import Path
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -18,17 +19,16 @@ def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 
 def main():
-    print(os.listdir())
-    ABC_dirs = glob.glob("ABC*[!py]")
-    ARC_dirs = glob.glob("ARC*[!py]")
-    AGC_dirs = glob.glob("AGC*[!py]")
-    ABC_files = glob.glob("**/ABC*.py", recursive=True)
-    print(ABC_files)
-    for f in ABC_files:
-        contest = "ABC"
-        if not os.path.exists(contest):
-            os.mkdir(contest)
-        shutil.move(f, contest)
+    ABC_files = Path("./").glob("AGC*")
+    for path in ABC_files:
+        if path.name == "AGC":
+            continue
+        print(path)
+        contest = path.name[:6]
+        print(contest)
+        goto_fol = Path("AGC")/contest
+        shutil.move(str(path), str(goto_fol))
+
 
 
 

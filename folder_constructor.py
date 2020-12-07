@@ -18,7 +18,7 @@ def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 
 def main():
-    os.chdir("C:\\Users\\betab\\PycharmProjects\\AtCoder")
+    os.chdir("C:\\Users\\User\\PycharmProjects\\AtCoder")
     print(os.path.dirname(os.path.abspath(__file__)))
     print(os.getcwd())
     ABC_files = glob.glob("ABC*.py")
