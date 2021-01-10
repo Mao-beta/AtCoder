@@ -28,23 +28,20 @@ def main():
     roads = make_adjlist_d(N, edges)
     #print(roads)
 
-    stack = deque()
-    seen = set()
+    min_prices = [10**10] * (N+1)
+    min_idx = [i for i in range(N+1)]
     ans = -10**10
-    for start in range(1, N+1):
-        if start in seen: continue
+    for i in range(N+1):
+        if i == 0: continue
 
-        stack.append((start, 10**10))
-        while stack:
-            now, buy = stack.pop()
-            seen.add(now)
-            ans = max(A[now]-buy, ans)
-            towns = roads[now]
-            for goto in towns:
-                stack.append((goto, min(buy, A[now])))
+        for goto in roads[i]:
+            min_prices[goto] = min(min_prices[goto], A[i], min_prices[i])
+
+    for i, (p, idx) in enumerate(zip(min_prices, min_idx)):
+        if i == 0: continue
+        ans = max(ans, A[i]-p)
 
     print(ans)
-
 
 
 
