@@ -1,5 +1,6 @@
 import sys
 import math
+from collections import defaultdict
 from collections import deque
 
 sys.setrecursionlimit(1000000)
@@ -12,8 +13,11 @@ SI = lambda: input()
 
 
 def main():
-    h = float(input())
-    print("あなたの身長は", h, "です")
+    V, T, S, D = NMI()
+    if V*T <= D <= V*S:
+        print("No")
+    else:
+        print("Yes")
 
 
 if __name__ == "__main__":

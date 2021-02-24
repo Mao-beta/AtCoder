@@ -1,5 +1,6 @@
 import sys
 import math
+from collections import defaultdict
 from collections import deque
 
 sys.setrecursionlimit(1000000)
@@ -12,8 +13,7 @@ SI = lambda: input()
 
 
 def main():
-    h = float(input())
-    print("あなたの身長は", h, "です")
+    pass
 
 
 if __name__ == "__main__":
