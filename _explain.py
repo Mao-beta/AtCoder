@@ -12,8 +12,7 @@ SI = lambda: input()
 
 
 def main():
-    h = float(input())
-    print("あなたの身長は", h, "です")
+    print(float(0.1))
 
 
 if __name__ == "__main__":
