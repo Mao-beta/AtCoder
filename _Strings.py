@@ -17,6 +17,7 @@ def rabin_karp(s, t):
     """
     ローリングハッシュ
     ハッシュ化にO(|S|+|T|)、検索にO(|S|)
+    sの連続部分文字列でtに一致するものの始点のindexをまとめてlistで返す
     """
     def exe(x, m):
         th = 0
@@ -74,7 +75,9 @@ def manacher(s):
 
 
 def main():
-    pass
+    s = "ab" * 10**5
+    t = "c"
+    print(rabin_karp(s, t))
 
 
 if __name__ == "__main__":
