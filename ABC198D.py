@@ -1,6 +1,7 @@
 import sys
 import math
 from collections import deque
+from itertools import permutations
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -11,108 +12,65 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
-def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
+def main():
+    S = [SI() for _ in range(3)]
 
+    # 最上位と末位
+    S_first = [s[0] for s in S]
+    S_last = [s[-1] for s in S]
 
-N = 128
-s = "0123456789ABCDEFGHIJKLMNOPQRTSUVWXYZ"
-word = [['' for i in range(N)] for j in range(128)]
-digit = [0 for i in range(len(s))]
-l = [0 for i in range(len(s))]
-ok = [False for i in range(10)]
-ii = 0
-jj = 0
-carry = 0
-solution = 0
+    # 使いうる文字
+    use_chrs = set("".join(S))
+    # 文字の種類数
+    n_chrs = len(use_chrs)
 
+    # 10種類より多ければ解けない
+    if n_chrs > 10:
+        print("UNSOLVABLE")
+        exit()
 
-def found():
-    global solution
-    solution += 1
-    #print("\n解 %d" % solution)
-    for i in range(imax):
-        if (i == imax-1):
-            #print("-"*jmax)
-            pass
-        for j in range(jmax):
-            k = jmax-1-j
-            c = word[i][k]
-            if (c == ''):
-                #print(" ", end="")
-                pass
-            else:
-                print("%d" % digit[s.index(c)], end='')
-        print("")
-    exit()
+    # 辞書の初期化
+    EtoN = {s: 0 for s in use_chrs}
 
+    # 辞書を元に文字から数字に変換する関数
+    def calc(T, dic):
+        T = T[::-1]
+        res = 0
+        for i, t in enumerate(T):
+            res += dic[t] * 10**i
+        return res
 
-def tr(sum):
-    global ii, jj
-    w = word[ii][jj]
-    c = 0 if w == '' else s.index(w)
-    if (ii < imax-1):
-        ii += 1
-        d = digit[c]
-        if (d < 0):
-            d = l[c]
-            while(d <= 9):
-                if (ok[d]):
-                    digit[c] = d
-                    ok[d] = False
-                    tr(sum+d)
-                    ok[d] = True
-                d += 1
-            digit[c] = -1
-        else:
-            tr(sum+d)
-        ii -= 1
-    else:
-        jj += 1
-        ii = 0
-        carry, d = divmod(sum, 10)
-        if (digit[c] == d):
-            if (jj < jmax):
-                tr(carry)
-            elif (carry == 0):
-                found()
-        else:
-            if (digit[c] < 0 and ok[d] and d >= l[c]):
-                digit[c] = d
-                ok[d] = False
-                if (jj < jmax):
-                    tr(carry)
-                elif (carry == 0):
-                    found()
-                digit[c] = -1
-                ok[d] = True
-        jj -= 1
-        ii = imax-1
+    # 10_P_nの順列　※listにはしない
+    Perm = permutations(range(10), n_chrs)
 
+    for case in Perm:
+        # 今回の辞書
+        for s, n in zip(use_chrs, case):
+            EtoN[s] = n
 
-argv = [SI(), SI(), SI()]
-imax = len(argv)
-jmax = max(map(len, argv))
+        # 一の位の数字
+        A0 = EtoN[S_last[0]]
+        B0 = EtoN[S_last[1]]
+        C0 = EtoN[S_last[2]]
 
-for i in range(imax):
-    argv[i] = argv[i].upper()
-    l[s.index(argv[i][0])] = 1
-    a = argv[i][-1::-1]
-    for j in range(len(a)):
-        word[i][j] = a[j]
-        c = word[i][j]
-        if (c.isalpha()):
-            digit[s.index(c)] = -1
-        elif (c.isdigit()):
-            digit[s.index(c)] = int(c)
-        else:
-            print("Invalid parameter.")
-            exit(1)
+        # 一の位の和が違うなら無理
+        if (A0 + B0) % 10 != C0:
+            continue
 
-for i in range(10):
-    ok[i] = True
-tr(0)
-if (solution == 0):
+        # 最上位が0はダメ
+        if 0 in {EtoN[S_first[0]], EtoN[S_first[1]], EtoN[S_first[2]]}:
+            continue
+
+        A = calc(S[0], EtoN)
+        B = calc(S[1], EtoN)
+        C = calc(S[2], EtoN)
+
+        if A + B == C:
+            print(A, B, C, sep="\n")
+            exit()
+
     print("UNSOLVABLE")
-exit(0)
 
 
+if __name__ == "__main__":
+    main()
