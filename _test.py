@@ -26,6 +26,7 @@ num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
 def compress(S):
     """ 座標圧縮 """
 
+    S = set(S)
     zipped, unzipped = {}, {}
     for i, a in enumerate(sorted(S)):
         zipped[a] = i
