@@ -12,7 +12,26 @@ SI = lambda: input()
 
 
 def main():
-    pass
+    A, B = NMI()
+
+    ans = []
+    flag = False
+    if A < B:
+        A, B = B, A
+        flag = True
+
+    ans += [a for a in range(1, A+1)]
+    SA = sum(ans)
+    BL = [-b for b in range(1, B)]
+    ans += BL + [-sum(BL) - SA]
+
+    if flag:
+        ans = [-a for a in ans]
+
+    print(*ans)
+
+
+
 
 
 if __name__ == "__main__":
