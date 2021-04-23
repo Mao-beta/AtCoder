@@ -19,15 +19,23 @@ def make_grid(h, w, num): return [[int(num)] * w for _ in range(h)]
 
 
 def main():
-    ABC_files = Path("./").glob("AGC*")
-    for path in ABC_files:
-        if path.name == "AGC":
+    target_paths = list(Path("./").glob("*.py"))
+    for path in target_paths:
+        contest = path.stem[:3]
+        num = path.stem[3:6]
+        if contest not in ["ABC", "ARC", "AGC"]:
             continue
-        print(path)
-        contest = path.name[:6]
-        print(contest)
-        goto_fol = Path("AGC")/contest
-        shutil.move(str(path), str(goto_fol))
+
+        dst_dir = Path(f"./{contest}/{contest+num}")
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        dst_path = dst_dir/path.name
+        while dst_path.exists():
+            filename = dst_path.stem + "_"
+            suffix = path.suffix
+            dst_path = dst_dir/(filename+suffix)
+        shutil.move(path, dst_path)
+
+
 
 
 
