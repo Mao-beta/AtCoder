@@ -12,8 +12,6 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
-
-
 def main():
     R, C = NMI()
     A = [NLI() for _ in range(R)]
