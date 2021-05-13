@@ -13,6 +13,37 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
+from collections import deque
+def diameter(N, graph):
+    """
+    :param N: 木の頂点数
+    :param graph: 木の隣接行列(1-index)
+    :return: 直径
+    """
+
+    def dfs(start):
+        depth = [-1] * (N+1)
+        depth[start] = 0
+
+        stack = deque()
+        stack.append(start)
+
+        while stack:
+            now = stack.pop()
+            for goto in graph[now]:
+                if depth[goto] != -1:
+                    continue
+                depth[goto] = depth[now] + 1
+                stack.append(goto)
+        return depth
+
+    depth1 = dfs(1)
+    idx = depth1.index(max(depth1))
+    depth2 = dfs(idx)
+
+    return max(depth2)
+
+
 class Dijkstra():
     """ ダイクストラ法
     重み付きグラフにおける単一始点最短路アルゴリズム
