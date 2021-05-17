@@ -166,6 +166,7 @@ def op(s, t):
     return s + t
 
 # 各ノードに対する更新作用(applyなど)
+# 区間加算ならfに足す値、aに足される値が来る
 def mapping(f, a):
     return f + a
 
