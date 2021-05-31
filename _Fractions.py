@@ -27,6 +27,8 @@ def combination_mod_initialize(n, MOD=10**9+7):
 
 # 二項係数　高速
 def combination_mod(n, r, fac, inv, mod=10**9+7):
+    if n < r: return 0
+    if n < 0 or r < 0: return 0
     return fac[n] * inv[r] * inv[n-r]
 
 

@@ -200,6 +200,36 @@ def make_cumulative(A):
     return C
 
 
+def transpose(A):
+    """
+    2次元list Aの転置行列
+    """
+    return [list(x) for x in zip(*A)]
+
+
+def cum_2D(A):
+    """
+    2次元リストAの累積和
+    """
+    H = len(A)
+    W = len(A[0])
+    for h in range(H):
+        for w in range(W-1):
+            A[h][w+1] += A[h][w]
+    for w in range(W):
+        for h in range(H-1):
+            A[h+1][w] += A[h][w]
+
+    return A
+
+
+def area_sum(cum, hl, hr, wl, wr):
+    """
+    2次元累積和の行列cum（左と上は0）から、元の行列の[hl:hr, wl:wr]の範囲で和をとる
+    """
+    return cum[hr][wr] - cum[hl][wr] - cum[hr][wl] + cum[hl][wl]
+
+
 # 有理数クラス
 class MyFraction:
     def __init__(self, a, b):
