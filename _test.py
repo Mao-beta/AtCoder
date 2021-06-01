@@ -38,19 +38,65 @@ def compress(S):
 def make_grid_int(h, w, num): return [[int(num)] * w for _ in range(h)]
 def make_grid_bool(h, w, bool): return [[bool] * w for _ in range(h)]
 
-#隣接リスト 1-index
-def make_adjlist_nond(n, edges):
-    res = [[] for _ in range(n+1)]
-    for edge in edges:
-        res[edge[0]].append(edge[1])
-        res[edge[1]].append(edge[0])
+#隣接リスト 入力1-index を 0-index に
+def adjlist_nond_1to0(n, edges):
+    res = [[] for _ in range(n)]
+    for a, b in edges:
+        a, b = a-1, b-1
+        res[a].append(b)
+        res[b].append(a)
     return res
 
-def make_adjlist_d(n, edges):
-    res = [[] for _ in range(n+1)]
-    for edge in edges:
-        res[edge[0]].append(edge[1])
+def adjlist_d_1to0(n, edges):
+    res = [[] for _ in range(n)]
+    for a, b in edges:
+        a, b = a-1, b-1
+        res[a].append(b)
     return res
+
+
+# dfs テンプレ
+def dfs(start, graph, seen):
+    from collections import deque
+
+    stack = deque()
+    stack.append(start)
+
+    while stack:
+        now = stack.pop()
+        seen[start] = 1
+
+        for goto in graph[now]:
+            if seen[goto]:
+                continue
+            stack.append(goto)
+
+    return
+
+
+def dfs_paint_01_color(start, graph):
+    # 二色塗り分け
+    from collections import deque
+
+    stack = deque()
+    stack.append(start)
+
+    n = len(graph)
+    colors = [-1] * n
+    colors[start] = 0
+
+    while stack:
+        now = stack.pop()
+        c = colors[now]
+
+        for goto in graph[now]:
+            if colors[goto] != -1:
+                continue
+            stack.append(goto)
+            colors[goto] = 1 - c
+
+    return colors
+
 
 
 # K以下の積を満たす部分列の長さの最大値を得る尺取り法
@@ -207,10 +253,13 @@ def transpose(A):
     return [list(x) for x in zip(*A)]
 
 
-def cum_2D(A):
+def cum_2D(_A):
     """
     2次元リストAの累積和
     """
+    from copy import deepcopy
+
+    A = deepcopy(_A)
     H = len(A)
     W = len(A[0])
     for h in range(H):

@@ -1,10 +1,9 @@
 import sys
 import math
-from collections import defaultdict
 from collections import deque
 
 sys.setrecursionlimit(1000000)
-MOD = 998244353
+MOD = 10 ** 9 + 7
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
@@ -156,85 +155,6 @@ class lazy_segtree:
         return x
 
 
-INF = 10**20
-# opの恒等写像
-def e():
-    return INF
-
-# ノード間演算(prodなど)
-def op(s, t):
-    return min(s, t)
-
-# 各ノードに対する更新作用(applyなど)
-def mapping(f, a):
-    return f + a
-
-# f(g())の合成写像
-def composition(f, g):
-    return f + g
-
-# mappingの恒等写像
-def id():
-    return 0
-
-
-def main():
-    N, M = NMI()
-    querys = [NLI() for _ in range(M)]
-
-    tree = lazy_segtree(op, e, mapping, composition, id, N)
-
-    for i in range(N):
-        tree.set(i, 0)
-
-    for s, t in querys:
-        s, t = s-1, t-1
-        tree.apply(s, t+1, 1)
-
-    ans = []
-    for i, (s, t) in enumerate(querys, start=1):
-        s, t = s-1, t-1
-        m = tree.prod(s, t+1)
-        if m > 1:
-            ans.append(i)
-
-    print(len(ans))
-    if ans:
-        print(*ans, sep="\n")
-
-
-if __name__ == "__main__":
-    main()
-
-
-
-"""
-区間加算、区間最小値取得
-INF = 10**20
-# opの恒等写像
-def e():
-    return INF
-
-# ノード間演算(prodなど)
-def op(s, t):
-    return min(s, t)
-
-# 各ノードに対する更新作用(applyなど)
-def mapping(f, a):
-    return f + a
-
-# f(g())の合成写像
-def composition(f, g):
-    return f + g
-
-# mappingの恒等写像
-def id():
-    return 0
-"""
-
-
-"""
-区間更新、区間最大値取得
 INF = 10**10
 ID = 10**10
 
@@ -258,4 +178,22 @@ def composition(f, g):
 # mappingの恒等写像
 def id():
     return ID
-"""
+
+
+def main():
+    W, N = NMI()
+    Lazy = lazy_segtree(op, e, mapping, composition, id, W)
+
+    for _ in range(N):
+        l, r = NMI()
+        g = r - l + 1
+        l -= 1
+        r = l + g
+        h = Lazy.prod(l, r)
+        print(h+1)
+        Lazy.apply(l, r, h+1)
+
+
+
+if __name__ == "__main__":
+    main()
