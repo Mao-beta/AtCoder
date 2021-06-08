@@ -64,7 +64,7 @@ def dfs(start, graph, seen):
 
     while stack:
         now = stack.pop()
-        seen[start] = 1
+        seen[now] = 1
 
         for goto in graph[now]:
             if seen[goto]:
