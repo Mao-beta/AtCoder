@@ -353,7 +353,14 @@ def z_algo(S):
 
 
 def main():
-    print(MyFraction(1,2) / MyFraction(1, 4) + MyFraction(-2, 1))
+    N = int()
+    #A = list(map(int, input().split()))
+    A = NLI()
+    print(A)
+    A = [[a, i] for i, a in enumerate(A, start=1)]
+    A.sort(reverse=True)
+    for a, i in A:
+        print(i)
 
 
 if __name__ == "__main__":
