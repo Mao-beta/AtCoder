@@ -12,6 +12,48 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
+def zeta(n, dp):
+    """
+    高速ゼータ変換　和集合のリストから積集合のリストへ変換など
+    """
+    dp = dp.copy()
+    for j in range(n):
+        bit = 1<<j
+        for i in range(1<<n):
+            if i & bit == 0:
+                dp[i] += dp[i | bit]
+    return dp
+
+
+def mobius(n, dp):
+    """
+    高速メビウス変換　積集合のリストから和集合のリストへ変換など
+    """
+    dp = dp.copy()
+    for j in range(n):
+        bit = 1<<j
+        for i in range(1<<n):
+            if i & bit == 0:
+                dp[i] -= dp[i | bit]
+    return dp
+
+
+
+class Combinations:
+    def __init__(self, n, mod):
+        self.mod = mod
+        self.fac = [1] * (n + 1)
+        self.inv = [1] * (n + 1)
+        for i in range(1, n + 1):
+            self.fac[i] = self.fac[i - 1] * i % self.mod
+            self.inv[i] = self.inv[i - 1] * pow(i, self.mod - 2, self.mod) % self.mod
+
+    def cmb(self, n, r):
+        if n < r: return 0
+        if n < 0 or r < 0: return 0
+        return self.fac[n] * self.inv[r] * self.inv[n - r] % MOD
+
+
 # nCr 要math
 def cmb(n, r):
     return math.factorial(n) // math.factorial(r) // math.factorial(n-r)
@@ -35,6 +77,7 @@ def combination_mod(n, r, fac, inv, mod=10**9+7):
 class Eratosthenes:
     """
     エラトステネスの篩、メビウス関数
+    素因数分解、約数列挙、互いに素の個数
     """
     def __init__(self, n):
         self.n = n
@@ -143,12 +186,11 @@ def prime_factorize(n):
     return result
 
 
-"""
-# Nの素因数分解を辞書で返す
+# Nの素因数分解を辞書で返す(単体)
 def prime_fact(n):
-    root = int(math.sqrt(n))
+    root = int(n**0.5) + 1
     prime_dict = {}
-    for i in range(2, root+1):
+    for i in range(2, root):
         cnt = 0
         while n % i == 0:
             cnt += 1
@@ -158,7 +200,7 @@ def prime_fact(n):
     if n != 1:
         prime_dict[n] = 1
     return prime_dict
-"""
+
 
 def main():
     pass

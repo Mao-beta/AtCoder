@@ -92,11 +92,19 @@ class Eratosthenes:
 
 
 def main():
-    N = NI()
+    N, K = NMI()
     E = Eratosthenes(N)
-
-    for x in range(N+1):
-        print(E.euler(x))
+    nums = [0] * (K+1)
+    ans = 0
+    for g in range(K, 0, -1):
+        # gcdがgの倍数
+        num = pow((K//g), N, MOD)
+        for gg in range(g*2, K+1, g):
+            num -= nums[gg]
+        nums[g] = num
+        ans += g * num
+        ans %= MOD
+    print(ans)
 
 
 if __name__ == "__main__":
