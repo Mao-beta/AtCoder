@@ -44,7 +44,64 @@ def diameter(N, graph):
     return max(depth2)
 
 
-class Dijkstra():
+class Dijkstra:
+    """ ダイクストラ法
+    重み付きグラフにおける単一始点最短路アルゴリズム
+
+    * 使用条件
+        - 負のコストがないこと
+        - 有向グラフ、無向グラフともにOK
+
+    * 計算量はO(E*log(V))
+
+    * ベルマンフォード法より高速なので、負のコストがないならばこちらを使うとよい
+    """
+
+    def __init__(self, n, edges, is_one_index=False):
+        """
+        :param n: 頂点数 頂点は数字じゃなくてもよい
+        :param edges: [from, to, cost]の形の辺のList
+        :param is_one_index: 1-indexならTrue
+        """
+        from collections import defaultdict
+
+        self.n = n
+        self.edges = edges
+        self.INF = 10**20
+
+        self.graph = defaultdict(list)
+        for a, b, c in edges:
+            if is_one_index:
+                a, b = a-1, b-1
+            self.graph[a].append((b, c))
+
+    def get_mincost(self, start):
+        from collections import defaultdict
+        import heapq
+
+        hq = []
+        heapq.heappush(hq, (0, start))
+
+        res = defaultdict(lambda: self.INF)
+        temp_costs = defaultdict(lambda: self.INF)
+
+        while hq:
+            now_c, now = heapq.heappop(hq)
+            if res[now] < now_c:
+                continue
+
+            res[now] = now_c
+            for goto, cost in self.graph[now]:
+                goto_c = now_c + cost
+
+                if temp_costs[goto] > goto_c:
+                    heapq.heappush(hq, (goto_c, goto))
+                    temp_costs[goto] = goto_c
+
+        return res
+
+"""
+class __Dijkstra():
     """ ダイクストラ法
     重み付きグラフにおける単一始点最短路アルゴリズム
 
@@ -118,7 +175,7 @@ class Dijkstra():
                     d[e.to] = d[v] + e.cost  # dの更新
                     heapq.heappush(que, (d[e.to], e.to))  # キューに新たな最短経路の候補(最短距離, 頂点番号)の情報をpush
         return d
-
+"""
 
 class BellmanFord():
     """ ベルマンフォード法
