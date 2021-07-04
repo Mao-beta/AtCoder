@@ -100,7 +100,7 @@ class Dijkstra:
 
         return res
 
-"""
+
 class __Dijkstra():
     """ ダイクストラ法
     重み付きグラフにおける単一始点最短路アルゴリズム
@@ -175,7 +175,7 @@ class __Dijkstra():
                     d[e.to] = d[v] + e.cost  # dの更新
                     heapq.heappush(que, (d[e.to], e.to))  # キューに新たな最短経路の候補(最短距離, 頂点番号)の情報をpush
         return d
-"""
+
 
 class BellmanFord():
     """ ベルマンフォード法
