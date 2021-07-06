@@ -185,7 +185,8 @@ class SegTree:
         k += self.num
         self.tree[k] = x
         while k > 1:
-            self.tree[k >> 1] = self.segfunc(self.tree[k], self.tree[k ^ 1])
+            l, r = min(k, k^1), max(k, k^1)
+            self.tree[k >> 1] = self.segfunc(self.tree[l], self.tree[r])
             k >>= 1
 
     def add(self, k, x):
@@ -201,18 +202,19 @@ class SegTree:
         :param r: 0-index
         :return:
         """
-        res = self.ide_ele
+        res_L = self.ide_ele
+        res_R = self.ide_ele
         l += self.num
         r += self.num
         while l < r:
             if l & 1:
-                res = self.segfunc(res, self.tree[l])
+                res_L = self.segfunc(res_L, self.tree[l])
                 l += 1
             if r & 1:
-                res = self.segfunc(res, self.tree[r - 1])
+                res_R = self.segfunc(self.tree[r - 1], res_R)
             l >>= 1
             r >>= 1
-        return res
+        return self.segfunc(res_L, res_R)
 
 
 class BIT():

@@ -3,7 +3,7 @@ import math
 from collections import deque
 
 sys.setrecursionlimit(1000000)
-MOD = 10 ** 9 + 7
+MOD = 998244353
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
@@ -11,14 +11,22 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
+class Line:
+    def __init__(self, a, b):
+        self.a = a % MOD
+        self.b = b % MOD
+
+    def value(self, x):
+        return (self.a * x + self.b) % MOD
+
 # SegTreeの関数
-def segfunc(x, y):
-    return x + y
+def segfunc(F, G):
+    return Line(F.a * G.a, F.b * G.a + G.b)
 
 
 # 単位元
 # min->inf, max->-inf, add->0, mul->1
-ide_ele = 0
+ide_ele = Line(1, 0)
 
 
 # セグメント木
@@ -94,14 +102,19 @@ class SegTree:
 
 def main():
     N, Q = NMI()
-    A = NLI()
-    S = SegTree(A, segfunc, ide_ele)
+    Fs = [NLI() for _ in range(N)]
+    Fs = [Line(a, b) for a, b in Fs]
+    S = SegTree(Fs, segfunc, ide_ele)
+
     for _ in range(Q):
-        query = NLI()
-        if query[0] == 0:
-            S.add(query[1], query[2])
+        t, *query = NLI()
+        if t == 0:
+            p, c, d = query
+            S.update(p, Line(c, d))
         else:
-            print(S.query(query[1], query[2]))
+            l, r, x = query
+            F = S.query(l, r)
+            print(F.value(x))
 
 
 if __name__ == "__main__":
