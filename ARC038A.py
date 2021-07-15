@@ -1,0 +1,23 @@
+import sys
+import math
+from collections import defaultdict
+from collections import deque
+
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
+
+
+def main():
+    N = NI()
+    A = NLI()
+    A.sort(reverse=True)
+    print(sum([A[i] for i in range(0, N, 2)]))
+
+
+if __name__ == "__main__":
+    main()
