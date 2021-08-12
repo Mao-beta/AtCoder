@@ -1,5 +1,6 @@
 import sys
 import math
+from collections import defaultdict
 from collections import deque
 
 sys.setrecursionlimit(1000000)
@@ -12,14 +13,8 @@ SI = lambda: input()
 
 
 def main():
-    N = NI()
-    A = NLI()
-    print(A)
-    A = [(a, i+1) for i, a in enumerate(A)]
-    print(A)
-    A.sort()
-    print(A)
-    print(A[-2][1])
+    S = set(SI() for _ in range(4))
+    print("Yes" if len(S) == 4 else "No")
 
 
 if __name__ == "__main__":
