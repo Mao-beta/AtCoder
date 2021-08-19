@@ -259,3 +259,54 @@ def composition(f, g):
 def id():
     return ID
 """
+
+
+"""
+# 区間更新・区間加算(10進法でそのまま表示)
+MOD = 998244353
+
+INF = 1<<60
+
+max_N = 200003
+ten = [pow(10, i, MOD) for i in range(max_N)]
+one = [0]
+for i in range(max_N-1):
+    one.append((one[-1]*10+1)%MOD)
+
+def S(_sum, _len):
+    return (_sum << 30) + _len
+
+def S2sum(s):
+    return s >> 30
+
+def S2len(s):
+    return s & ((1<<30) - 1)
+
+
+# opの恒等写像
+def e():
+    return S(0, 0)
+
+# ノード間演算(prodなど)
+def op(s, t):
+    res_sum = (S2sum(s) * ten[S2len(t)] + S2sum(t)) % MOD
+    res_len = (S2len(s) + S2len(t)) % MOD
+    return S(res_sum, res_len)
+
+# 各ノードに対する更新作用(applyなど)
+# 区間加算ならfに足す値、aに足される値が来る
+def mapping(f, a):
+    if f == 0:
+        return a
+    return S(f * one[S2len(a)], S2len(a))
+
+
+# f(g())の合成写像
+def composition(f, g):
+    return g if f == 0 else f
+
+# mappingの恒等写像
+def id():
+    return 0
+    
+"""
