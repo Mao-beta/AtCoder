@@ -55,6 +55,25 @@ def adjlist_d_1to0(n, edges):
     return res
 
 
+import bisect
+def LIS(A):
+    """
+    A[:i]までに関するLISの長さのリストを取得する
+    ans[i]はA[0:i+1]におけるLISの長さ
+    """
+    INF = 1<<60
+    n = len(A)
+    # dp[i]は長さがiとなるLISの末尾の最小値
+    dp = [INF] * (n+1)
+    dp[0] = -INF
+    ans = []
+    for a in A:
+        idx = bisect.bisect_left(dp, a)
+        dp[idx] = a
+        ans.append(bisect.bisect_left(dp, INF) - 1)
+    return ans
+
+
 # dfs テンプレ
 def dfs(start, graph, seen):
     from collections import deque
