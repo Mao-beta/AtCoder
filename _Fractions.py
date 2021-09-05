@@ -117,7 +117,7 @@ class Combinations:
     def cmb(self, n, r):
         if n < r: return 0
         if n < 0 or r < 0: return 0
-        return self.fac[n] * self.inv[r] * self.inv[n - r] % MOD
+        return self.fac[n] * self.inv[r] % MOD * self.inv[n - r] % MOD
 
     def perm(self, n, r):
         if n < r: return 0
