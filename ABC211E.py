@@ -92,15 +92,11 @@ def main():
     N = NI()
     K = NI()
     G = [SI() for _ in range(N)]
-    grid = GridBit(N, N)
-    for h in range(N):
-        for w in range(N):
-            if G[h][w] == ".":
-                grid.set_one(h, w)
 
     seen = set()
     que = deque()
 
+    # 1マス目は自力で塗る
     for h in range(N):
         for w in range(N):
             if G[h][w] == "#":
@@ -110,6 +106,9 @@ def main():
             que.append(g)
             seen.add(g)
 
+    # BFS
+    # Kマスになったらfinalにつっこむ
+    # 盤面nowはGridBit型
     final = set()
     while que:
         now = que.popleft()
@@ -117,10 +116,13 @@ def main():
             final.add(now)
             continue
 
+        # now.get_asides()で隣接する白マスのh, wを列挙
         for h, w in now.get_asides():
+            # 置けないときはスルー
             if G[h][w] == "#":
                 continue
 
+            # 次の盤面を用意
             g = GridBit(N, N)
             g.load_bit(now.bit)
             g.set_one(h, w)
