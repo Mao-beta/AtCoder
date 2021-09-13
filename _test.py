@@ -55,6 +55,32 @@ def adjlist_d_1to0(n, edges):
     return res
 
 
+# 半分全列挙
+def split_and_list(A):
+    """
+    半分全列挙
+    :param A: 長さ40以下くらいのList
+    :return: 前半と後半それぞれについて、各部分集合の和のList
+    """
+
+    def solve_half(A_half):
+        n = len(A_half)
+        res = []
+        for case in range(1<<n):
+            now = 0
+            for i in range(n):
+                if (case >> i) & 1:
+                    now += A_half[i]
+            res.append(now)
+        res.sort()
+        return res
+
+    N = len(A)
+    return solve_half(A[:N//2]), solve_half(A[N//2:])
+
+
+
+
 import bisect
 def LIS(A):
     """
