@@ -273,6 +273,22 @@ def prime_fact(n):
     return prime_dict
 
 
+def convert_base(str_n, base0, base1):
+    """
+    base0進数の文字列str_nを、base1進数の文字列に変換する
+    """
+    tmp = 0
+    for i, n in enumerate(str_n[::-1]):
+        tmp += pow(base0, i) * int(n)
+
+    res = ""
+    while tmp > 0:
+        m = tmp % base1
+        res = str(m) + res
+        tmp //= base1
+    return res or "0"
+
+
 def main():
     pass
 
