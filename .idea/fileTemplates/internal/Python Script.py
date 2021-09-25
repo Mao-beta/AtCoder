@@ -2,7 +2,7 @@ import sys
 import math
 from collections import deque
 
-sys.setrecursionlimit(1000000)
+sys.setrecursionlimit(100000)
 MOD = 10 ** 9 + 7
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
