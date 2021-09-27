@@ -24,7 +24,7 @@ def main():
     # zはleading-zero bは使った数の集合(1<<10)
     dp = [[[[INF]*(1<<10) for _ in range(2)]
            for _ in range(2)] for _ in range(L+1)]
-    dp[0][0][0][0] = int(A)
+    dp[0][0][1][0] = int(A)
 
     for i in range(L):
         for j in range(2):
@@ -56,7 +56,7 @@ def main():
     # zはleading-zero bは使った数の集合(1<<10)
     dp = [[[[INF]*(1<<10) for _ in range(2)]
            for _ in range(2)] for _ in range(L+1)]
-    dp[0][0][0][0] = -int(A)
+    dp[0][0][1][0] = -int(A)
 
     for i in range(L):
         for j in range(2):
