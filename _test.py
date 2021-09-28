@@ -55,6 +55,37 @@ def adjlist_d_1to0(n, edges):
     return res
 
 
+# grid探索セット
+H = 10
+W = 10
+DIR = [[-1, 0], [1, 0], [0, 1], [0, -1]]
+def i2hw(i):
+    return i//W, i%W
+
+def hw2i(h, w):
+    return h*W + w
+
+def in_grid(h, w):
+    return 0 <= h < H and 0 <= w < W
+
+# バックトラックのようなもの
+now = set()
+grid = ["...."]*4
+
+def rec(h, w):
+    res = 0
+    for dh, dw in DIR:
+        nh, nw = h+dh, w+dw
+        if not in_grid(nh, nw): continue
+        if grid[nh][nw] == "#": continue
+        if (nh, nw) in now: continue
+
+        now.add((nh, nw))
+        res = max(res, rec(nh, nw))
+        now.discard((nh, nw))
+    return res
+
+
 # 半分全列挙
 def split_and_list(A):
     """
