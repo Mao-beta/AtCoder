@@ -54,6 +54,50 @@ def adjlist_d_1to0(n, edges):
         res[a].append(b)
     return res
 
+# 辺の端点からIDに紐づけする辞書
+def edgedict_nond_1to0(edges):
+    E_dic = {}
+    for i, (u, v) in enumerate(edges):
+        u, v = u-1, v-1
+        E_dic[(u, v)] = i
+        E_dic[(v, u)] = i
+    return E_dic
+
+
+
+def euler_tour(start, n, graph):
+    """
+    非再帰オイラーツアー
+    :param start: 始点
+    :param n: 頂点数
+    :param graph: 隣接リスト(0-indexed)
+    :return: 回った順の頂点のリスト
+    """
+    stack = deque()
+    stack.append(start)
+
+    seen = [0] * n
+    seen[start] = 1
+    res = []
+
+    while stack:
+        now = stack.pop()
+
+        # 行きがけ
+        if now >= 0:
+            res.append(now)
+            for goto in sorted(graph[now], reverse=True):
+                if seen[goto]: continue
+                seen[goto] = 1
+                stack.append(~now) # ここ大事
+                stack.append(goto)
+
+        # 帰りがけ
+        else:
+            res.append(~now)
+
+    return res
+
 
 # grid探索セット
 H = 10

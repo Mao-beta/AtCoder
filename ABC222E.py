@@ -20,15 +20,20 @@ def adjlist_nond_1to0(n, edges):
     return res
 
 
-def main():
-    N, M, K = NMI()
-    A = NLI()
-    edges = [NLI() for _ in range(N-1)]
+def edgedict_nond_1to0(edges):
     E_dic = {}
     for i, (u, v) in enumerate(edges):
         u, v = u-1, v-1
         E_dic[(u, v)] = i
         E_dic[(v, u)] = i
+    return E_dic
+
+
+def main():
+    N, M, K = NMI()
+    A = NLI()
+    edges = [NLI() for _ in range(N-1)]
+    E_dic = edgedict_nond_1to0(edges)
     graph = adjlist_nond_1to0(N, edges)
     C = [0] * (N-1)
     parents = [-1] * N
