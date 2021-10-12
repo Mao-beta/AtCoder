@@ -373,23 +373,28 @@ def transpose(A):
     return [list(x) for x in zip(*A)]
 
 
-def cum_2D(_A):
+def cum_2D(A):
     """
     2次元リストAの累積和
     """
-    from copy import deepcopy
-
-    A = deepcopy(_A)
     H = len(A)
     W = len(A[0])
-    for h in range(H):
-        for w in range(W-1):
-            A[h][w+1] += A[h][w]
-    for w in range(W):
-        for h in range(H-1):
-            A[h+1][w] += A[h][w]
+    C = [[0]*W for _ in range(H)]
 
-    return A
+    for h in range(H):
+        cw = 0
+        for w in range(W):
+            if h == 0 and w == 0:
+                C[h][w] = A[h][w]
+            elif h == 0:
+                C[h][w] = A[h][w] + C[h][w-1]
+            elif w == 0:
+                C[h][w] = A[h][w] + C[h-1][w]
+            else:
+                cw += A[h][w]
+                C[h][w] = C[h-1][w] + cw
+
+    return C
 
 
 def area_sum(cum, hl, hr, wl, wr):
