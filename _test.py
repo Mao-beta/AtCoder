@@ -176,11 +176,11 @@ def LIS(A):
 
 
 # dfs テンプレ
-def dfs(start, graph, seen):
-    from collections import deque
-
+def dfs(start, graph):
+    n = len(graph)
     stack = deque()
     stack.append(start)
+    seen = [0] * n
 
     while stack:
         now = stack.pop()
