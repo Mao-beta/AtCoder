@@ -527,6 +527,17 @@ class MyFraction:
     def __repr__(self):
         return "{0}/{1}".format(self.numerator, self.denominator)
 
+
+    def __lt__(self, other):
+        Fa_n, Fa_d = self.get_nd()
+        Fb_n, Fb_d = other.get_nd()
+        return Fa_n * Fb_d < Fb_n * Fa_d
+
+    def __le__(self, other):
+        Fa_n, Fa_d = self.get_nd()
+        Fb_n, Fb_d = other.get_nd()
+        return Fa_n * Fb_d <= Fb_n * Fa_d
+
     def get_nd(self):
         return (self.numerator, self.denominator)
 
