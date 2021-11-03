@@ -94,46 +94,38 @@ class Dinic:
 
 
 def main():
-    """TLE"""
     H, W, C = NMI()
     A = [NLI() for _ in range(H)]
 
     def hw2v(h, w):
         return h * W + w
 
-    V = H*W*3 + 2
+    V = H*W + 2
     tree = Dinic(V)
     S = V-1
     T = V-2
 
     ans = 0
-    Z = H * W
 
     for h in range(H):
         for w in range(W):
             v = hw2v(h, w)
             a = A[h][w]
-            score = a - 2*C
 
-            if score >= 0:
-                ans += abs(score)
-                tree.add_edge(S, v, abs(score))
+            ans += a
+            tree.add_edge(S, v, a)
+
+            if h == H-1 or w == W-1:
+                tree.add_edge(v, T, C)
             else:
-                tree.add_edge(v, T, abs(score))
+                nv = hw2v(h + 1, w + 1)
+                tree.add_edge(v, nv, C)
 
-            for dh, dw in [[1, 1], [-1, 1]]:
-                nh, nw = h + dh, w + dw
-                if nh < 0 or nh >= H or nw < 0 or nw >= W:
-                    continue
-
-                nv = hw2v(nh, nw)
-
-                # S->Z: C, Z->X: inf, Z->Y: inf
-                ans += C
-                tree.add_edge(S, Z, C)
-                tree.add_edge(Z, v, INF)
-                tree.add_edge(Z, nv, INF)
-                Z += 1
+            if h == H-1 or w == 0:
+                tree.add_edge(v, T, C)
+            else:
+                nv = hw2v(h + 1, w - 1)
+                tree.add_edge(v, nv, C)
 
     ans -= tree.flow(S, T)
     print(ans)
