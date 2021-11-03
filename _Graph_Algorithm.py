@@ -267,61 +267,83 @@ i<->jが関係性に対応
 「追加コスト」＝上記の向きにコストぶんの辺
 """
 class Dinic:
-    """ 最大流(Dinic) """
-    INF = 10 ** 20
+    __slots__ = ["n", "graph", "level", "it"]
+
+    class Edge:
+        def __init__(self, to, cap, rev=None):
+            self.to = to
+            self.cap = cap
+            self.rev = rev
 
     def __init__(self, n):
         self.n = n
-        self.links = [[] for _ in range(n)]
-        self.depth = None
-        self.progress = None
+        self.graph = [[] for i in range(n)]
 
-    def add_link(self, _from, to, cap):
-        self.links[_from].append([cap, to, len(self.links[to])])
-        self.links[to].append([0, _from, len(self.links[_from]) - 1])
+    def add_edge(self, fr, to, cap=1):
+        forward = self.Edge(to, cap, None)
+        forward.rev = backward = self.Edge(fr, 0, forward)
+        self.graph[fr].append(forward)
+        self.graph[to].append(backward)
 
-    def bfs(self, s):
-        from collections import deque
-
-        depth = [-1] * self.n
-        depth[s] = 0
+    def bfs(self, s, t):
+        graph = self.graph
+        level = self.level = [self.n] * self.n
         q = deque([s])
+        level[s] = 0
         while q:
-            v = q.popleft()
-            for cap, to, rev in self.links[v]:
-                if cap > 0 and depth[to] < 0:
-                    depth[to] = depth[v] + 1
-                    q.append(to)
-        self.depth = depth
+            x = q.popleft()
+            lx = level[x] + 1
+            for e in graph[x]:
+                y = e.to
+                if e.cap and level[y] > lx:
+                    level[y] = lx
+                    if y == t:
+                        return True
+                    q.append(y)
+        return False
 
-    def dfs(self, v, t, flow):
-        if v == t:
-            return flow
-        links_v = self.links[v]
-        for i in range(self.progress[v], len(links_v)):
-            self.progress[v] = i
-            cap, to, rev = link = links_v[i]
-            if cap == 0 or self.depth[v] >= self.depth[to]:
-                continue
-            d = self.dfs(to, t, min(flow, cap))
-            if d == 0:
-                continue
-            link[0] -= d
-            self.links[to][rev][0] += d
-            return d
+    def dfs(self, s, t, f):
+        graph = self.graph
+        level = self.level
+        it = self.it
+        q = deque([t])
+        while q:
+            x = q[-1]
+            if x == s:
+                q.pop()
+                for y in q:
+                    cap = graph[y][it[y]].rev.cap
+                    if cap < f:
+                        f = cap
+                for y in q:
+                    e = graph[y][it[y]]
+                    e.cap += f
+                    e.rev.cap -= f
+                return f
+            lx = level[x] - 1
+            while it[x] < len(graph[x]):
+                e = graph[x][it[x]]
+                y = e.to
+                rev = e.rev
+                if rev.cap == 0 or lx != level[y]:
+                    it[x] += 1
+                    continue
+                q.append(y)
+                break
+            if it[x] == len(graph[x]):
+                q.pop()
+                level[x] = self.n
         return 0
 
-    def max_flow(self, s, t):
+    def flow(self, s, t):
         flow = 0
-        while True:
-            self.bfs(s)
-            if self.depth[t] < 0:
-                return flow
-            self.progress = [0] * self.n
-            current_flow = self.dfs(s, t, INF)
-            while current_flow > 0:
-                flow += current_flow
-                current_flow = self.dfs(s, t, INF)
+        while self.bfs(s, t):
+            self.it = [0] * self.n
+            f = self.dfs(s, t, float("inf"))
+            while f:
+                flow += f
+                f = self.dfs(s, t, float("inf"))
+        return flow
 
 
 from heapq import heappush, heappop
