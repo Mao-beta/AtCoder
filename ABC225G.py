@@ -13,6 +13,7 @@ SI = lambda: input()
 
 INF = 10 ** 10
 
+
 class Dinic:
     __slots__ = ["n", "graph", "level", "it"]
 
@@ -25,6 +26,8 @@ class Dinic:
     def __init__(self, n):
         self.n = n
         self.graph = [[] for i in range(n)]
+        self.level = [self.n] * self.n
+        self.it = [0] * self.n
 
     def add_edge(self, fr, to, cap=1):
         forward = self.Edge(to, cap, None)
@@ -34,7 +37,11 @@ class Dinic:
 
     def bfs(self, s, t):
         graph = self.graph
-        level = self.level = [self.n] * self.n
+
+        for i in range(self.n):
+            self.level[i] = self.n
+
+        level = self.level
         q = deque([s])
         level[s] = 0
         while q:
@@ -85,7 +92,8 @@ class Dinic:
     def flow(self, s, t):
         flow = 0
         while self.bfs(s, t):
-            self.it = [0] * self.n
+            for i in range(self.n):
+                self.it[i] = 0
             f = self.dfs(s, t, float("inf"))
             while f:
                 flow += f
@@ -94,6 +102,55 @@ class Dinic:
 
 
 def main():
+    """愚直？解"""
+    H, W, C = NMI()
+    A = [NLI() for _ in range(H)]
+
+    def hw2v(h, w):
+        return h * W + w
+
+    V = H * W * 3 + 2
+    tree = Dinic(V)
+    S = V - 1
+    T = V - 2
+
+    ans = 0
+    Z = H * W
+
+    for h in range(H):
+        for w in range(W):
+            v = hw2v(h, w)
+            a = A[h][w]
+            score = a - 2 * C
+
+            if score >= 0:
+                ans += abs(score)
+                tree.add_edge(S, v, abs(score))
+            else:
+                tree.add_edge(v, T, abs(score))
+
+            for dh, dw in [[1, 1], [-1, 1]]:
+                nh, nw = h + dh, w + dw
+                if nh < 0 or nh >= H or nw < 0 or nw >= W:
+                    continue
+
+                nv = hw2v(nh, nw)
+
+                # S->Z: C, Z->X: inf, Z->Y: inf
+                ans += C
+                tree.add_edge(S, Z, C)
+                tree.add_edge(Z, v, INF)
+                tree.add_edge(Z, nv, INF)
+                Z += 1
+
+    ans -= tree.flow(S, T)
+    print(ans)
+
+
+def _main():
+    """
+    writer解
+    """
     H, W, C = NMI()
     A = [NLI() for _ in range(H)]
 

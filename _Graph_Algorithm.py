@@ -278,6 +278,8 @@ class Dinic:
     def __init__(self, n):
         self.n = n
         self.graph = [[] for i in range(n)]
+        self.level = [self.n] * self.n
+        self.it = [0] * self.n
 
     def add_edge(self, fr, to, cap=1):
         forward = self.Edge(to, cap, None)
@@ -287,7 +289,11 @@ class Dinic:
 
     def bfs(self, s, t):
         graph = self.graph
-        level = self.level = [self.n] * self.n
+
+        for i in range(self.n):
+            self.level[i] = self.n
+
+        level = self.level
         q = deque([s])
         level[s] = 0
         while q:
@@ -338,13 +344,13 @@ class Dinic:
     def flow(self, s, t):
         flow = 0
         while self.bfs(s, t):
-            self.it = [0] * self.n
+            for i in range(self.n):
+                self.it[i] = 0
             f = self.dfs(s, t, float("inf"))
             while f:
                 flow += f
                 f = self.dfs(s, t, float("inf"))
         return flow
-
 
 from heapq import heappush, heappop
 class MinCostFlow:
