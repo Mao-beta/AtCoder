@@ -1,5 +1,6 @@
 import sys
 import math
+from collections import defaultdict
 from collections import deque
 
 sys.setrecursionlimit(1000000)
@@ -10,8 +11,6 @@ NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
 
-
-INF = 10**20
 
 class Dinic:
     __slots__ = ["n", "graph", "level", "it"]
@@ -102,63 +101,38 @@ class Dinic:
 
 def main():
     N = NI()
-    C = [SI() for _ in range(N)]
-
-    def hw2v(h, w):
-        return h * N + w
-
-    V = 5 * N**2 + 2
+    A = NLI()
+    V = N + 2
     tree = Dinic(V)
-    z = N**2
-    S = V-1
-    T = V-2
+    S = 0
+    T = V-1
     ans = 0
 
-    for h in range(N):
-        for w in range(N):
-            v = hw2v(h, w)
+    INF = 10**12
 
-            # 黒で塗る→R、白で塗る→B
-            # 隣接が異なる色だとスコア1→は無理
-            # マスのパリティで反転
-            # h+w % 2 == 0のとき黒で塗る→R、白で塗る→B
-            # h+w % 2 == 1のとき白で塗る→R、黒で塗る→B
-            # もともと黒のマスは、白にしたらcost inf
+    for x, a in enumerate(A, start=1):
+        # 割る→R、割らない→B
+        # a > 0:
+        # 割られないとaもらえる
+        # aもらって、割られるとaコスト
+        # a < 0:
+        # 割られないと|a|コスト
+        if a >= 0:
+            ans += a
+            tree.add_edge(x, T, a)
+            #print(f"{x} -> T: cost {a}")
+        else:
+            tree.add_edge(S, x, abs(a))
+            #print(f"S -> {x}: cost {abs(a)}")
 
-            # 両方Rでスコア1→片方Bでコスト1
-            # S->Z: cost 1 Z->X,Y: cost inf
-            # 両方Bでスコア1→片方Rでコスト1
-            # Z->T: cost 1 X,Y->Z: cost inf
+        # xを割ったらkxも必ず割る
+        # xR ^ kxBのときinfコスト
+        for y in range(x*2, N+1, x):
+            #print(f"{x} -> {y}: cost inf")
+            tree.add_edge(x, y, INF)
 
-            if C[h][w] == "B":
-                if (h+w) % 2 == 0:
-                    tree.add_edge(S, v, INF)
-                else:
-                    tree.add_edge(v, T, INF)
-
-            elif C[h][w] == "W":
-                if (h+w) % 2 == 0:
-                    tree.add_edge(v, T, INF)
-                else:
-                    tree.add_edge(S, v, INF)
-
-            for dh, dw in [[0, 1], [1, 0]]:
-                nh, nw = h+dh, w+dw
-                nv = hw2v(nh, nw)
-                if nh < 0 or nh >= N or nw < 0 or nw >= N:
-                    continue
-                ans += 1
-                tree.add_edge(S, z, 1)
-                tree.add_edge(z, v, INF)
-                tree.add_edge(z, nv, INF)
-                z += 1
-                ans += 1
-                tree.add_edge(z, T, 1)
-                tree.add_edge(v, z, INF)
-                tree.add_edge(nv, z, INF)
-                z += 1
-
-    print(ans - tree.flow(S, T))
+    cost = tree.flow(S, T)
+    print(ans - cost)
 
 
 if __name__ == "__main__":
