@@ -268,6 +268,7 @@ R->Bの辺の重みを全部足したもの（コスト>=0）を最小にする
 両方Bで報酬：報酬もらっておいて, Z->T: cost, X, Y->Z: inf
 """
 
+
 # ACL_maxflow(Dinic)
 from typing import NamedTuple, Optional, List, cast
 class MFGraph:
