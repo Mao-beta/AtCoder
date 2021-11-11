@@ -181,14 +181,15 @@ def dfs(start, graph):
     stack = deque()
     stack.append(start)
     seen = [0] * n
+    seen[start] = 1
 
     while stack:
         now = stack.pop()
-        seen[now] = 1
 
         for goto in graph[now]:
             if seen[goto]:
                 continue
+            seen[goto] = 1
             stack.append(goto)
 
     return
