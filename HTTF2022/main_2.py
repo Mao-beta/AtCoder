@@ -63,6 +63,7 @@ class Scheduler:
         self.events = [[] for _ in range(3001)]
         self.members = None
         self.tasks = None
+        self.task_dependency = None
         self.release_num = 0
         self.finish_flag = False
         self.free_member = self.M
@@ -77,6 +78,7 @@ class Scheduler:
 
     def register_tasks(self, task_diffs, task_deps):
         self.tasks = []
+        self.task_dependency = task_deps
 
         for i, (diff, pars) in enumerate(zip(task_diffs, task_deps)):
             task = Task(ID=i, diff=diff, pars=pars)
@@ -141,10 +143,11 @@ class Scheduler:
         assigns = []
 
         sorted_members = sorted(self.members, key=lambda x: sum(x.pred_skill))
+
         if self.task_depth is None:
-            self.task_depth = self.task_topo()
+            self.task_topo()
             self.task_depth = [[d, i] for i, d in enumerate(self.task_depth)]
-            self.task_depth.sort(key=lambda x: (x[0], -max(self.tasks[x[1]].diff)))
+            self.task_depth.sort(reverse=True)
             printf("#", self.task_depth)
 
         for d, idx in self.task_depth:
@@ -165,10 +168,8 @@ class Scheduler:
                     m_id = member.ID
                     m_day = pred_day
 
-            if m_day > 25 and self.free_member < 1:
-                continue
-
             if m_id is not None:
+                printf(f"# m_day: {m_day}")
                 member = self.members[m_id]
                 member.assign(task.ID, self.day)
                 task.assign(member.ID)
@@ -321,30 +322,23 @@ class Scheduler:
 
 
     def task_topo(self):
-        topograph = [[] for _ in range(self.N)]
-        for task in self.tasks:
-            ID = task.ID
-            adj = task.pars
-            for p in adj:
-                topograph[p].append(ID)
+        graph = self.task_dependency
 
-        depth = [self.N] * self.N
+        self.task_depth = [-1] * self.N
 
-        for start in range(self.N):
-            if depth[start] != self.N:
+        for start in range(self.N-1, -1, -1):
+            if self.task_depth[start] != -1:
                 continue
             que = deque([start])
-            depth[start] = min(depth[start], 0)
+            self.task_depth[start] = 0
             while que:
                 now = que.popleft()
-                now_depth = depth[now]
-                for goto in topograph[now]:
-                    if now_depth + 1 < depth[goto]:
+                now_depth = self.task_depth[now]
+
+                for goto in graph[now]:
+                    if self.task_depth[goto] < now_depth + 1:
+                        self.task_depth[goto] = now_depth + 1
                         que.append(goto)
-                        depth[goto] = min(depth[goto], now_depth + 1)
-
-        return depth
-
 
     def work(self):
         """
@@ -390,26 +384,27 @@ class Scheduler:
         diff_i = [[d, i] for i, d in enumerate(diff)]
         diff_i.sort(reverse=True)
 
+        top_n = self.K // 3
+
         new_skill = skill[:]
-        if elapsed <= 1:
+        if elapsed <= 3:
             new_skill = [max(s, d) for s, d in zip(skill, diff)]
         elif gap > 5:
-            for j in range(5):
+            for j in range(top_n):
                 d, idx = diff_i[j]
                 new_skill[idx] = max(0, skill[idx] - 2)
         elif gap > 2:
-            for j in range(5):
+            for j in range(top_n):
                 d, idx = diff_i[j]
                 new_skill[idx] = max(0, skill[idx] - 1)
         elif gap < -5:
-            for j in range(5):
+            for j in range(top_n):
                 d, idx = diff_i[j]
                 new_skill[idx] = skill[idx] + 3
         elif gap < -2:
-            for j in range(5):
+            for j in range(top_n):
                 d, idx = diff_i[j]
                 new_skill[idx] = skill[idx] + 2
-
 
         self.modify_pred(member, new_skill)
 
