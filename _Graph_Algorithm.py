@@ -14,6 +14,37 @@ SI = lambda: input()
 
 
 from collections import deque
+def topological_sort(graph):
+    """
+    BFSによるトポロジカルソート O(V+E)
+    :param graph: 隣接リスト
+    :return: 長さnならトポソ可能、そうでなければサイクルあり
+    """
+    n = len(graph)
+    dims = [0] * n
+    for i, adj in enumerate(graph):
+        for goto in adj:
+            dims[goto] += 1
+
+    que = deque()
+    for i, d in enumerate(dims):
+        if d == 0:
+            que.append(i)
+
+    res = []
+    while que:
+        now = que.popleft()
+        res.append(now)
+
+        for goto in graph[now]:
+            dims[goto] -= 1
+            if dims[goto] == 0:
+                que.append(goto)
+
+    return res
+
+
+from collections import deque
 def diameter(N, graph):
     """
     :param N: 木の頂点数
