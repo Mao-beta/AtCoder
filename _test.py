@@ -23,6 +23,15 @@ num_to_alp = {i: chr(i+97) for i in range(26)}
 num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
 
 
+def read_input_file(path):
+    """
+    pathのファイルをNLI()形式などでよみこむ
+    """
+    with open(path, mode="r") as f:
+        A = [list(map(int, l.split())) for l in f.readlines()]
+    #print(*A, sep="\n")
+
+
 def compress(S):
     """ 座標圧縮 """
 
