@@ -23,34 +23,6 @@ except:
 #IS_LOCAL = False
 
 
-def move_robot(grid, order, robot, L_robots, R_robots):
-    URDL = [[-1, 0], [0, 1], [1, 0], [0, -1]]
-    d = 0
-    nh, nw = 14, 14
-    path = [[nh, nw]]
-    for s in order:
-        if s == "S":
-            dh, dw = URDL[d]
-            nh += dh
-            nw += dw
-            if grid[nh][nw] == "#":
-                nh -= dh
-                nw -= dw
-        elif s == "R":
-            R_robots[(nh, nw)].add(robot)
-            d = (d+1) % 4
-            if grid[nh][nw] == "L":
-                d = (d-2) % 4
-        elif s == "L":
-            L_robots[(nh, nw)].add(robot)
-            d = (d-1) % 4
-            if grid[nh][nw] == "R":
-                d = (d-2) % 4
-        path.append([nh, nw])
-
-    return nh, nw, path
-
-
 def solve(values):
     start_time = time.time()
     TIME_LIMIT = 2.5
@@ -67,15 +39,61 @@ def solve(values):
         ans[-1][w] = "#"
 
     # 初期移動
-    # hw -> idx
-    # あるhwでL/Rを実行したrobotのidxのset
+    # hw -> robot
+    # あるhwでL/Rを実行したrobotのset
     L_robots = defaultdict(set)
     R_robots = defaultdict(set)
+
+    # robot -> hw
+    robots_L = [set() for _ in range(N)]
+    robots_R = [set() for _ in range(N)]
+
+
+    def move_robot(order, robot):
+
+        for h, w in robots_L[robot]:
+            L_robots[(h, w)].discard(robot)
+        for h, w in robots_R[robot]:
+            R_robots[(h, w)].discard(robot)
+
+        robots_L[robot] = set()
+        robots_R[robot] = set()
+
+        URDL = [[-1, 0], [0, 1], [1, 0], [0, -1]]
+        d = 0
+        nh, nw = 14, 14
+        path = [[nh, nw]]
+        for s in order:
+            if s == "S":
+                dh, dw = URDL[d]
+                nh += dh
+                nw += dw
+                if ans[nh][nw] == "#":
+                    nh -= dh
+                    nw -= dw
+            elif s == "R":
+                R_robots[(nh, nw)].add(robot)
+                robots_R[robot].add((nh, nw))
+                if ans[nh][nw] == "L":
+                    d = (d - 1) % 4
+                else:
+                    d = (d + 1) % 4
+            elif s == "L":
+                L_robots[(nh, nw)].add(robot)
+                robots_L[robot].add((nh, nw))
+                if ans[nh][nw] == "R":
+                    d = (d + 1) % 4
+                else:
+                    d = (d - 1) % 4
+
+            path.append([nh, nw])
+
+        return nh, nw
 
     robots_dst = []
     dests = [[0]*M for _ in range(M)]
     for i, s in enumerate(S):
-        h, w, path = move_robot(ans, s, i, L_robots, R_robots)
+        h, w = move_robot(s, i)
         dests[h][w] += 1
         robots_dst.append([h, w])
 
@@ -92,10 +110,11 @@ def solve(values):
 
     if IS_LOCAL:
         print(score)
+        print(*dests, sep="\n")
+
 
     # 山登り
     loop_cnt = 1
-    paths = [[] for _ in range(N)]
 
     while True:
         rh = random.randint(1, M-2)
@@ -107,18 +126,17 @@ def solve(values):
         bs = ans[rh][rw]
         ans[rh][rw] = rs
 
-        targets = list(R_robots[(rh, rw)] & L_robots[(rh, rw)])
-        HWs = []
+        NHWs = []
         BHWs = []
+        targets = list(L_robots[(rh, rw)] & R_robots[(rh, rw)])
         for robot in targets:
-            h, w, path = move_robot(ans, S[robot], robot, L_robots, R_robots)
-            paths[robot] = path
+            nh, nw = move_robot(S[robot], robot)
             bh, bw = robots_dst[robot]
-            robots_dst[robot][0] = h
-            robots_dst[robot][1] = w
+            robots_dst[robot][0] = nh
+            robots_dst[robot][1] = nw
             dests[bh][bw] -= 1
-            dests[h][w] += 1
-            HWs.append((h, w))
+            dests[nh][nw] += 1
+            NHWs.append((nh, nw))
             BHWs.append((bh, bw))
 
         tmp_score = 0
@@ -131,29 +149,36 @@ def solve(values):
 
         else:
             ans[rh][rw] = bs
-            for (h, w), (bh, bw), robot in zip(HWs, BHWs, targets):
-                th, tw, path = move_robot(ans, S[robot], robot, L_robots, R_robots)
-                paths[robot] = path
-                robots_dst[robot][0] = th
-                robots_dst[robot][1] = tw
-                dests[th][tw] += 1
-                dests[h][w] -= 1
+            targets = list(L_robots[(rh, rw)] & R_robots[(rh, rw)])
+            for robot in targets:
+                nh, nw = move_robot(S[robot], robot)
+                bh, bw = robots_dst[robot]
+                robots_dst[robot][0] = nh
+                robots_dst[robot][1] = nw
+                dests[bh][bw] -= 1
+                dests[nh][nw] += 1
 
         loop_cnt += 1
+        if loop_cnt % 100 == 0:
+            print(loop_cnt, score, tmp_score)
+            #print(*dests, sep="\n")
 
         if time.time() - start_time > TIME_LIMIT:
             break
+
+    tmp_score = 0
+    for h in range(M):
+        for w in range(M):
+            tmp_score += score_dict[dests[h][w]]
+    print(tmp_score)
 
     if IS_LOCAL:
         print(loop_cnt, score)
         print(*dests, sep="\n")
         print(sum([sum(r) for r in dests]))
 
-        for robot in range(389, 391):
-            print(paths[robot])
 
     return ans
-
 
 
 def output_ans(ans, path=None):
