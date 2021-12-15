@@ -3,6 +3,7 @@ import math
 from collections import deque
 from pathlib import Path
 from heapq import heapify, heappop, heappush
+import random
 
 sys.setrecursionlimit(100000)
 MOD = 10 ** 9 + 7
@@ -27,47 +28,49 @@ def solve(values):
     return ans
 
 
-
 def output_ans(ans, path=None):
     if path:
         with open(path, "w") as f:
             for row in ans:
-                f.write(" ".join(map(str, row)) + "\n")
+                f.write("".join(map(str, row)) + "\n")
     else:
         for row in ans:
-            print(*row)
+            print(*row, sep="")
 
 
 def input_values(path=None):
-    values = {}
     if path:
         with open(path, mode="r") as f:
             inputs = f.readlines()
-            N, K = map(int, inputs[0].split())
-            A = [int(row) for row in inputs[1:]]
+            N, M, L = map(int, inputs[0].split())
+            S = inputs[1:]
 
     else:
-        N, K = NMI()
-        A = [NI() for _ in range(N)]
+        N, M, L = NMI()
+        S = [SI() for _ in range(N)]
 
-    return values
+    return N, M, L, S
 
 
-def main():
+def main(file=None):
     in_path = None
-    if IS_LOCAL:
-        in_path = Path("./in/in_K3000.txt")
-        filename = in_path.name.split("_")[1]
+    out_path = None
+
+    if file:
+        in_filename = file + ".in"
+        in_path = Path("./in/") / in_filename
+        out_filename = file + ".out"
+        out_path = Path("./out/") / out_filename
 
     values = input_values(in_path)
     ans = solve(values)
-
-    out_path = None
-    if IS_LOCAL:
-        out_path = Path("./out/")/filename
-
     output_ans(ans, out_path)
 
 
 if __name__ == "__main__":
-    main()
+    if IS_LOCAL:
+        for i in range(1):
+            random.seed(i)
+            main(str(i).zfill(3))
+    else:
+        main()
