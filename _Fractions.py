@@ -272,6 +272,15 @@ def prime_fact(n):
         prime_dict[n] = 1
     return prime_dict
 
+# 約数列挙（単体）
+def divisors(x):
+    res = set()
+    for i in range(1, int(x**0.5) + 2):
+        if x % i == 0:
+            res.add(i)
+            res.add(x//i)
+    return res
+
 
 def convert_base(str_n, base0, base1):
     """
