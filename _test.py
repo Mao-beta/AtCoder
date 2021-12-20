@@ -74,6 +74,35 @@ def edgedict_nond_1to0(edges):
 
 
 
+# ダブリングの骨格
+
+def ide():
+    """n==0や1などの終着点で返すもの"""
+    return
+
+def step(n):
+    """nを1減らすとき"""
+    return
+
+def double(n):
+    """nを半分にするとき"""
+    return
+
+from functools import lru_cache
+@lru_cache(maxsize=None)
+def rec(n):
+    if n == 1:
+        return ide()
+
+    if n % 2:
+        return step(rec(n-1))
+
+    else:
+        return double(rec(n//2))
+
+
+
+
 def euler_tour(start, n, graph):
     """
     非再帰オイラーツアー
