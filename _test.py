@@ -23,6 +23,14 @@ num_to_alp = {i: chr(i+97) for i in range(26)}
 num_to_ALP = {i: chr(i+97).upper() for i in range(26)}
 
 
+# 無限defaultdict
+from collections import defaultdict
+class recursiveDefaultdict(defaultdict):
+    def __init__(self):
+        super().__init__()
+        self.default_factory = type(self)
+
+
 def read_input_file(path):
     """
     pathのファイルをNLI()形式などでよみこむ
