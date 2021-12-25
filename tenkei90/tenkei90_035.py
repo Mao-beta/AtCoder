@@ -1,0 +1,185 @@
+import sys
+import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict
+from functools import lru_cache
+
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+
+
+class LCATree:
+    def __init__(self, n, edges, root):
+        """
+        最小共通祖先(LCA)を求める木　要deque
+        :param n: nodeの数(1からn)
+        :param edges: 辺の情報(1からn-1)
+        :param root: 根
+        """
+        self.n = n
+        self.max_double = len(bin(self.n))  # 最大何回ダブリングで遡るか およそlog2(n)
+        self.adj = self.make_adjlist_nond(self.n, edges)  # 隣接リスト
+        self.root = root
+        # parent[i][x]はxから2^i回根の方向に上った点 -1ならその親が存在しない
+        self.parent = [[-1] * (self.n + 1) for _ in range(self.max_double)]
+        self.depth = [-1] * (self.n + 1)
+        # ノードvを何番目に見たか（1-index）
+        self.v2i = {}
+
+        # dfsで各ノードの親と深さを記録
+        stack = deque()
+        stack.append(self.root)
+        self.depth[self.root] = 0
+        idx = 1
+        while stack:
+            now = stack.pop()
+            par = self.parent[0][now]
+            self.v2i[now] = idx
+            idx += 1
+
+            for goto in self.adj[now]:
+                if goto == par:
+                    continue
+                stack.append(goto)
+                self.parent[0][goto] = now
+                self.depth[goto] = self.depth[now] + 1
+
+        for d in range(self.max_double):
+            if d == 0: continue
+            pre_par = self.parent[d - 1]
+            for i in range(self.n + 1):
+                if pre_par[i] < 0:
+                    self.parent[d][i] = -1
+                    continue
+                self.parent[d][i] = pre_par[pre_par[i]]
+
+    def get_dist(self, x, y, lca):
+        return self.depth[x] + self.depth[y] - self.depth[lca] * 2
+
+    def get_LCA(self, x, y):
+        """
+        ノードxとノードyのLCA(最小共通祖先)を返す
+        :param x:
+        :param y:
+        :return: res
+        """
+        dx, dy = self.depth[x], self.depth[y]
+        # 深いほうをxとする
+        if dx < dy:
+            x, y = y, x
+            dx, dy = dy, dx
+        gap_d = dx - dy
+        # 同じ高さまで引き上げる
+        for i in range(self.max_double + 1):
+            if (gap_d >> i) & 1:
+                x = self.parent[i][x]
+        # 引き上げた結果同じ所ならそこがLCA
+        if x == y:
+            return x
+
+        # xとyを同時にダブリングで引き上げる
+        # ジャンプ先の地点が異なるならOK、同じならジャンプ幅を半分にする
+        for i in range(self.max_double - 1, -1, -1):
+            if self.parent[i][x] != self.parent[i][y]:
+                x = self.parent[i][x]
+                y = self.parent[i][y]
+        # ギリギリ同じにならない地点の親がLCA
+        return self.parent[0][x]
+
+    @staticmethod
+    def make_adjlist_nond(n, edges):
+        res = [[] for _ in range(n + 1)]
+        for edge in edges:
+            res[edge[0]].append(edge[1])
+            res[edge[1]].append(edge[0])
+        return res
+
+
+def solve_1(N, AB, Q, KV):
+
+    def adjlist_nond_1to0(n, edges):
+        res = [[] for _ in range(n)]
+        for a, b in edges:
+            a, b = a - 1, b - 1
+            res[a].append(b)
+            res[b].append(a)
+        return res
+
+    graph = adjlist_nond_1to0(N, AB)
+    INF = 10**10
+    D = [[INF]*N for _ in range(N)]
+
+    for root in range(N):
+        stack = deque()
+        stack.append(root)
+        D[root][root] = 0
+        prevs = [-1] * N
+
+        while stack:
+            now = stack.pop()
+            d = D[root][now]
+            for goto in graph[now]:
+                if prevs[now] == goto: continue
+                stack.append(goto)
+                prevs[goto] = now
+                D[root][goto] = d + 1
+
+
+def solve_23(N, AB, Q, KV):
+    tree = LCATree(N, AB, 1)
+
+    for k, *V in KV:
+        if k == 2:
+            x, y = V
+            lca = tree.get_LCA(x, y)
+            print(tree.get_dist(x, y, lca))
+
+        elif k == 3:
+            dists = []
+            for i in range(3):
+                x, y = V[i%k], V[(i+1)%k]
+                lca = tree.get_LCA(x, y)
+                dists.append(tree.get_dist(x, y, lca))
+            print(sum(dists)//2)
+
+
+def solve(N, AB, Q, KV):
+    tree = LCATree(N, AB, 1)
+    v2i = tree.v2i
+
+    for K, *V in KV:
+        TV = [[v2i[v], v] for v in V]
+        TV.sort()
+        res = 0
+        for i in range(K):
+            x, y = TV[i%K][1], TV[(i+1)%K][1]
+            #print(x, y)
+            lca = tree.get_LCA(x, y)
+            res += tree.get_dist(x, y, lca)
+        print(res//2)
+
+
+def main():
+    # input
+    N = NI()
+    AB = [NLI() for _ in range(N-1)]
+    Q = NI()
+    KV = [NLI() for _ in range(Q)]
+
+    solve(N, AB, Q, KV)
+
+    #solve_23(N, AB, Q, KV)
+
+
+if __name__ == "__main__":
+    main()

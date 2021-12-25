@@ -4,7 +4,7 @@ import bisect
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
 from functools import lru_cache
-from itertools import accumulate, combinations, permutations
+from itertools import accumulate
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -20,8 +20,19 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
-    
+    # input
+    N, K = NMI()
+    A = NLI()
+
+    C = list(accumulate([0]+A))
+    CC = defaultdict(int)
+    ans = 0
+    for c in C[::-1]:
+        ans += CC[c+K]
+        CC[c] += 1
+
+    print(ans)
+
 
 if __name__ == "__main__":
     main()

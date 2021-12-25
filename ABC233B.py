@@ -2,9 +2,8 @@ import sys
 import math
 import bisect
 from heapq import heapify, heappop, heappush
-from collections import deque, defaultdict, Counter
+from collections import deque, defaultdict
 from functools import lru_cache
-from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -20,8 +19,12 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
-    
+    # input
+    L, R = NMI()
+    S = list(SI())
+    S[L-1:R] = S[L-1:R][::-1]
+    print("".join(S))
+
 
 if __name__ == "__main__":
     main()
