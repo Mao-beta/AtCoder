@@ -1,20 +1,27 @@
+from collections import defaultdict
 class UnionFind:
     def __init__(self, n):
-        #親要素のノード番号を格納　xが根のとき-(サイズ)を格納
+        # 親要素のノード番号を格納　xが根のとき-(サイズ)を格納
         self.par = [-1 for i in range(n)]
         self.n = n
+        self.roots = set(range(n))
+        self.group_num = n
+        self.members = defaultdict(set)
+
+        for i in range(n):
+            self.members[i].add(i)
 
     def find(self, x):
-        #根ならその番号を返す
+        # 根ならその番号を返す
         if self.par[x] < 0:
             return x
         else:
-            #親の親は親
+            # 親の親は親
             self.par[x] = self.find(self.par[x])
             return self.par[x]
 
     def is_same(self, x, y):
-        #根が同じならTrue
+        # 根が同じならTrue
         return self.find(x) == self.find(y)
 
     def unite(self, x, y):
@@ -22,9 +29,16 @@ class UnionFind:
         y = self.find(y)
         if x == y: return
 
-        #木のサイズを比較し、小さいほうから大きいほうへつなぐ
+        # 木のサイズを比較し、小さいほうから大きいほうへつなぐ
         if self.par[x] > self.par[y]:
             x, y = y, x
+
+        self.group_num -= 1
+        self.roots.discard(y)
+        assert self.group_num == len(self.roots)
+
+        self.members[x] |= self.members[y]
+        self.members[y] = set()
 
         self.par[x] += self.par[y]
         self.par[y] = x
@@ -32,21 +46,21 @@ class UnionFind:
     def size(self, x):
         return -self.par[self.find(x)]
 
-    def members(self, x):
+    def get_members(self, x):
         root = self.find(x)
-        return [i for i in range(self.n) if self.find(i) == root]
+        return self.members[root]
 
-    def roots(self):
-        return [i for i, x in enumerate(self.par) if x < 0]
+    def get_roots(self):
+        return self.roots
 
     def group_count(self):
-        return len(self.roots())
+        return len(self.roots)
 
     def all_group_members(self):
-        return {r: self.members(r) for r in self.roots()}
+        return self.members
 
     def __repr__(self):
-        return '\n'.join('{}: {}'.format(r, self.members(r)) for r in self.roots())
+        return '\n'.join('{}: {}'.format(r, self.members[r]) for r in self.roots)
 
 
 class WeightedUnionFind:
