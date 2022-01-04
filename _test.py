@@ -55,6 +55,18 @@ def compress(S):
 def make_grid_int(h, w, num): return [[int(num)] * w for _ in range(h)]
 def make_grid_bool(h, w, bool): return [[bool] * w for _ in range(h)]
 
+
+# 隣接リスト
+def adjlist(n, edges, first_idx=1, directed=False):
+    res = [[] for _ in range(n)]
+    for a, b in edges:
+        a, b = a-first_idx, b-first_idx
+        res[a].append(b)
+        if not directed:
+            res[b].append(a)
+    return res
+
+
 #隣接リスト 入力1-index を 0-index に
 def adjlist_nond_1to0(n, edges):
     res = [[] for _ in range(n)]
