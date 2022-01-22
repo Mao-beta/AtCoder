@@ -621,6 +621,27 @@ def Salesman(dist, need_return):
     return ans
 
 
+def reconstruct_post_from_pre_and_in(Pre, In):
+    """
+    PreorderとInorderの列からPostorderを復元する
+    """
+    In_inv = {x: i for i, x in enumerate(In)}
+    now = [0]
+    ans = []
+
+    def rec(l, r):
+        if l >= r: return
+        root = Pre[now[0]]
+        now[0] += 1
+        idx = In_inv[root]
+        rec(l, idx)
+        rec(idx+1, r)
+        ans.append(root)
+
+    rec(0, N)
+    return ans
+
+
 def main():
     N = NI()
     P = [NLI() for _ in range(N)]
