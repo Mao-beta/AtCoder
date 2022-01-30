@@ -105,7 +105,8 @@ def mobius(n, dp):
 
 
 
-class Combinations:
+class Comb:
+    """nCrのnもrも10**6くらい"""
     def __init__(self, n, mod):
         self.mod = mod
         self.fac = [1] * (n + 1)
@@ -114,15 +115,47 @@ class Combinations:
             self.fac[i] = self.fac[i - 1] * i % self.mod
             self.inv[i] = self.inv[i - 1] * pow(i, self.mod - 2, self.mod) % self.mod
 
-    def cmb(self, n, r):
+    def C(self, n, r):
         if n < r: return 0
         if n < 0 or r < 0: return 0
         return self.fac[n] * self.inv[r] % MOD * self.inv[n - r] % MOD
 
-    def perm(self, n, r):
+    def P(self, n, r):
         if n < r: return 0
         if n < 0 or r < 0: return 0
         return self.fac[n] * self.inv[n - r] % MOD
+
+    def H(self, n, r):
+        return self.C(n+r-1, r-1)
+
+
+class HugeComb:
+    """nCrのnが10**9くらいあるが、rが200くらい"""
+    def __init__(self, r_max, mod=10**9+7):
+        assert r_max >= 0
+        self.r_max = r_max
+        self.inv = [1] * (r_max+1)
+        self.mod = mod
+
+        for i in range(1, r_max+1):
+            a = self.inv[i-1] * pow(i, mod-2, mod)
+            self.inv[i] = a
+
+    def P(self, n, r):
+        assert r >= 0
+        assert n >= r
+        res = 1
+        for i in range(r):
+            res = res * (n-i) % self.mod
+        return res
+
+    def C(self, n, r):
+        assert r <= self.r_max
+        return self.P(n, r) * self.inv[r] % self.mod
+
+    def H(self, n, r):
+        return self.C(n+r-1, r-1)
+
 
 
 # nCr 要math
