@@ -1,15 +1,22 @@
 import sys
 import math
-from collections import defaultdict
-from collections import deque
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
-MOD = 998244353
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
 
 
 class lazy_segtree():
@@ -148,96 +155,68 @@ class lazy_segtree():
         return 0
 
 
-# 区間最小値取得(prod)・区間加算(apply)
-INF = 1<<60
+# 区間和取得(prod)・区間更新(apply)
+# opの恒等写像
+E = (0, 0)
 
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
+def op(s, t):
+    res_sum = s[0] + t[0]
+    res_len = s[1] + t[1]
+    return (res_sum, res_len)
 
 def mapping(f, a):
     # f: 作用する、a: 作用される
-    return f + a
+    if f == ID:
+        return a
+    return (f[0] * a[1], a[1])
 
 def composition(f, g):
     # f(g())
-    return f + g
+    return g if f == ID else f
 
 # mappingの単位元
-ID = 0
-
-
-
-"""
-# 区間最小値取得、区間一様加算
-INF = 1<<60
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
-
-def mapping(f, a):
-    # f: 作用する、a: 作用される
-    return f + a
-
-def composition(f, g):
-    # f(g()) 
-    return f + g
-
-# mappingの単位元
-ID = 0
-"""
-
-"""
-# 区間最小値取得、区間更新
-INF = 1<<60
-EMP = -1
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
-
-def mapping(f, a):
-    # f: 作用する、a: 作用される
-    if f == EMP: return a
-    return f
-
-def composition(f, g):
-    # f(g()) 
-    return g if f == EMP else f
-
-# mappingの単位元
-ID = EMP
-"""
+ID = -1
 
 
 def main():
-    N, M = NMI()
-    querys = [NLI() for _ in range(M)]
-    A = [0] * N
+    N, Q, X = NMI()
+    PP = NLI()
+    P = []
+    for p in PP:
+        if p > X:
+            p = (2, 1)
+        elif p < X:
+            p = (0, 1)
+        else:
+            p = (1, 1)
+        P.append(p)
 
-    tree = lazy_segtree(A,
-                        OP=op, E=E, MAPPING=mapping,
-                        COMPOSITION=composition, ID=ID)
+    CLR = [NLI() for _ in range(Q)]
+    tree = lazy_segtree(P, op, E, mapping, composition, ID)
 
-    for s, t in querys:
-        s -= 1
-        tree.apply(s, t, 1)
 
-    ans = []
-    for i, (s, t) in enumerate(querys):
-        s -= 1
-        if tree.prod(s, t) > 1:
-            ans.append(i+1)
-    print(len(ans))
-    if ans:
-        print(*ans, sep="\n")
+    for c, l, r in CLR:
+        l -= 1
+        s = tree.prod(l, r)[0]
+        n = r - l
+        over = s // 2
+        even = s % 2
+        less = n - even - over
+
+        if c == 1:
+            tree.apply(l, l+less, (0, 1))
+            tree.apply(l+less, l+less+even, (1, 1))
+            tree.apply(r-over, r, (2, 1))
+
+        else:
+            tree.apply(l, l+over, (2, 1))
+            tree.apply(l+over, l+over+even, (1, 1))
+            tree.apply(r-less, r, (0, 1))
+
+
+    for i in range(N):
+        if tree.get(i)[0] == 1:
+            print(i+1)
 
 
 if __name__ == "__main__":

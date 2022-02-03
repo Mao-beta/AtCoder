@@ -1,15 +1,22 @@
 import sys
 import math
-from collections import defaultdict
-from collections import deque
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
-MOD = 998244353
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
 
 
 class lazy_segtree():
@@ -148,96 +155,49 @@ class lazy_segtree():
         return 0
 
 
-# 区間最小値取得(prod)・区間加算(apply)
+# 区間min取得(prod)・区間更新(apply)
 INF = 1<<60
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
+# opの恒等写像
 E = INF
+
+def op(s, t):
+    return min(s, t)
 
 def mapping(f, a):
     # f: 作用する、a: 作用される
-    return f + a
-
-def composition(f, g):
-    # f(g())
-    return f + g
-
-# mappingの単位元
-ID = 0
-
-
-
-"""
-# 区間最小値取得、区間一様加算
-INF = 1<<60
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
-
-def mapping(f, a):
-    # f: 作用する、a: 作用される
-    return f + a
-
-def composition(f, g):
-    # f(g()) 
-    return f + g
-
-# mappingの単位元
-ID = 0
-"""
-
-"""
-# 区間最小値取得、区間更新
-INF = 1<<60
-EMP = -1
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
-
-def mapping(f, a):
-    # f: 作用する、a: 作用される
-    if f == EMP: return a
+    if f == ID:
+        return a
     return f
 
 def composition(f, g):
-    # f(g()) 
-    return g if f == EMP else f
+    # f(g())
+    return g if f == ID else f
 
 # mappingの単位元
-ID = EMP
-"""
+ID = -1
 
 
 def main():
-    N, M = NMI()
-    querys = [NLI() for _ in range(M)]
-    A = [0] * N
+    N, Q = NMI()
+    STX = [NLI() for _ in range(N)]
+    D = [NI() for _ in range(Q)]
+    INF = 10**10
+    ans = [INF] * Q
 
-    tree = lazy_segtree(A,
-                        OP=op, E=E, MAPPING=mapping,
-                        COMPOSITION=composition, ID=ID)
+    STX.sort(key=lambda x: -x[2])
 
-    for s, t in querys:
-        s -= 1
-        tree.apply(s, t, 1)
+    tree = lazy_segtree(ans, op, E, mapping, composition, ID)
 
-    ans = []
-    for i, (s, t) in enumerate(querys):
-        s -= 1
-        if tree.prod(s, t) > 1:
-            ans.append(i+1)
-    print(len(ans))
-    if ans:
-        print(*ans, sep="\n")
+    for s, t, x in STX:
+        l = s - x
+        r = t - x
+        li = bisect.bisect_left(D, l)
+        ri = bisect.bisect_left(D, r)
+        tree.apply(li, ri, x)
+
+    for i in range(Q):
+        a = tree.get(i)
+        print(a if a != INF else -1)
 
 
 if __name__ == "__main__":
