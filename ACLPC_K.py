@@ -1,23 +1,22 @@
 import sys
 import math
-from collections import defaultdict
-from collections import deque
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
-MOD = 998244353
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
-
-
-# tupleを合成してintとして扱う
-def T(s, n):
-    return (s << 30) | n
-
-def invT(t):
-    return t >> 30, t & ((1 << 30) - 1)
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
 
 
 class lazy_segtree():
@@ -156,96 +155,51 @@ class lazy_segtree():
         return 0
 
 
-# 区間最小値取得(prod)・区間加算(apply)
-INF = 1<<60
+def T(s, n):
+    return (s << 30) | n
+
+def invT(t):
+    return t >> 30, t & ((1 << 30) - 1)
+
 
 def op(x, y):
-    return min(x, y)
+    x0, x1 = invT(x)
+    y0, y1 = invT(y)
+    return T((x0 + y0) % MOD99, x1 + y1)
 
 # opの単位元
-E = INF
+E = T(0, 1)
 
 def mapping(f, a):
     # f: 作用する、a: 作用される
-    return f + a
+    b, c = invT(f)
+    a0, a1 = invT(a)
+    return T((a0 * b % MOD99 + a1 * c % MOD99) % MOD99, a1)
 
 def composition(f, g):
     # f(g())
-    return f + g
+    b0, c0 = invT(f)
+    b1, c1 = invT(g)
+    # b0(b1 a + c1) + c0
+    return T(b0 * b1 % MOD99, (b0 * c1 % MOD99 + c0) % MOD99)
 
 # mappingの単位元
-ID = 0
-
-
-
-"""
-# 区間最小値取得、区間一様加算
-INF = 1<<60
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
-
-def mapping(f, a):
-    # f: 作用する、a: 作用される
-    return f + a
-
-def composition(f, g):
-    # f(g()) 
-    return f + g
-
-# mappingの単位元
-ID = 0
-"""
-
-"""
-# 区間最小値取得、区間更新
-INF = 1<<60
-EMP = -1
-
-def op(x, y):
-    return min(x, y)
-
-# opの単位元
-E = INF
-
-def mapping(f, a):
-    # f: 作用する、a: 作用される
-    if f == EMP: return a
-    return f
-
-def composition(f, g):
-    # f(g()) 
-    return g if f == EMP else f
-
-# mappingの単位元
-ID = EMP
-"""
+ID = T(1, 0)
 
 
 def main():
-    N, M = NMI()
-    querys = [NLI() for _ in range(M)]
-    A = [0] * N
-
-    tree = lazy_segtree(A,
-                        OP=op, E=E, MAPPING=mapping,
-                        COMPOSITION=composition, ID=ID)
-
-    for s, t in querys:
-        s -= 1
-        tree.apply(s, t, 1)
-
-    ans = []
-    for i, (s, t) in enumerate(querys):
-        s -= 1
-        if tree.prod(s, t) > 1:
-            ans.append(i+1)
-    print(len(ans))
-    if ans:
-        print(*ans, sep="\n")
+    N, Q = NMI()
+    A = NLI()
+    A = [T(a, 1) for a in A]
+    tree = lazy_segtree(A, op, E, mapping, composition, ID)
+    for _ in range(Q):
+        q, *query = NLI()
+        if q == 0:
+            l, r, b, c = query
+            tree.apply(l, r, T(b, c))
+        else:
+            l, r = query
+            print(invT(tree.prod(l, r))[0])
 
 
 if __name__ == "__main__":
