@@ -244,6 +244,24 @@ def kmp(s, t):
     return matched_indices
 
 
+# 自前ローリングハッシュ用
+import random
+M = 998244353
+b = random.sample(range(10 ** 4, 10 ** 5), 1)[0]
+
+def make_hash(S, b, m):
+    # SのHash tableを作る　O(|S|)
+    H = [0]
+    for s in S:
+        H.append((H[-1] * b + s) % m)
+    return H
+
+def sub_hash(H, P, M, l, r):
+    # Sの累積HashリストHから、部分文字列S[l:r]のhashを計算する
+    # Pは基数bのpow、Mは剰余の法
+    # 前計算していればO(1)
+    return (H[r] - P[r-l] * H[l]) % M
+
 
 import random
 def rabin_karp(s, t):
