@@ -1,0 +1,1378 @@
+#x: 21	y: 15	type: PIG
+#x: 18	y: 17	type: PIG
+#x: 26	y: 22	type: DOG
+#x: 28	y: 12	type: COW
+#x: 4	y: 21	type: CAT
+#x: 24	y: 19	type: RABBIT
+#x: 13	y: 6	type: COW
+#x: 9	y: 10	type: PIG
+#x: 20	y: 5	type: PIG
+#x: 5	y: 17	type: RABBIT
+#x: 11	y: 14	type: PIG
+#x: 28	y: 10	type: RABBIT
+#x: 0	y: 5	type: RABBIT
+#x: 18	y: 8	type: COW
+#x: 20	y: 19	type: CAT
+#x: 14	y: 23	type: DOG
+UDUDDDDU
+UDLDDDDU
+UDLDDDDR
+UDLDLDDR
+UDLDLDLR
+UDLDLDLR
+UDLDLDLR
+UDLDLDLR
+UDLDLDLR
+UDLDLDLR
+UDLLLDL.
+ULLLLLL.
+ULLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLL.L.
+LLLLL.L.
+LLLL..L.
+LLLL..L.
+LLLL..L.
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL.L....
+LL......
+LL......
+LL......
+LL......
+LL......
+.L......
+# PHASE 1
+# now x: 15, y: 1
+# #x: 14	y: 0	type: DOG
+........
+# now x: 15, y: 1
+# #x: 15	y: 1	type: DOG
+........
+# now x: 15, y: 1
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+# #x: 15	y: 1	type: HUMAN
+l.......
+# now x: 15, y: 1
+RRRRRRR.
+# now x: 15, y: 2
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+# #x: 15	y: 2	type: HUMAN
+l.......
+# now x: 15, y: 2
+RRRRRRR.
+# now x: 15, y: 3
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+# #x: 15	y: 3	type: HUMAN
+l.......
+# now x: 15, y: 3
+RRRRRRR.
+# now x: 15, y: 4
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+# #x: 15	y: 4	type: HUMAN
+l.......
+# now x: 15, y: 4
+RRRRRRR.
+# now x: 15, y: 5
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+# #x: 15	y: 5	type: HUMAN
+l.......
+# now x: 15, y: 5
+RRRRRRR.
+# now x: 15, y: 6
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 16	y: 5	type: DOG
+........
+# now x: 15, y: 6
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 16	y: 5	type: DOG
+........
+# now x: 15, y: 6
+# #x: 14	y: 5	type: DOG
+........
+# now x: 15, y: 6
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 16	y: 5	type: DOG
+........
+# now x: 15, y: 6
+# #x: 15	y: 6	type: DOG
+........
+# now x: 15, y: 6
+# #x: 14	y: 5	type: DOG
+........
+# now x: 15, y: 6
+# #x: 14	y: 5	type: DOG
+........
+# now x: 15, y: 6
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+# #x: 15	y: 6	type: HUMAN
+l.......
+# now x: 15, y: 6
+RRRRRRR.
+# now x: 15, y: 7
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+# #x: 15	y: 7	type: HUMAN
+l.......
+# now x: 15, y: 7
+RRRRRRR.
+# now x: 15, y: 8
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+# #x: 15	y: 8	type: HUMAN
+l.......
+# now x: 15, y: 8
+RRRRRRR.
+# now x: 15, y: 9
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+# #x: 15	y: 9	type: HUMAN
+l.......
+# now x: 15, y: 9
+RRRRRRR.
+# now x: 15, y: 10
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+# #x: 15	y: 10	type: HUMAN
+l.......
+# now x: 15, y: 10
+RRRRRRR.
+# now x: 15, y: 11
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+# #x: 15	y: 11	type: HUMAN
+l.......
+# now x: 15, y: 11
+RRRRRRR.
+# now x: 15, y: 12
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+# #x: 15	y: 12	type: HUMAN
+l.......
+# now x: 15, y: 12
+RRRRRRR.
+# now x: 15, y: 13
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+# #x: 15	y: 13	type: HUMAN
+l.......
+# now x: 15, y: 13
+RRRRRRR.
+# now x: 15, y: 14
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+# #x: 15	y: 14	type: HUMAN
+l.......
+# now x: 15, y: 14
+RRRRRRR.
+# now x: 15, y: 15
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+# #x: 15	y: 15	type: HUMAN
+l.......
+# now x: 15, y: 15
+RRRRRRR.
+# now x: 15, y: 16
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+# #x: 15	y: 16	type: HUMAN
+l.......
+# now x: 15, y: 16
+RRRRRRR.
+# now x: 15, y: 17
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+# #x: 15	y: 17	type: HUMAN
+l.......
+# now x: 15, y: 17
+RRRRRRR.
+# now x: 15, y: 18
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+# #x: 15	y: 18	type: HUMAN
+l.......
+# now x: 15, y: 18
+RRRRRRR.
+# now x: 15, y: 19
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+# #x: 15	y: 19	type: HUMAN
+l.......
+# now x: 15, y: 19
+RRRRRRR.
+# now x: 15, y: 20
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+# #x: 15	y: 20	type: HUMAN
+l.......
+# now x: 15, y: 20
+RRRRRRR.
+# now x: 15, y: 21
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+# #x: 15	y: 21	type: HUMAN
+l.......
+# now x: 15, y: 21
+RRRRRRR.
+# now x: 15, y: 22
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+# #x: 15	y: 22	type: HUMAN
+l.......
+# now x: 15, y: 22
+RRRRRRR.
+# now x: 15, y: 23
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+# #x: 15	y: 23	type: HUMAN
+l.......
+# now x: 15, y: 23
+RRRRRRR.
+# now x: 15, y: 24
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+# #x: 15	y: 24	type: HUMAN
+l.......
+# now x: 15, y: 24
+RRRRRRR.
+# now x: 15, y: 25
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+# #x: 15	y: 25	type: HUMAN
+l.......
+# now x: 15, y: 25
+RRRRRRR.
+# now x: 15, y: 26
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+# #x: 15	y: 26	type: HUMAN
+l.......
+# now x: 15, y: 26
+RRRRRRR.
+# now x: 15, y: 27
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+# #x: 15	y: 27	type: HUMAN
+l.......
+# now x: 15, y: 27
+RRRRRRR.
+# now x: 15, y: 28
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+# #x: 15	y: 28	type: HUMAN
+l.......
+# now x: 15, y: 28
+RRRRRRR.
+# now x: 15, y: 29
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+# #x: 15	y: 29	type: HUMAN
+l.......
+# now x: 15, y: 29
+# PHASE 2
+........
+# PHASE 3
+DDDDDDD.
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+# #x: 16	y: 29	type: HUMAN
+u.......
+DDDDDDD.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+LLLLLLL.
+# PHASE2 1
+# now x: 17, y: 15
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+# #x: 17	y: 15	type: HUMAN
+u.......
+# now x: 17, y: 15
+DDDDDDD.
+# now x: 18, y: 15
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+# #x: 18	y: 15	type: HUMAN
+u.......
+# now x: 18, y: 15
+DDDDDDD.
+# now x: 19, y: 15
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+# #x: 19	y: 15	type: HUMAN
+u.......
+# now x: 19, y: 15
+DDDDDDD.
+# now x: 20, y: 15
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+# #x: 20	y: 15	type: HUMAN
+u.......
+# now x: 20, y: 15
+DDDDDDD.
+# now x: 21, y: 15
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+# #x: 21	y: 15	type: HUMAN
+u.......
+# now x: 21, y: 15
+DDDDDDD.
+# now x: 22, y: 15
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+# #x: 22	y: 15	type: HUMAN
+u.......
+# now x: 22, y: 15
+DDDDDDD.
+# now x: 23, y: 15
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+# #x: 23	y: 15	type: HUMAN
+u.......
+# now x: 23, y: 15
+DDDDDDD.
+# now x: 24, y: 15
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+# #x: 24	y: 15	type: HUMAN
+u.......
+# now x: 24, y: 15
+DDDDDDD.
+# now x: 25, y: 15
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+# #x: 25	y: 15	type: HUMAN
+u.......
+# now x: 25, y: 15
+DDDDDDD.
+# now x: 26, y: 15
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+# #x: 26	y: 15	type: HUMAN
+u.......
+# now x: 26, y: 15
+DDDDDDD.
+# now x: 27, y: 15
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+# #x: 27	y: 15	type: HUMAN
+u.......
+# now x: 27, y: 15
+DDDDDDD.
+# now x: 28, y: 15
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: CAT
+........
+# now x: 28, y: 15
+# #x: 27	y: 14	type: CAT
+........
+# now x: 28, y: 15
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+# #x: 28	y: 15	type: HUMAN
+u.......
+# now x: 28, y: 15
+DDDDDDD.
+# now x: 29, y: 15
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+# #x: 29	y: 15	type: HUMAN
+u.......
+# now x: 29, y: 15
+# PHASE 2
+........
+# left: 6, right: 0
+# PHASE 3
+RRRRRRR.
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+# #x: 29	y: 16	type: HUMAN
+l.......
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........
+........

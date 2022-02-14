@@ -1,0 +1,1 @@
+C:\Users\betab\PycharmProjects\AtCoder\AHC008\visualizer\target\release\tester.exe: C:\Users\betab\PycharmProjects\AtCoder\AHC008\visualizer\src\bin\tester.rs C:\Users\betab\PycharmProjects\AtCoder\AHC008\visualizer\src\lib.rs
