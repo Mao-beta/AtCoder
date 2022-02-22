@@ -20,8 +20,28 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    H = NI()
-    print(math.sqrt(H * (12800000 + H)))
+    N = NI()
+    A = NLI()
+    D = deque()
+    num = 0
+    for a in A:
+        if not D:
+            D.append([a, 1])
+            num += 1
+        else:
+            x, k = D.pop()
+            if x == a:
+                k += 1
+                if k < x:
+                    D.append([x, k])
+                    num += 1
+                else:
+                    num -= k-1
+            else:
+                D.append([x, k])
+                D.append([a, 1])
+                num += 1
+        print(num)
 
 
 if __name__ == "__main__":

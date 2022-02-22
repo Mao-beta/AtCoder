@@ -20,7 +20,8 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
+    X = NI()
+    print(X//10)
 
 
 if __name__ == "__main__":

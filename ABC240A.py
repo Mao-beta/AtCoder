@@ -20,8 +20,16 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    H = NI()
-    print(math.sqrt(H * (12800000 + H)))
+    A, B = NMI()
+    A, B = A-1, B-1
+    if A == 9 and B == 0:
+        print("Yes")
+    elif A == 0 and B == 9:
+        print("Yes")
+    elif abs(A-B) % 10 == 1:
+        print("Yes")
+    else:
+        print("No")
 
 
 if __name__ == "__main__":

@@ -20,8 +20,7 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    H = NI()
-    print(math.sqrt(H * (12800000 + H)))
+    pass
 
 
 if __name__ == "__main__":

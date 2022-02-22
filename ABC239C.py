@@ -20,7 +20,19 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
+    x1, y1, x2, y2 = NMI()
+    x = x2 - x1
+    y = y2 - y1
+    DX = [1, 2, 2, 1, -1, -2, -2, -1]
+    DY = [2, 1, -1, -2, -2, -1, 1, 2]
+    for X, Y in zip(DX, DY):
+        for dx, dy in zip(DX, DY):
+            nx, ny = X + dx, Y + dy
+            if x == nx and y == ny:
+                print("Yes")
+                exit()
+
+    print("No")
 
 
 if __name__ == "__main__":
