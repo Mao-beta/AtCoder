@@ -20,7 +20,19 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
+    N, M = NMI()
+    A = NLI()
+    B = NLI()
+    D = defaultdict(int)
+    for a in A:
+        D[a] += 1
+    for b in B:
+        D[b] -= 1
+
+    if min(D.values()) >= 0:
+        print("Yes")
+    else:
+        print("No")
 
 
 if __name__ == "__main__":
