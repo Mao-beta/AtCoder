@@ -6,10 +6,6 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations
 
-if "PyPy" in sys.version:
-    import pypyjit
-    pypyjit.set_param('max_unroll_recursion=-1')
-
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -24,8 +20,20 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
-    
+    N = NI()
+    S = SI()
+    SC = S.split("C")
+    ans = []
+    for ss in SC:
+        C = Counter(ss)
+        B = C["A"] * 2 + C["B"]
+        A = B // 2
+        B %= 2
+        s = "A" * A + "B" * B
+        ans.append(s)
+
+    print("C".join(ans))
+
 
 if __name__ == "__main__":
     main()

@@ -276,6 +276,8 @@ def make_prime_table(n):
     return sieve
 
 prime_table = make_prime_table(1000)
+# 素数列挙
+primes = [p for i, p in enumerate(prime_table) if i == p]
 
 # 素因数分解　上のprime_tableと組み合わせて使う
 def prime_factorize(n):

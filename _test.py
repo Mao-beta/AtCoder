@@ -94,6 +94,28 @@ def edgedict_nond_1to0(edges):
 
 
 
+class Doubling:
+    def __init__(self, D, M=60):
+        """Dが1回の遷移、2^M回までのダブリング表"""
+        self.M = M
+        self.D = [D]
+        for m in range(self.M):
+            tmp = []
+            for i in range(len(D)):
+                j = self.D[-1][i]
+                tmp.append(self.D[-1][j])
+            self.D.append(tmp)
+
+    def pow(self, K, start):
+        """ダブリング遷移DをもとにstartからK回後の遷移先を求める"""
+        now = start
+        for m in range(self.M):
+            if (K >> m) & 1:
+                now = self.D[m][now]
+        return now
+
+
+
 # ダブリングの骨格
 
 def ide():

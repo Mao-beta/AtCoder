@@ -8,6 +8,7 @@ from itertools import accumulate, combinations, permutations
 
 if "PyPy" in sys.version:
     import pypyjit
+
     pypyjit.set_param('max_unroll_recursion=-1')
 
 sys.setrecursionlimit(1000000)
@@ -24,8 +25,12 @@ SLI = lambda: list(SMI())
 
 
 def main():
-    pass
-    
+    N, S = NMI()
+    ans = 0
+    for a in range(1, N+1):
+        ans += min(max(0, S - a), N)
+    print(ans)
+
 
 if __name__ == "__main__":
     main()
