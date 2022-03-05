@@ -94,6 +94,29 @@ def edgedict_nond_1to0(edges):
 
 
 
+class Knapsack:
+    def __init__(self, N, WV):
+        self.N = N
+        self.WV = WV
+        self.sumW = 0
+        self.sumV = 0
+        for w, v in WV:
+            self.sumW += w
+            self.sumV += v
+
+    def solve_limW(self, limW):
+        dp = [[0]*(limW + 1) for _ in range(self.N + 1)]
+
+        for i in range(self.N):
+            w, v = self.WV[i]
+            for j in range(limW + 1):
+                dp[i+1][j] = max(dp[i+1][j], dp[i][j])
+                if j+w <= limW:
+                    dp[i+1][j+w] = max(dp[i+1][j+w], dp[i][j] + v)
+
+        return max(dp[-1])
+
+
 class Doubling:
     def __init__(self, D, M=60):
         """Dが1回の遷移、2^M回までのダブリング表"""
