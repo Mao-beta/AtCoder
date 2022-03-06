@@ -118,12 +118,12 @@ class Comb:
     def C(self, n, r):
         if n < r: return 0
         if n < 0 or r < 0: return 0
-        return self.fac[n] * self.inv[r] % MOD * self.inv[n - r] % MOD
+        return self.fac[n] * self.inv[r] % self.mod * self.inv[n - r] % self.mod
 
     def P(self, n, r):
         if n < r: return 0
         if n < 0 or r < 0: return 0
-        return self.fac[n] * self.inv[n - r] % MOD
+        return self.fac[n] * self.inv[n - r] % self.mod
 
     def H(self, n, r):
         return self.C(n+r-1, r-1)
