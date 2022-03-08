@@ -1,11 +1,15 @@
 import sys
 import math
-import cmath
 import bisect
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations
+
+if "PyPy" in sys.version:
+    import pypyjit
+
+    pypyjit.set_param('max_unroll_recursion=-1')
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -62,9 +66,6 @@ class Vector:
     def norm(self):
         return self.real() ** 2 + self.imag() ** 2
 
-    def dist(self, other):
-        return cmath.sqrt((self - other).norm()).real
-
     def dot(self, other):
         return (self.z * other.z.conjugate()).real
 
@@ -79,10 +80,6 @@ class Vector:
             res = math.degrees(res)
         return res
 
-    def rotate(self, deg):
-        nz = self.z * cmath.exp(complex(0, deg * cmath.pi / 180))
-        return Vector(nz.real, nz.imag)
-
     def is_parallel(self, other):
         return abs(self.cross(other)) < self.EPS
 
@@ -93,83 +90,13 @@ class Vector:
         return f"Vector({self.real()}, {self.imag()})"
 
 
-class Line:
-    def __init__(self, P: Vector, Q: Vector, is_segment: bool=False):
-        self.D = Q - P
-        if self.D.real() < 0:
-            self.D *= -1
-        self.P = P
-        self.Q = None
-        if is_segment:
-            self.Q = Q
-        self.is_segment = is_segment
-
-    def projection(self, V: Vector):
-        """点Vから直線への射影"""
-        va = self.D
-        vb = V - self.P
-        return va.dot(vb) * va / va.norm() + self.P
-
-    def reflection(self, V: Vector):
-        """直線について点Vと対称な点"""
-        proj = self.projection(V)
-        return proj * 2 - V
-
-    def is_on(self, V: Vector):
-        proj = self.projection(V)
-        return proj == V
-
-    def __repr__(self):
-        return f"Line({self.P}, {self.D})"
-
-
-class Circle:
-    def __init__(self, x, y, r):
-        self.x = x
-        self.y = y
-        self.r = r
-
-    def dist2(self, other):
-        return (self.x - other.x)**2 + (self.y - other.y)**2
-
-    def relation(self, other):
-        d2 = self.dist2(other)
-
-        if d2 > (self.r + other.r)**2:
-            # 背反
-            return 5
-        elif d2 == (self.r + other.r)**2:
-            # 外接
-            return 4
-        elif d2 == (self.r - other.r)**2:
-            # 内接
-            return 2
-        elif d2 < (self.r - other.r)**2:
-            # 包含
-            return 1
-        else:
-            # 交差
-            return 3
-
-
 def main():
-    Q = NI()
-    for _ in range(Q):
-        p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y = NMI()
-        P1 = Vector(p1x, p1y)
-        P2 = Vector(p2x, p2y)
-        P3 = Vector(p3x, p3y)
-        P4 = Vector(p4x, p4y)
-        va = P2 - P1
-        vb = P4 - P3
-
-        if va.is_parallel(vb):
-            print(2)
-        elif va.is_orthogonal(vb):
-            print(1)
-        else:
-            print(0)
-
+    N = NI()
+    V = [Vector(*NMI()) for _ in range(N)]
+    ans = 10**7
+    for va, vb in combinations(V, 2):
+        ans = min(ans, math.sqrt((va-vb).norm()))
+    print(ans)
 
 
 if __name__ == "__main__":
