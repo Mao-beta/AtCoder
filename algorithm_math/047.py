@@ -25,8 +25,6 @@ SLI = lambda: list(SMI())
 
 
 
-
-
 def adjlist_nond_1to0(n, edges):
     res = [[] for _ in range(n)]
     for a, b in edges:
