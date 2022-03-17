@@ -138,7 +138,7 @@ class HugeComb:
         self.mod = mod
 
         for i in range(1, r_max+1):
-            a = self.inv[i-1] * pow(i, mod-2, mod)
+            a = self.inv[i-1] * pow(i, mod-2, mod) % mod
             self.inv[i] = a
 
     def P(self, n, r):
