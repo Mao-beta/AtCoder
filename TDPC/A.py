@@ -52,20 +52,14 @@ class FPS:
             self.A[i] %= self.mod
 
 
-
 def main():
-    """ ABC159F, ABC169Fなど """
-
-    N, S = NMI()
-    A = NLI()
-    fps = FPS(S)
-    ans = 0
-    for a in A:
-        fps.add_a(1, 0)
-        fps.mul_base(1, 1, a)
-        ans += fps.A[-1]
-        ans %= MOD99
-    print(ans)
+    N = NI()
+    P = NLI()
+    fps = FPS(10000)
+    fps.add_a(1, 0)
+    for p in P:
+        fps.mul_base(1, 1, p)
+    print(10001 - fps.A.count(0))
 
 
 if __name__ == "__main__":
