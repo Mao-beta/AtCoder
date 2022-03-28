@@ -106,14 +106,16 @@ def mobius(n, dp):
 
 
 class Comb:
-    """nCrのnもrも10**6くらい"""
+    """nCrのnもrも10**7くらいまで"""
     def __init__(self, n, mod):
         self.mod = mod
         self.fac = [1] * (n + 1)
         self.inv = [1] * (n + 1)
         for i in range(1, n + 1):
             self.fac[i] = self.fac[i - 1] * i % self.mod
-            self.inv[i] = self.inv[i - 1] * pow(i, self.mod - 2, self.mod) % self.mod
+        self.inv[n] = pow(self.fac[n], self.mod-2, self.mod)
+        for i in range(n-1, 0, -1):
+            self.inv[i] = self.inv[i+1] * (i+1) % self.mod
 
     def C(self, n, r):
         if n < r: return 0
