@@ -6,10 +6,6 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations
 
-if "PyPy" in sys.version:
-    import pypyjit
-    pypyjit.set_param('max_unroll_recursion=-1')
-
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
