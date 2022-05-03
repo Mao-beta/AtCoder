@@ -1,6 +1,5 @@
 import sys
 import math
-import cmath
 import bisect
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
@@ -25,6 +24,8 @@ class Vector:
     EPS = 1e-11
 
     def __init__(self, x, y):
+        self.x = x
+        self.y = y
         self.z = complex(x, y)
 
     def __add__(self, other):
@@ -124,7 +125,6 @@ class Line:
 
 
 def across(A: Vector, B: Vector, C: Vector, D: Vector):
-    """線分ABと線分CDの交差判定（あまり厳密でないかも）"""
     AB = B - A
     AC = C - A
     AD = D - A
@@ -140,53 +140,20 @@ def across(A: Vector, B: Vector, C: Vector, D: Vector):
     return True
 
 
-class Circle:
-    def __init__(self, x, y, r):
-        self.x = x
-        self.y = y
-        self.r = r
-
-    def dist2(self, other):
-        return (self.x - other.x)**2 + (self.y - other.y)**2
-
-    def relation(self, other):
-        d2 = self.dist2(other)
-
-        if d2 > (self.r + other.r)**2:
-            # 背反
-            return 5
-        elif d2 == (self.r + other.r)**2:
-            # 外接
-            return 4
-        elif d2 == (self.r - other.r)**2:
-            # 内接
-            return 2
-        elif d2 < (self.r - other.r)**2:
-            # 包含
-            return 1
-        else:
-            # 交差
-            return 3
-
-
 def main():
-    Q = NI()
-    for _ in range(Q):
-        p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y = NMI()
-        P1 = Vector(p1x, p1y)
-        P2 = Vector(p2x, p2y)
-        P3 = Vector(p3x, p3y)
-        P4 = Vector(p4x, p4y)
-        va = P2 - P1
-        vb = P4 - P3
+    ax, ay, bx, by = NMI()
+    A = Vector(ax, ay)
+    B = Vector(bx, by)
+    N = NI()
+    V = [Vector(*NLI()) for _ in range(N)]
 
-        if va.is_parallel(vb):
-            print(2)
-        elif va.is_orthogonal(vb):
-            print(1)
-        else:
-            print(0)
+    ans = 0
+    for i in range(N):
+        C, D = V[i], V[(i+1)%N]
+        if across(A, B, C, D):
+            ans += 1
 
+    print(ans//2 + 1)
 
 
 if __name__ == "__main__":
