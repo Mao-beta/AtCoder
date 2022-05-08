@@ -25,15 +25,11 @@ SLI = lambda: list(SMI())
 
 
 class FPS:
-    def __init__(self, n, mod=998244353, A=None):
+    def __init__(self, A, mod=998244353):
         """nは最高次の次数"""
-        self.n = n
-        self.A = [0] * (self.n+1)
+        self.n = len(A) - 1
+        self.A = A.copy()
         self.mod = mod
-
-        if A is not None:
-            for i, a in enumerate(A):
-                self.A[i] = a
 
     def __repr__(self):
         return str(self.A)
@@ -51,21 +47,61 @@ class FPS:
                 self.A[i] += self.A[i-k] * b
             self.A[i] %= self.mod
 
+    def mul(self, other, lim=False):
+        """
+        P -> PとQの畳み込みにする, self.n次より上は無視
+        愚直にやるのでO(d^2)
+        """
+        if lim:
+            res = [0] * (self.n+1)
+            for s in range(self.n+1):
+                for i in range(self.n+1):
+                    j = s - i
+                    if j > other.n or j < 0: continue
+                    res[s] += self.A[i] * other.A[j]
+                    res[s] %= self.mod
+            self.A = res
+
+        else:
+            res = [0] * (self.n + other.n + 1)
+            for i in range(self.n+1):
+                for j in range(other.n+1):
+                    res[i+j] += self.A[i] * other.A[j]
+                    res[i+j] %= self.mod
+            self.A = res
+
+
+def bostan_mori(A: FPS, Q: FPS, N: int):
+    """数列A、d次の特性方程式QからN番目の項を計算する"""
+    A = FPS(A.A)
+    Q = FPS(Q.A)
+    N -= 1
+
+    while N > 0:
+        # print(N)
+        Q1 = FPS([q * (-1)**(i%2) for i, q in enumerate(Q.A)])
+        A.mul(Q1)
+        Q.mul(Q1)
+
+        if N % 2 == 0:
+            A = FPS(A.A[::2])
+        else:
+            A = FPS(A.A[1::2])
+        Q = FPS(Q.A[::2])
+
+        N >>= 1
+        # print(A)
+
+    return A.A[0]
 
 
 def main():
     """ ABC159F, ABC169Fなど """
-
-    N, S = NMI()
-    A = NLI()
-    fps = FPS(S)
-    ans = 0
-    for a in A:
-        fps.add_a(1, 0)
-        fps.mul_base(1, 1, a)
-        ans += fps.A[-1]
-        ans %= MOD99
-    print(ans)
+    A = FPS([0, 1, 1])
+    Q = FPS([1, -1, -1])
+    for i in range(10):
+        res = bostan_mori(A, Q, i)
+        print(res)
 
 
 if __name__ == "__main__":
