@@ -19,17 +19,76 @@ SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 
 
-from atcoder.segtree import SegTree
+class segtree:
+    def __init__(self, N, func, e):
+        self.N = N
+        self.func = func
+        self.e = e
+
+        b = len(bin(self.N - 1)[2:])
+        self.size = 1 << b
+
+        self.tree = [self.e] * self.size * 2
+
+    def update(self, i, x):
+        i += self.size
+        l, r = i, i+1
+        a = x
+        while l > 0:
+            self.tree[l] = a
+            if l % 2:
+                a = self.func(self.tree[l-1], a)
+                l -= 1
+            if r % 2:
+                a = self.func(a, self.tree[r])
+                r += 1
+            l >>= 1
+            r >>= 1
+
+    def find(self, l, r):
+        l += self.size
+        r += self.size
+        al = self.e
+        ar = self.e
+        while l < r:
+            if l % 2:
+                al = self.func(al, self.tree[l])
+                l += 1
+            if r % 2:
+                ar = self.func(self.tree[r-1], ar)
+                r -= 1
+            l >>= 1
+            r >>= 1
+        a = self.func(al, ar)
+        return a
+
+
+    def get(self, i):
+        i += self.size
+        return self.tree[i]
+
+    def each(self):
+        return self.tree[self.size:]
+
+    def __repr__(self):
+        return str(self.each())
+
 
 def main():
     N, Q = NMI()
-    tree = SegTree(min, (1<<31)-1, [(1<<31)-1]*N)
+
+    INF = (1 << 31) - 1
+    seg = segtree(N, min, INF)
+
     for _ in range(Q):
         c, x, y = NMI()
         if c == 0:
-            tree.set(x, y)
+            seg.update(x, y)
         else:
-            print(tree.prod(x, y+1))
+            y += 1
+            print(seg.find(x, y))
+        # print(seg)
+
 
 
 if __name__ == "__main__":
