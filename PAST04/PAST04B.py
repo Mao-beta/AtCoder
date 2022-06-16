@@ -12,25 +12,30 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
+def solve(X, Y):
+    if Y == 0:
+        print("ERROR")
+        return 0
+
+    ans = str(X * 100 // Y)
+    L = len(ans)
+    if L >= 4:
+        print(ans[:-2] + "." + ans[-2:])
+    elif L == 3:
+        print(ans[:-2] + "." + ans[-2:])
+    elif L == 2:
+        print("0." + ans)
+    else:
+        print("0.0" + ans)
+
+
 def main():
     X, Y = NMI()
 
-    if Y == 0:
-        print("ERROR")
-        exit()
-    if X == 0:
-        print("0.00")
-        exit()
-
-    ans = str(math.floor(100*X/Y))
-    ans = ans[:-2] + "." + ans[-2:]
-    if ans[0] == ".":
-        print("0"+ans)
-    else:
-        print(ans)
-
-    
-
+    # for X in range(101):
+    #     for Y in range(101):
+    #         print(X, Y, " ", end="")
+    solve(X, Y)
 
 
 if __name__ == "__main__":
