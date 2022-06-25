@@ -162,6 +162,11 @@ class string:
         return lcp
 
     def z_algorithm(s):
+        """
+        文字列が与えられた時、各 i について
+        「S と S[i:] の最長共通接頭辞の長さ」
+        を記録した配列 A を O(|S|) で構築する
+        """
         n=len(s)
         if n==0:
             return []
