@@ -283,6 +283,34 @@ def kmp(s, t):
     return matched_indices
 
 
+
+class RollingHash():
+    """
+    文字列SについてのHash table
+    rh = RollingHash(S, 37, MOD)
+    hash = rh.get(l, r) # S[l:r]のhash
+    """
+    def __init__(self, s, base, mod):
+        self.mod = mod
+        self.pw = pw = [1]*(len(s)+1)
+
+        l = len(s)
+        self.h = h = [0]*(l+1)
+
+        v = 0
+        for i in range(l):
+            h[i+1] = v = (v * base + ord(s[i])) % mod
+        v = 1
+        for i in range(l):
+            pw[i+1] = v = v * base % mod
+
+    def get(self, l, r):
+        return (self.h[r] - self.h[l] * self.pw[r-l]) % self.mod
+
+
+
+
+
 # 自前ローリングハッシュ用
 import random
 M = 998244353
@@ -365,9 +393,10 @@ def manacher(s):
 
 
 def main():
-    s = "ab" * 10**5
-    t = "c"
-    print(rabin_karp(s, t))
+    S = input()
+    T = input()
+    ans = kmp(S, T)
+    print(*ans, end="\n")
 
 
 if __name__ == "__main__":

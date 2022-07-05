@@ -1,9 +1,10 @@
 import sys
-
-try:
-    import numpy as np
-except:
-    pass
+import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -113,45 +114,20 @@ class BitSet:
         return self._len
 
 
-
 def main():
+    """ABC258G"""
     N = NI()
     A = [SI() for _ in range(N)]
     IA = [BitSet(a) for a in A]
     ans = 0
     for i in range(N):
         ni = IA[i]
-        for j in range(i+1, N):
+        for j in range(i + 1, N):
             nj = IA[j]
             if A[i][j] == "0":
                 continue
             ans += ni & nj
     print(ans // 3)
-
-
-
-def _main():
-    N = NI()
-    A = [list(map(float, list(SI()))) for _ in range(N)]
-    A = np.array(A)
-    B = (A @ A) * A
-    print(np.sum(B.astype(np.int64)) // 6)
-
-
-def main_TLE():
-    N = NI()
-    A = [list(map(int, list(SI()))) for _ in range(N)]
-    A = np.array(A)
-    B = (A @ A) * A
-    print(np.sum(B) // 6)
-
-
-def main_TLE_():
-    N = NI()
-    A = [list(map(float, list(SI()))) for _ in range(N)]
-    A = np.array(A)
-    B = A @ A @ A
-    print(np.trace(B.astype(np.int64)) // 6)
 
 
 if __name__ == "__main__":
