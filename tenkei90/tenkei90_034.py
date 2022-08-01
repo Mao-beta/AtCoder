@@ -12,26 +12,62 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 
 
+class KindDeque():
+    """
+    D = KindDeque()
+    D.kindで種類数を、len(D)で長さを、
+    D.Cで中身のkeyごとの個数（要はCounterのような辞書）を
+    O(1)で取ってこれるdeque
+    """
+    def __init__(self):
+        self.D = deque()
+        self._k = 0
+        self.C = defaultdict(int)
+
+    @property
+    def kind(self):
+        return self._k
+
+    def __len__(self):
+        return len(self.D)
+
+    def append(self, x):
+        self.D.append(x)
+        if self.C[x] == 0:
+            self._k += 1
+        self.C[x] += 1
+
+    def appendleft(self, x):
+        self.D.appendleft(x)
+        if self.C[x] == 0:
+            self._k += 1
+        self.C[x] += 1
+
+    def pop(self):
+        x = self.D.pop()
+        self.C[x] -= 1
+        if self.C[x] == 0:
+            self._k -= 1
+
+    def popleft(self):
+        x = self.D.popleft()
+        self.C[x] -= 1
+        if self.C[x] == 0:
+            self._k -= 1
+
+
 def main():
     N, K = NMI()
     A = NLI()
 
-    que = deque()
-    D = defaultdict(int)
-    kind = 0
+    que = KindDeque()
     ans = 0
 
     for i, a in enumerate(A):
         que.append(a)
-        D[a] += 1
-        if D[a] == 1:
-            kind += 1
 
-        while kind > K:
-            x = que.popleft()
-            D[x] -= 1
-            if D[x] == 0:
-                kind -= 1
+        while que.kind > K:
+            que.popleft()
 
         ans = max(ans, len(que))
 
