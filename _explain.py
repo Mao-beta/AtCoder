@@ -1,3 +1,4 @@
+import random
 import sys
 import math
 from collections import deque
@@ -12,12 +13,7 @@ SI = lambda: input()
 
 
 def main():
-    S1 = "mari"
-    S2 = "to"
-    S3 = "zzo"
-    word = []
-    word += S1
-    print(word)
+    pass
 
 
 if __name__ == "__main__":
