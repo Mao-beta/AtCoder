@@ -479,24 +479,24 @@ def transpose(A):
 
 def cum_2D(A):
     """
-    2次元リストAの累積和
+    2次元リストAの累積和（左と上は0になる）
     """
     H = len(A)
     W = len(A[0])
-    C = [[0]*W for _ in range(H)]
+    C = [[0]*(W+1) for _ in range(H+1)]
 
     for h in range(H):
         cw = 0
         for w in range(W):
+            cw += A[h][w]
             if h == 0 and w == 0:
-                C[h][w] = A[h][w]
+                C[h+1][w+1] = A[h][w]
             elif h == 0:
-                C[h][w] = A[h][w] + C[h][w-1]
+                C[h+1][w+1] = A[h][w] + C[h+1][w]
             elif w == 0:
-                C[h][w] = A[h][w] + C[h-1][w]
+                C[h+1][w+1] = A[h][w] + C[h][w+1]
             else:
-                cw += A[h][w]
-                C[h][w] = C[h-1][w] + cw
+                C[h+1][w+1] = C[h][w+1] + cw
 
     return C
 
