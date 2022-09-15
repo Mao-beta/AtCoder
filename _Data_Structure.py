@@ -453,7 +453,7 @@ class Heapq:
         heappush(self.p, x)
         self.clean()
     def clean(self):
-        while self.p and self.q[0]==self.p[0]:
+        while self.p and self.q and self.q[0]==self.p[0]:
           heappop(self.q)
           heappop(self.p)
     def pop(self, exc=None):
