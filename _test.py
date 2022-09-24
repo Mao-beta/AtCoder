@@ -299,7 +299,7 @@ def dfs(start, graph):
 
 
 def dfs_paint_01_color(start, graph):
-    # 二色塗り分け
+    # 二色塗り分け 二部グラフである前提
     from collections import deque
 
     stack = deque()
