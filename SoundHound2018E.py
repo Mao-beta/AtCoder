@@ -21,6 +21,13 @@ SLI = lambda: list(SMI())
 
 def main():
     N, M = NMI()
+    UVS = [NLI() for _ in range(M)]
+    UVS = [[x-1, y-1, w] for x, y, w in UVS]
+
+
+
+def _main():
+    N, M = NMI()
     UVS = [NLI() for i in range(M)]
 
     G = [[] for _ in range(N)]
