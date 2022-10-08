@@ -186,220 +186,23 @@ class string:
         return z
 
 
-from typing import List
-from itertools import groupby
-
-# RUN LENGTH ENCODING str -> list(tuple())
-# example) "aabbbbaaca" -> [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)]
-def runLengthEncode(S: str) -> "List[tuple[str, int]]":
-    grouped = groupby(S)
-    res = []
-    for k, v in grouped:
-        res.append((k, int(len(list(v)))))
-    return res
-
-# RUN LENGTH DECODING list(tuple()) -> str
-# example) [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)] -> "aabbbbaaca"
-def runLengthDecode(L: "list[tuple]") -> str:
-    res = ""
-    for c, n in L:
-        res += c * int(n)
-    return res
-
-# RUN LENGTH ENCODING str -> str
-# example) "aabbbbaaca" -> "a2b4a2c1a1"
-def runLengthEncodeToString(S: str) -> str:
-    grouped = groupby(S)
-    res = ""
-    for k, v in grouped:
-        res += k + str(len(list(v)))
-    return res
-
-
-
-# 編集距離
-S = "acpc"
-T = "acm"
-SL = len(S)
-TL = len(T)
-
-@lru_cache(maxsize=None)
-def edit_distance(i, j):
-    if i >= SL: return TL - j
-    if j >= TL: return SL - i
-    if S[i] == T[j]:
-        return edit_distance(i + 1, j + 1)
-
-    res_add = edit_distance(i, j + 1)
-    res_del = edit_distance(i + 1, j)
-    res_mod = edit_distance(i + 1, j + 1)
-    return 1 + min(res_add, res_del, res_mod)
-
-
-
-# KMP法
-# 1対1の検索アルゴリズム。Tが固定のときTableを使いまわせる？
-# 前計算O(|T|), 検索O(|S|)
-# 事前にTから「j文字目で照合失敗したら次は何文字ずらすか」テーブルを作っておき、
-# マッチ位置を試す位置を少なくする。
-def make_kmp_table(t):
-    """
-    tbl[i]: t[:x] == t[i-x:i] となる最大のx
-    つまり、tのi文字目からみて後ろ何文字が、tのprefixと一致するか
-    """
-    i = 2
-    j = 0
-    m = len(t)
-    tbl = [0] * (m + 1)
-    tbl[0] = -1
-    while i <= m:
-        if t[i - 1] == t[j]:
-            tbl[i] = j + 1
-            i += 1
-            j += 1
-        elif j > 0:
-            j = tbl[j]
-        else:
-            tbl[i] = 0
-            i += 1
-    return tbl
-
-
-def kmp(s, t):
-    matched_indices = []
-    tbl = make_kmp_table(t)
-    i = 0
-    j = 0
-    n = len(s)
-    m = len(t)
-    while i + j < n:
-        if t[j] == s[i + j]:
-            j += 1
-            if j == m:
-                matched_indices.append(i)
-                i += j - tbl[j]
-                j = tbl[j]
-        else:
-            i += j - tbl[j]
-            if j > 0:
-                j = tbl[j]
-    return matched_indices
-
-
-
-class RollingHash():
-    """
-    文字列SについてのHash table
-    rh = RollingHash(S, 37, MOD)
-    hash = rh.get(l, r) # S[l:r]のhash
-    """
-    def __init__(self, s, base, mod):
-        self.mod = mod
-        self.pw = pw = [1]*(len(s)+1)
-
-        l = len(s)
-        self.h = h = [0]*(l+1)
-
-        v = 0
-        for i in range(l):
-            h[i+1] = v = (v * base + ord(s[i])) % mod
-        v = 1
-        for i in range(l):
-            pw[i+1] = v = v * base % mod
-
-    def get(self, l, r):
-        return (self.h[r] - self.h[l] * self.pw[r-l]) % self.mod
-
-
-
-
-
-# 自前ローリングハッシュ用
-import random
-M = 998244353
-b = random.sample(range(10 ** 4, 10 ** 5), 1)[0]
-
-def make_hash(S, b, m):
-    # SのHash tableを作る　O(|S|)
-    H = [0]
-    for s in S:
-        H.append((H[-1] * b + s) % m)
-    return H
-
-def sub_hash(H, P, M, l, r):
-    # Sの累積HashリストHから、部分文字列S[l:r]のhashを計算する
-    # Pは基数bのpow、Mは剰余の法
-    # 前計算していればO(1)
-    return (H[r] - P[r-l] * H[l]) % M
-
-
-import random
-def rabin_karp(s, t):
-    """
-    ローリングハッシュ
-    ハッシュ化にO(|S|+|T|)、検索にO(|S|)
-    sの連続部分文字列でtに一致するものの始点のindexをまとめてlistで返す
-    """
-    def exe(x, m):
-        th = 0
-        for c in tt:
-            th = (th * x + c) % m
-
-        sh = 0
-        for c in st[:l]:
-            sh = (sh * x + c) % m
-        xl = pow(x, l - 1, m)
-
-        matched = set()
-        if sh == th:
-            matched.add(0)
-        for i, (c0, c1) in enumerate(zip(st, st[l:]), start=1):
-            sh = ((sh - c0 * xl) * x + c1) % m
-            if sh == th:
-                matched.add(i)
-
-        return matched
-
-    l = len(t)
-    st = list(map(ord, s))
-    tt = list(map(ord, t))
-    # Xはなるべくst,ttの最大要素より大きくする
-    # Mはとりあえず2^61-1(素数)を設定する
-    xs = random.sample(range(10 ** 9, 10 ** 10), 3)
-    ans = exe(xs[0], 2305843009213693951)
-    ans.intersection_update(exe(xs[1], 2305843009213693951))
-    ans.intersection_update(exe(xs[2], 2305843009213693951))
-    return sorted(ans)
-
-
-def manacher(s):
-    """
-    文字列Sから奇数長の最長の回文をO(|S|)で検索するアルゴリズム。
-    Sの各文字の間にSには絶対に登場しないダミー文字を挟み込むと、偶数長の回文も見つけられる。
-    両端と各文字の間に'$'を挿入すると、「各要素の値-1」がそこを中心とした回文の長さとなる。
-    """
-    n = len(s)
-    radius = [0] * n
-    i, j = 0, 0
-    while i < n:
-        while i - j >= 0 and i + j < n and s[i - j] == s[i + j]:
-            j += 1
-        radius[i] = j
-        k = 1
-        while i - k >= 0 and i + k < n and k + radius[i - k] < j:
-            radius[i + k] = radius[i - k]
-            k += 1
-        i += k
-        j -= k
-    return radius
-
-
-
 def main():
-    S = input()
-    T = input()
-    ans = kmp(S, T)
-    print(*ans, end="\n")
+    N = NI()
+    S = SI()
+    T = SI()
+
+    X = S + S + "a" * N + T + T + "z" * N
+    A = string.suffix_array(X)
+
+    ans = 0
+    s = 0
+    for a in A:
+        if a < N:
+            s += 1
+        elif 3*N <= a < 4*N:
+            ans += s
+
+    print(ans)
 
 
 if __name__ == "__main__":
