@@ -153,9 +153,7 @@ class SortedMultiset(Generic[T]):
         return ans
 
 
-def main():
-    N, K = NMI()
-    P = NLI()
+def main(N, K, P):
     MS = SortedMultiset()
     ans = [-1] * (N+1)
     C = [0] * (N+1)
@@ -184,9 +182,67 @@ def main():
                 ans[now] = i
                 now = pars[now]
 
-    for a in ans[1:]:
-        print(a)
+    # for a in ans[1:]:
+    #     print(a)
+
+    return ans[1:]
+
+
+
+def wa_main(N, K, P):
+    P = [0] + P
+    field_num = deque()
+    field_yama = defaultdict(list)
+
+    ans = [-1] * (N + 1)
+    # 各queの先頭の数字を管理するリストが必要か
+    # 食べられたターンが必要だから、その山に何が含まれているかの情報も必要
+
+    import bisect
+    if K == 1:
+        for i in range(1, N + 1):
+            ans[P[i]] = i
+        return ans[1:]
+
+    else:
+        for i in range(1, N + 1):
+            num_yama = len(field_num)
+            ind = bisect.bisect_left(field_num, P[i])
+            if ind == num_yama:
+                field_num.append(P[i])
+                field_yama[P[i]].append(P[i])
+            else:
+                field_yama[P[i]] = field_yama[field_num[ind]]
+                field_yama[P[i]].append(P[i])
+                field_num[ind] = P[i]
+                if len(field_yama[P[i]]) == K:
+                    # field_numからP[i]を消してターン数を記録
+                    field_num.remove(P[i])
+                    for f in field_yama[P[i]]:
+                        ans[f] = i
+
+        # for a in ans[1:]:
+        #     print(a)
+    return ans[1:]
 
 
 if __name__ == "__main__":
-    main()
+    N, K = NMI()
+    P = NLI()
+    
+    ans = main(N, K, P)
+    print(*ans, sep="\n")
+
+    # N = 8
+    # for K in range(1, N+1):
+    #     for P in permutations(range(1, N+1)):
+    #         P = list(P)
+    #         ans = main(N, K, P)
+    #         wa = wa_main(N, K, P)
+    #         if ans != wa:
+    #             print(N, K, P)
+    #             print(ans)
+    #             print(wa)
+    #             exit()
+    #         
+    #         
