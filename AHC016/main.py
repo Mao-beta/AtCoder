@@ -32,7 +32,7 @@ def main():
     M = int(M)
     eps = float(eps)
 
-    N = M
+    N = 100
     ij2idx = {}
     idx = 0
     for i in range(N):
@@ -69,7 +69,7 @@ def main():
 
     def calc_abs(gdim, hdim):
         # return abs(sum(gdim) - sum(hdim))
-        gdim = [d * (1-eps) + (N-1-d) * eps for d in gdim]
+        # gdim = [d * (1-eps) + (N-1-d) * eps for d in gdim]
         gdim = sorted(gdim)
         hdim = sorted(hdim)
         return sum([abs(g-h) for g, h in zip(gdim, hdim)])
@@ -79,7 +79,6 @@ def main():
     vs = [int(gap * i) for i in range(M)]
 
     G = []
-    Gdims = []
     for vnum in vs:
         GG = [[0]*N for _ in range(N)]
         for i in range(vnum):
@@ -90,7 +89,6 @@ def main():
         # print(*GG, sep="\n")
         GG = D2G(GG)
         G.append(GG[:])
-        Gdims.append(count_dims(GG))
 
     # if IS_LOCAL:
     #     print(*Gdims, sep="\n")
@@ -126,27 +124,63 @@ def main():
         return res
 
 
+    def simulate_G(sk):
+        """shuffleなし、反転のみ"""
+        g = G[sk][:]
+        for i in range(N):
+            for j in range(i+1, N):
+                idx = ij2idx[(i, j)]
+                if random.uniform(0, 1) < eps:
+                    g[idx] ^= 1
+
+        return g
+
+
+    # Gdims_monte[i]: Giから作成したシミュレーション
+    Gdims_monte = [[] for _ in range(M)]
+    for sk in range(M):
+        for i in range(20):
+            G_sk_i = simulate_G(sk)
+            Gdims_monte[sk].append(count_dims(G_sk_i))
+
+
+    sks = []
+    answers = []
+
     for q in range(100):
         if IS_LOCAL:
-            H = simulate_H(NI())
+            sk = NI()
+            sks.append(sk)
+            H = simulate_H(sk)
         else:
             H = input()
             H = list(map(int, H))
 
         hdim = count_dims(H)
         res = []
-        for gdim in Gdims:
-            res.append(calc_abs(gdim, hdim))
+        for i, gdims in enumerate(Gdims_monte):
+            for gdim in gdims:
+                res.append((calc_abs(gdim, hdim), i))
 
-        ans = -1
-        best = 10**8
-        for i, a in enumerate(res):
-            if a < best:
-                ans = i
-                best = a
+        res.sort()
+        C = Counter([i for a, i in res[:20]])
+        ans = C.most_common()[0][0]
+        # ans = -1
+        # best = 10**8
+        # for i, a in enumerate(res):
+        #     if a < best:
+        #         ans = i
+        #         best = a
 
         print(ans)
+        answers.append(ans)
         sys.stdout.flush()
+
+
+    if IS_LOCAL:
+        bad = sum([int(sk != tk) for sk, tk in zip(sks, answers)])
+        score = round((10**9) * (0.9 ** bad) / N)
+        print(score)
 
 
 if __name__ == "__main__":
