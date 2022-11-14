@@ -32,7 +32,9 @@ def main():
     M = int(M)
     eps = float(eps)
 
-    N = 100
+    # N = 100
+    # N = M
+    N = min(int(M * (1+eps)), 100)
     ij2idx = {}
     idx = 0
     for i in range(N):
@@ -57,6 +59,14 @@ def main():
 
         return G
 
+    def bernoulli(p):
+        r = random.uniform(0, 1)
+        return int(r < p)
+
+    def make_random_G(p):
+        G = [bernoulli(p) for i in range(N*(N-1)//2)]
+        return G
+
     def count_dims(H):
         res = [0] * N
         for i in range(N):
@@ -75,20 +85,29 @@ def main():
         return sum([abs(g-h) for g, h in zip(gdim, hdim)])
 
 
-    gap = (N-1) / (M-1)
+    # gap = (N-1) / (M-1)
+    # vs = [int(gap * i) for i in range(M)]
+    #
+    # G = []
+    # for vnum in vs:
+    #     GG = [[0]*N for _ in range(N)]
+    #     for i in range(vnum):
+    #         for j in range(N):
+    #             GG[i][j] = 1
+    #             GG[j][i] = 1
+    #
+    #     # print(*GG, sep="\n")
+    #     GG = D2G(GG)
+    #     G.append(GG[:])
+
+    gap = N * (N - 1) // 2 / (M - 1)
     vs = [int(gap * i) for i in range(M)]
 
     G = []
-    for vnum in vs:
-        GG = [[0]*N for _ in range(N)]
-        for i in range(vnum):
-            for j in range(N):
-                GG[i][j] = 1
-                GG[j][i] = 1
-
-        # print(*GG, sep="\n")
-        GG = D2G(GG)
+    for v in vs:
+        GG = [1] * v + [0] * (N * (N - 1) // 2 - v)
         G.append(GG[:])
+
 
     # if IS_LOCAL:
     #     print(*Gdims, sep="\n")
@@ -135,17 +154,28 @@ def main():
 
         return g
 
+    monte_K = 35
 
     # Gdims_monte[i]: Giから作成したシミュレーション
     Gdims_monte = [[] for _ in range(M)]
     for sk in range(M):
-        for i in range(20):
+        for i in range(monte_K):
             G_sk_i = simulate_G(sk)
             Gdims_monte[sk].append(count_dims(G_sk_i))
 
 
     sks = []
     answers = []
+    gdim_totals = []
+    for i, gdims in enumerate(Gdims_monte):
+        gdim_total = [0] * N
+
+        for j, gdim in enumerate(gdims):
+            for k, d in enumerate(gdim):
+                gdim_total[k] += gdim[k]
+
+        gdim_totals.append(gdim_total)
+
 
     for q in range(100):
         if IS_LOCAL:
@@ -157,20 +187,25 @@ def main():
             H = list(map(int, H))
 
         hdim = count_dims(H)
-        res = []
-        for i, gdims in enumerate(Gdims_monte):
-            for gdim in gdims:
-                res.append((calc_abs(gdim, hdim), i))
+        for i in range(N):
+            hdim[i] *= monte_K
 
-        res.sort()
-        C = Counter([i for a, i in res[:20]])
-        ans = C.most_common()[0][0]
-        # ans = -1
-        # best = 10**8
-        # for i, a in enumerate(res):
-        #     if a < best:
-        #         ans = i
-        #         best = a
+        res = []
+
+        for i in range(M):
+            res.append(calc_abs(gdim_totals[i], hdim))
+
+
+        # res.sort()
+        # C = Counter([i for a, i in res[:monte_K]])
+        # ans = C.most_common()[0][0]
+
+        ans = -1
+        best = 10**8
+        for i, a in enumerate(res):
+            if a < best:
+                ans = i
+                best = a
 
         print(ans)
         answers.append(ans)
