@@ -27,7 +27,107 @@ SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 
 
+import random
+
+class Graphs:
+    def __init__(self, M, eps, N):
+        self.M = M
+        self.eps = eps
+        self.N = N
+        self.E = N * (N-1) // 2
+        self.Gs = []
+
+        self.ij2idx = {}
+        idx = 0
+        for i in range(N):
+            for j in range(i + 1, N):
+                self.ij2idx[(i, j)] = idx
+                idx += 1
+
+        self.build_Gs()
+
+
+    # 計算系
+    def count_dims(self, G):
+        # グラフGの各頂点の次数を数える
+        res = [0] * self.N
+        for i in range(self.N):
+            for j in range(i + 1, self.N):
+                idx = self.ij2idx[(i, j)]
+                if G[idx] == 1:
+                    res[i] += 1
+                    res[j] += 1
+        return res
+
+    def calc_abs(self, gdim, hdim):
+        # 次数のリスト同士で距離を計算
+        gdim = sorted(gdim)
+        hdim = sorted(hdim)
+        return sum([abs(g-h) for g, h in zip(gdim, hdim)])
+
+
+    def simulate_G(self, sk):
+        """G[sk]をepsに従って反転したものを返す"""
+        g = self.Gs[sk][:]
+        for i in range(self.N):
+            for j in range(i+1, self.N):
+                idx = self.ij2idx[(i, j)]
+                if random.uniform(0, 1) < self.eps:
+                    g[idx] ^= 1
+        return g
+
+    # グラフ構築関連
+    def make_flat_G(self, k):
+        # k本ずつ辺を持つ
+        G = [0] * (self.N * (self.N - 1) // 2)
+
+        for s in range(0, self.N, k+1):
+            for i in range(s, s+k+1):
+                for j in range(i+1, s+k+1):
+                    if i < self.N and j < self.N:
+                        idx = self.ij2idx[(i, j)]
+                        G[idx] = 1
+        return G
+
+    def make_sigmoid_G(self, v):
+        # 左からv個1、それ以外は0
+        return [1] * v + [0] * (self.E - v)
+
+
+    def build_Gs(self):
+        # 全頂点の次数をなるべく揃える 3の倍数くらい？
+        step = 3
+        for k in range(step, self.N - step, step):
+            self.Gs.append(self.make_flat_G(k))
+
+        gap = self.E / (self.M - len(self.Gs) - 1)
+        vs = [int(gap * i) for i in range(self.M - len(self.Gs))]
+
+        for v in vs:
+            GG = [1] * v + [0] * (self.E - v)
+            self.Gs.append(GG[:])
+
+
+    # 出力系
+    def output_Gs(self):
+        print(self.N)
+        sys.stdout.flush()
+        for g in self.Gs:
+            print("".join(map(str, g)))
+            sys.stdout.flush()
+
+
 def main():
+    M, eps = SMI()
+    M = int(M)
+    eps = float(eps)
+    N = min(int(M * (1+eps)), 100)
+
+    graphs = Graphs(M, eps, N)
+    graphs.output_Gs()
+
+
+def _main():
     M, eps = SMI()
     M = int(M)
     eps = float(eps)
@@ -43,21 +143,6 @@ def main():
             idx += 1
 
 
-    def D2G(D):
-        """
-        距離行列をグラフ形式に
-        :param D:
-        :return:
-        """
-        N = len(D)
-        G = [0] * (N * (N - 1) // 2)
-        for i in range(N):
-            for j in range(i+1, N):
-                if D[i][j] > 0:
-                    idx = ij2idx[(i, j)]
-                    G[idx] = 1
-
-        return G
 
     def bernoulli(p):
         r = random.uniform(0, 1)
@@ -96,21 +181,6 @@ def main():
         hdim = sorted(hdim)
         return sum([abs(g-h) for g, h in zip(gdim, hdim)])
 
-
-    # gap = (N-1) / (M-1)
-    # vs = [int(gap * i) for i in range(M)]
-    #
-    # G = []
-    # for vnum in vs:
-    #     GG = [[0]*N for _ in range(N)]
-    #     for i in range(vnum):
-    #         for j in range(N):
-    #             GG[i][j] = 1
-    #             GG[j][i] = 1
-    #
-    #     # print(*GG, sep="\n")
-    #     GG = D2G(GG)
-    #     G.append(GG[:])
 
     G = []
     # 全頂点の次数をなるべく揃える 3の倍数くらい？
