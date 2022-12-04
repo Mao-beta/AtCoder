@@ -21,8 +21,15 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N, P = NMI()
+    E = [0] * (N+1)
+    E[1] = 1
+    c = P * pow(100, MOD99-2, MOD99) % MOD99
+    p = (100-P) * pow(100, MOD99-2, MOD99) % MOD99
+    for i in range(2, N+1):
+        E[i] = (E[i-1] * p + E[i-2] * c + 1) % MOD99
+    print(E[-1])
+
 
 if __name__ == "__main__":
     main()

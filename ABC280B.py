@@ -21,8 +21,14 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    S = [0] + NLI()
+    S = S[::-1]
+    ans = []
+    for i in range(N):
+        ans.append(S[i] - S[i+1])
+    print(*ans[::-1])
+
 
 if __name__ == "__main__":
     main()

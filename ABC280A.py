@@ -21,8 +21,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    H, W = NMI()
+    ans = 0
+    for _ in range(H):
+        ans += SI().count("#")
+    print(ans)
+
 
 if __name__ == "__main__":
     main()

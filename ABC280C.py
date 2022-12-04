@@ -21,8 +21,14 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    S = SI()
+    T = SI()
+    for i in range(len(S)):
+        if S[i] != T[i]:
+            print(i+1)
+            exit()
+    print(len(T))
+
 
 if __name__ == "__main__":
     main()
