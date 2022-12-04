@@ -19,8 +19,8 @@ SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
-from collections import defaultdict
 
+from collections import defaultdict
 
 class UnionFind:
     def __init__(self, n):
@@ -86,41 +86,30 @@ class UnionFind:
         return '\n'.join('{}: {}'.format(r, self.members[r]) for r in self.roots)
 
 
+def MST(N, edges):
+    """
+    要UnionFind
+    N頂点の最小全域木の長さ
+    edges = [[u, v, cost], ....] (0-index)
+    """
+    uf = UnionFind(N)
+    edges.sort(key=lambda x: -x[-1])
+    res = 0
+    for a, b, c in edges:
+        if uf.is_same(a, b):
+            continue
+        else:
+            res += c
+            uf.unite(a, b)
+    return res, uf
+
+
 def main():
     N, M = NMI()
-    AB = EI(M)
-    AB = [[x-1, y-1] for x, y in AB]
-    Q = NI()
-    querys = EI(Q)[::-1]
-    uf = UnionFind(N)
-    ans = []
-
-    safe = set(range(M))
-    for q, *X in querys:
-        if q == 1:
-            safe.discard(X[0]-1)
-
-    for mi in safe:
-        a, b = AB[mi]
-        uf.unite(a, b)
-
-    for q, *X in querys:
-        if q == 1:
-            x = X[0] - 1
-            a, b = AB[x]
-            uf.unite(a, b)
-        else:
-            u, v = X
-            u -= 1
-            v -= 1
-            ans.append(uf.is_same(u, v))
-    
-    for a in ans[::-1]:
-        if a:
-            print("Yes")
-        else:
-            print("No")
-
+    ABC = EI(M)
+    ABC = [[x-1, y-1, w] for x, y, w in ABC]
+    ans, uf = MST(N, ABC)
+    print(ans)
 
 
 if __name__ == "__main__":
