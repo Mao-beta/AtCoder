@@ -55,6 +55,7 @@ class Comb:
         return res
 
 
+
 def main():
     n, r = NMI()
     com = Comb(n, MOD)
