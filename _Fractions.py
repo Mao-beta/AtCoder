@@ -132,7 +132,7 @@ class Comb:
 
 
 class HugeComb:
-    """nCrのnが10**9くらいあるが、rが200くらい"""
+    """nCrのnが10**9くらいあるが、rが10**5くらい"""
     def __init__(self, r_max, mod=10**9+7):
         assert r_max >= 0
         self.r_max = r_max
