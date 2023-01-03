@@ -14,12 +14,17 @@ SI = lambda: input()
 def main():
     Q = NI()
     D = defaultdict(int)
+    ans = []
     for _ in range(Q):
         query = NLI()
         if query[0] == 0:
-            D[query[1]] = query[2]
+            D[query[1] * 2] = query[2]
         else:
-            print(D[query[1]])
+            if query[1] * 2 in D:
+                ans.append(D[query[1]*2])
+            else:
+                ans.append(0)
+    print("\n".join(map(str, ans)))
 
 
 if __name__ == "__main__":
