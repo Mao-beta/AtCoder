@@ -19,6 +19,9 @@ SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
+def print_err(*args):
+    print(*args, file=sys.stderr)
+    
 
 def main():
     pass
