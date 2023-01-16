@@ -72,6 +72,7 @@ def main():
     # C[s].sum(l, r)で個数を取得し、Tと比較
     C = [BIT(N) for _ in range(26)]
 
+    # Tは昇順なので個数だけ管理
     T = Counter(S)
 
     for i, s in enumerate(S):
@@ -90,13 +91,17 @@ def main():
             x -= 1
             c = ord(c) - ord("a")
             s = S[x]
+            # Tを更新
             T[s] -= 1
             T[c] += 1
+            # Sを更新
             S[x] = c
 
+            # 文字sと文字cに関するBITを更新
             C[s].add(x, -1)
             C[c].add(x, 1)
 
+            # 逆順に関する情報を更新
             if x > 0:
                 desc.add(x-1, -desc.get(x-1))
                 if S[x-1] > S[x]:
@@ -109,40 +114,55 @@ def main():
         else:
             l, r = query[1:]
             l, r = int(l), int(r)
+            # 半開区間にする
             l -= 1
+
+            # 1文字のときはOK
             if r - l == 1:
                 print("Yes")
                 continue
 
+            # 範囲内に逆順があればNo
             if desc.sum(l, r-1) > 0:
                 print("No")
                 continue
 
+            # S[l:r]のCounter
             X = [0] * 26
             for s in range(26):
                 X[s] = C[s].sum(l, r)
 
+            # ごり押しパート
+            # アルファベット順に見て、
+            # 0 0 ... 0 T以下 T T ... T T以下 0 0 ...
+            # を確認する
             start = False
             end = False
             ok = True
             for s in range(26):
+                # 左側なら次へ
                 if not start and X[s] == 0:
                     continue
+                # 万が一超えていたらNo（ないはず）
                 if X[s] > T[s]:
                     ok = False
                     break
 
+                # 終わってるのにXがあったらダメ
                 if end and X[s] > 0:
                     ok = False
                     break
+                # 終わってて0なら正常
                 elif end:
                     continue
 
                 if start:
+                    # 開始してて次にT未満ならそこで終わりのはず
                     if X[s] < T[s]:
                         end = True
                         continue
                 else:
+                    # まだ開始してなく0でなくT以下ならそこが開始点
                     if X[s] <= T[s]:
                         start = True
 
