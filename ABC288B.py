@@ -21,8 +21,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N, K = NMI()
+    S = [SI() for _ in range(K)]
+    S.sort()
+    for i in range(K):
+        print(S[i])
+
 
 if __name__ == "__main__":
     main()
