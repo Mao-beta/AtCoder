@@ -21,31 +21,23 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    S = list(map(int, SI()))
-    X = [0] * (N+1)
+    S = SI()
+    K = NI()
+    N = len(S)
+    S = [ord(s) - ord("a") for s in S]
+    for i in range(N):
+        s = S[i]
+        if (26 - s) % 26 > K:
+            continue
 
-    X[0] = 1
-    X[1] = S[0]
-    c = 1
-    for i in range(2, N+1):
-        c = (c + X[i - 1]) % MOD99
-        X[i] = (X[i-1] * 10 + c * S[i-1]) % MOD99
+        K -= (26 - s) % 26
+        S[i] = 0
 
-    Y = [0]
-    for i in range(N-1, -1, -1):
-        Y.append((Y[-1] + S[i] * pow(10, N-1-i, MOD99)) % MOD99)
-    Y = Y[::-1]
+    if K > 0:
+        S[-1] = (S[-1] + K) % 26
 
-    # print(X)
-    # print(Y)
-
-    ans = 0
-    for x, y in zip(X, Y):
-        ans += x * y % MOD99
-        ans %= MOD99
-
-    print(ans)
+    S = [chr(s + ord("a")) for s in S]
+    print("".join(S))
 
 
 if __name__ == "__main__":

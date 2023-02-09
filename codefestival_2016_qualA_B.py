@@ -22,28 +22,17 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    S = list(map(int, SI()))
-    X = [0] * (N+1)
-
-    X[0] = 1
-    X[1] = S[0]
-    c = 1
-    for i in range(2, N+1):
-        c = (c + X[i - 1]) % MOD99
-        X[i] = (X[i-1] * 10 + c * S[i-1]) % MOD99
-
-    Y = [0]
-    for i in range(N-1, -1, -1):
-        Y.append((Y[-1] + S[i] * pow(10, N-1-i, MOD99)) % MOD99)
-    Y = Y[::-1]
-
-    # print(X)
-    # print(Y)
+    A = NLI()
+    C = Counter()
+    for i, a in enumerate(A, start=1):
+        if i > a:
+            i, a = a, i
+        C[(i, a)] += 1
 
     ans = 0
-    for x, y in zip(X, Y):
-        ans += x * y % MOD99
-        ans %= MOD99
+    for k in C.values():
+        if k == 2:
+            ans += 1
 
     print(ans)
 

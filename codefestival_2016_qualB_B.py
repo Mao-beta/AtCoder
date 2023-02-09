@@ -21,31 +21,20 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    S = list(map(int, SI()))
-    X = [0] * (N+1)
-
-    X[0] = 1
-    X[1] = S[0]
-    c = 1
-    for i in range(2, N+1):
-        c = (c + X[i - 1]) % MOD99
-        X[i] = (X[i-1] * 10 + c * S[i-1]) % MOD99
-
-    Y = [0]
-    for i in range(N-1, -1, -1):
-        Y.append((Y[-1] + S[i] * pow(10, N-1-i, MOD99)) % MOD99)
-    Y = Y[::-1]
-
-    # print(X)
-    # print(Y)
-
-    ans = 0
-    for x, y in zip(X, Y):
-        ans += x * y % MOD99
-        ans %= MOD99
-
-    print(ans)
+    N, A, B = NMI()
+    S = SI()
+    total = 0
+    alien = 0
+    for s in S:
+        if s == "a" and total < A+B:
+            print("Yes")
+            total += 1
+        elif s == "b" and total < A+B and alien < B:
+            print("Yes")
+            total += 1
+            alien += 1
+        else:
+            print("No")
 
 
 if __name__ == "__main__":
