@@ -74,6 +74,8 @@ class Solver:
         power = 100
         while not self.field.is_broken[y][x]:
             result = self.field.query(y, x, power)
+            power *= 2
+            power = min(power, 5000)
             if result == Response.FINISH:
                 print(f"total_cost={self.field.total_cost}", file=sys.stderr)
                 sys.exit(0)
