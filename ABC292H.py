@@ -127,7 +127,7 @@ class lazy_segtree():
         for i in range(self.log,0,-1):self.push(l>>i)
         sm=self.e
         while(1):
-            while(i%2==0):l>>=1
+            while(l%2==0):l>>=1
             if not(g(self.op(sm,self.d[l]))):
                 while(l<self.size):
                     self.push(l)
@@ -172,7 +172,7 @@ class lazy_segtree():
         return 0
 
 
-# 区間最小値取得(prod)・区間加算(apply)
+# 区間最大値取得(prod)・区間加算(apply)
 INF = 1<<60
 
 def op(x, y):
@@ -197,7 +197,7 @@ def main():
     N, B, Q = NMI()
     A = NLI()
     CX = EI(Q)
-    V = list(accumulate([a-B for a in A])) + [INF]
+    V = list(accumulate([a-B for a in A]))
     seg = lazy_segtree(V, op, E, mapping, composition, ID)
 
     total = sum(A)
@@ -209,25 +209,11 @@ def main():
         total += x - a
 
         def judge(X):
-            return seg.prod(0, X) >= 0
+            return X < 0
 
-        ok = N+1
-        ng = 0
-
-        while abs(ok - ng) > 1:
-            X = (ok + ng) // 2
-            if judge(X):
-                ok = X
-            else:
-                ng = X
-
-        s = seg.prod(0, ok)
-
-        if ok == N+1:
-            print(total / N)
-        else:
-            print(B + s / ok)
-
+        r = seg.max_right(0, judge)
+        r = min(r, N-1)
+        print(seg.get(r) / (r+1) + B)
 
 
 if __name__ == "__main__":
