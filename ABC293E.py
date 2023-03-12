@@ -33,7 +33,7 @@ def main():
 
     ans = pow(A, X, (A-1)*M) - 1
     ans //= A-1
-    print(ans)
+    print(ans % M)
 
 
 if __name__ == "__main__":
