@@ -6,11 +6,6 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations
 
-if "PyPy" in sys.version:
-    import pypyjit
-
-    pypyjit.set_param('max_unroll_recursion=-1')
-
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -22,7 +17,132 @@ NLI = lambda: list(NMI())
 SI = lambda: input()
 SMI = lambda: input().split()
 SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
 
+
+# 正方行列の積 mod
+def mul_matrix(A, B, mod=10**9+7):
+    size = len(A)
+    ans = [[0] * size for _ in range(size)]
+    for h in range(size):
+        for w in range(size):
+            for i in range(size):
+                ans[h][w] += A[h][i] * B[i][w] % mod
+                ans[h][w] %= mod
+    return ans
+
+# 正方行列の累乗 mod
+def _pow_matrix(A, n, mod=10**9+7):
+    if n == 1:
+        size = len(A)
+        E = [[0] * size for _ in range(size)]
+        for i in range(size):
+            E[i][i] = 1
+        return mul_matrix(A, E, mod)
+
+    if n % 2 == 0:
+        tA = pow_matrix(A, n//2, mod)
+        return mul_matrix(tA, tA, mod)
+    else:
+        tA = pow_matrix(A, n-1, mod)
+        return mul_matrix(tA, A, mod)
+
+
+# 正方行列の累乗 mod
+def pow_matrix(A, n, mod=10**9+7):
+    bitn = len(bin(n)) - 2
+    pows = []
+    size = len(A)
+    E = [[0] * size for _ in range(size)]
+    for i in range(size):
+        E[i][i] = 1
+
+    pows.append(A)
+    ans = E
+
+    for i in range(bitn):
+        if (n >> i) & 1:
+            ans = mul_matrix(pows[-1], ans, mod)
+        pows.append(mul_matrix(pows[-1], pows[-1], mod))
+
+    return ans
+
+
+
+def mul(f, g, mod=998244353):
+    """愚直畳み込み"""
+    fn = len(f)
+    gn = len(g)
+    res = [0] * (fn + gn - 1)
+    for fi in range(fn):
+        for gi in range(gn):
+            res[fi+gi] += f[fi] * g[gi] % mod
+            res[fi+gi] %= mod
+    return res
+
+
+def bostan_mori(P: list, Q: list, n: int, mod=998244353):
+    """
+    d+1項間線形漸化式Qをもつ数列の第n項 modをもとめる
+    A = P / Q
+    O(M(d)logN) M(d)はd次多項式同士の積の計算量(O(d^2 logN))
+    http://q.c.titech.ac.jp/docs/progs/polynomial_division.html
+
+    :param P: 母関数の分子を表すd項以下のlist
+    :param Q: 母関数の分母をあらわすd+1項のlist
+        (フィボナッチなら An - An-1 - An-2 = 0 なので Q=[1, -1, -1])
+    :param n: 求めたい第n項(0-index)
+    :return: A[n]
+    """
+
+    while n > 0:
+        Qm = [-q if i % 2 else q for i, q in enumerate(Q)]
+        V = mul(Q, Qm, mod)
+        Q = V[::2]
+        PQm = mul(P, Qm, mod)
+        if n % 2 == 0:
+            P = PQm[::2]
+            n >>= 1
+        else:
+            P = PQm[1::2]
+            n >>= 1
+
+    return P[0]
+
+
+def main(K, M, A, C):
+    if K >= M:
+        print(A[M-1])
+        exit()
+
+    ans = 0
+    for i in range(32):
+        Ab = [(a>>i) & 1 for a in A]
+        Cb = [1] + [-(c>>i) & 1 for c in C]
+
+        f = mul(Ab, Cb, 2)[:K]
+        b = bostan_mori(f, Cb, M-1, 2)
+
+        ans |= (b << i)
+
+    print(ans)
+
+
+if __name__ == "__main__":
+    K, M = NMI()
+    A = NLI()
+    C = NLI()
+    main(K, M, A, C)
+    exit()
+
+    from random import randint
+    for _ in range(1000):
+        K = randint(1, 100)
+        M = randint(1, 10**9)
+        A = [randint(0, 1<<32) for _ in range(K)]
+        C = [randint(0, 1<<32) for _ in range(K)]
+        print(K, M, A, C)
+        main(K, M, A, C)
 
 
 # ACL for python
@@ -209,205 +329,3 @@ class FFT():
         for i in range(n + m - 1):
             c[i] = (c[i] * iz) % self.mod
         return c[:n + m - 1]
-
-
-class FPS:
-    def __init__(self, A, mod=998244353):
-        """nは最高次の次数"""
-        self.n = len(A) - 1
-        self.A = A.copy()
-        self.mod = mod
-
-    def __repr__(self):
-        return str(self.A)
-
-    def add_a(self, a, k):
-        """x^kの係数にaを足す"""
-        self.A[k] += a
-        self.A[k] %= self.mod
-
-    def mul_base(self, a, b, k):
-        """(a + b x^k)倍"""
-        for i in range(self.n, -1, -1):
-            self.A[i] *= a
-            if i-k >= 0:
-                self.A[i] += self.A[i-k] * b
-            self.A[i] %= self.mod
-
-    def mul(self, other, lim=False):
-        """
-        P -> PとQの畳み込みにする, self.n次より上は無視
-        愚直にやるのでO(d^2)
-        """
-        if lim:
-            res = [0] * (self.n+1)
-            for s in range(self.n+1):
-                for i in range(self.n+1):
-                    j = s - i
-                    if j > other.n or j < 0: continue
-                    res[s] += self.A[i] * other.A[j]
-                    res[s] %= self.mod
-            self.A = res
-
-        else:
-            res = [0] * (self.n + other.n + 1)
-            for i in range(self.n+1):
-                for j in range(other.n+1):
-                    res[i+j] += self.A[i] * other.A[j]
-                    res[i+j] %= self.mod
-            self.A = res
-
-
-def _bostan_mori(A: FPS, Q: FPS, N: int):
-    """数列A、d次の特性方程式QからN番目の項を計算する"""
-    A = FPS(A.A)
-    Q = FPS(Q.A)
-    N -= 1
-
-    while N > 0:
-        # print(N)
-        Q1 = FPS([q * (-1)**(i%2) for i, q in enumerate(Q.A)])
-        A.mul(Q1)
-        Q.mul(Q1)
-
-        if N % 2 == 0:
-            A = FPS(A.A[::2])
-        else:
-            A = FPS(A.A[1::2])
-        Q = FPS(Q.A[::2])
-
-        N >>= 1
-        # print(A)
-
-    return A.A[0]
-
-
-M = 5
-
-def mul_sparse(f: list, a, b, k, M):
-    """(a + b * x^k)倍  x^Mまで"""
-    res = f.copy()
-    for i in range(M+1):
-        res[i] += f[i] * (a-1)
-        if i+k <= M:
-            res[i+k] += f[i] * b
-        res[i] %= MOD
-    return res
-
-def div_sparse_one(f: list, k, M):
-    """(1-x^k)で割る x^Mまで"""
-    res = f.copy()
-    for i in range(M+1):
-        if i+k <= M:
-            res[i+k] += res[i]
-            res[i+k] %= MOD
-    return res
-
-def xk_of_mul(k, f, g):
-    """f * g の x^k をもとめる(O(k))"""
-    res = 0
-    fn = len(f)
-    gn = len(g)
-    for fi in range(k+1):
-        gi = k - fi
-        if 0 <= fi < fn and 0 <= gi < gn:
-            res += f[fi] * g[gi]
-            res %= MOD
-    return res
-
-
-def mul(f, g, mod=998244353):
-    """愚直畳み込み"""
-    fn = len(f)
-    gn = len(g)
-    res = [0] * (fn + gn - 1)
-    for fi in range(fn):
-        for gi in range(gn):
-            res[fi+gi] += f[fi] * g[gi] % mod
-            res[fi+gi] %= mod
-    return res
-
-
-def bostan_mori(P: list, Q: list, n: int, mod=998244353):
-    """
-    d+1項間線形漸化式Qをもつ数列の第n項 modをもとめる
-    A = P / Q
-    O(M(d)logN) M(d)はd次多項式同士の積の計算量(O(d^2 logN))
-    http://q.c.titech.ac.jp/docs/progs/polynomial_division.html
-
-    :param P: 母関数の分子を表すd項以下のlist
-    :param Q: 母関数の分母をあらわすd+1項のlist
-        (フィボナッチなら An - An-1 - An-2 = 0 なので Q=[1, -1, -1])
-    :param n: 求めたい第n項(0-index)
-    :return: A[n]
-    """
-
-    while n > 0:
-        Qm = [-q if i % 2 else q for i, q in enumerate(Q)]
-        V = mul(Q, Qm, mod)
-        Q = V[::2]
-        PQm = mul(P, Qm, mod)
-        if n % 2 == 0:
-            P = PQm[::2]
-            n >>= 1
-        else:
-            P = PQm[1::2]
-            n >>= 1
-
-    return P[0]
-
-
-
-# 要FFT
-def mul_fft(f, g, fft):
-    """FFT畳み込み"""
-    # fft = FFT(mod)
-    res = fft.convolution(f, g)
-    return res
-
-fft = FFT(MOD99)
-
-def bostan_mori_fft(P: list, Q: list, fft: FFT, n: int):
-    """
-    d+1項間線形漸化式Qをもつ数列の第n項 modをもとめる
-    A = P / Q
-    O(M(d)logN) M(d)はd次多項式同士の積の計算量(O(dlogd logN))
-    d <= 15000くらいは2秒以内で計算できそう
-    http://q.c.titech.ac.jp/docs/progs/polynomial_division.html
-
-    :param P: 母関数の分子を表すd項以下のlist
-    :param Q: 母関数の分母をあらわすd+1項のlist
-        (フィボナッチなら An - An-1 - An-2 = 0 なので Q=[1, -1, -1])
-    :param n: 求めたい第n項(0-index)
-    :return: A[n]
-    """
-
-    while n > 0:
-        Qm = [-q if i % 2 else q for i, q in enumerate(Q)]
-        V = mul_fft(Q, Qm, fft)
-        Q = V[::2]
-        PQm = mul_fft(P, Qm, fft)
-        if n % 2 == 0:
-            P = PQm[::2]
-            n >>= 1
-        else:
-            P = PQm[1::2]
-            n >>= 1
-
-    return P[0]
-
-
-def main():
-    """ ABC159F, ABC169Fなど """
-
-    # フィボナッチの母関数は 1 / (1-x-x^2)
-    P = [1]
-    Q = [1, -1, -1]
-
-    for i in range(5):
-        res = bostan_mori_fft(P, Q, fft, i)
-        print(i, res)
-
-
-if __name__ == "__main__":
-    main()
