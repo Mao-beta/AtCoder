@@ -154,7 +154,14 @@ class segtree():
 def main():
     N = NI()
     LR = EI(N)
-    EI.sort()
+    LR.sort(key=lambda x: (x[0], -x[1]))
+    Z, UZ = compress([r for l, r in LR])
+    R = [Z[r] for l, r in LR]
+    ZN = len(Z)
+    seg = segtree([0]*len(Z), max, 0)
+    for r in R:
+        seg.set(r, seg.prod(r, ZN) + 1)
+    print(seg.prod(0, ZN))
 
 
 if __name__ == "__main__":
