@@ -24,6 +24,7 @@ def main():
     N = NI()
     A = NLI()
 
+
     if N == 2 and A[0] == 2:
         print("NO")
     else:
