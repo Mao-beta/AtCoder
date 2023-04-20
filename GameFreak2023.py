@@ -34,6 +34,7 @@ def solve2(N, X, Y, AB):
     heapify(T)
     ans = 10 ** 9
     now = 0
+
     while True:
         M = -heappop(T)
         m = -heappop(T)
