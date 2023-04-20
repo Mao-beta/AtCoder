@@ -27,7 +27,7 @@ def main():
     if N == 2 and A[0] == 2:
         print("NO")
     else:
-        print("YES")
+        print("YEAH")
 
 
 if __name__ == "__main__":
