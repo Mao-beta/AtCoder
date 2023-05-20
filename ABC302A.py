@@ -21,7 +21,7 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pA, B = NMI()
+    A, B = NMI()
     print((A+B-1)//B)
 
 
