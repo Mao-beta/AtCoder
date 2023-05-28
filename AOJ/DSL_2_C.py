@@ -18,6 +18,64 @@ SI = lambda: input()
 SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 
+import sys
+from typing import List, Tuple
+from heapq import heapify, heappop
+
+INT_MAX = 10 ** 15
+INT_MIN = -10 ** 15
+
+
+class kDTree:
+    def __init__(self, points: List[List[int, int]], divx=True):
+        self.l = None
+        self.r = None
+        self.xmin = INT_MAX
+        self.xmax = INT_MIN
+        self.ymin = INT_MAX
+        self.ymax = INT_MIN
+        self.size = 0
+
+        for p in points:
+            x, y = p
+            self.xmin = min(self.xmin, x)
+            self.xmax = max(self.xmax, x)
+            self.ymin = min(self.ymin, y)
+            self.ymax = max(self.ymax, y)
+
+        self.size = len(points)
+
+        if self.size <= 1:
+            return
+
+        cen = self.size // 2
+        if divx:
+            points.sort(key=lambda x: x[0])
+        else:
+            points.sort(key=lambda x: x[1])
+
+        self.l = kDTree(points[:cen], not divx)
+        self.r = kDTree(points[cen:], not divx)
+
+    def count(self, x1, x2, y1, y2):
+        stack = [self]
+        count = 0
+        while stack:
+            node = stack.pop()
+            if node is None:
+                continue
+
+            if x2 < node.xmin or node.xmax < x1 or y2 < node.ymin or node.ymax < y1:
+                continue
+
+            if x1 <= node.xmin and node.xmax <= x2 and y1 <= node.ymin and node.ymax <= y2:
+                count += node.size
+            else:
+                stack.append(node.l)
+                stack.append(node.r)
+
+        return count
+
 
 from bisect import bisect_left, bisect_right
 from typing import List, Optional, Tuple
@@ -50,6 +108,22 @@ class KDTree(object):
                 if sx <= v[j][0] <= tx:
                     ans.append(v[j][2])
         return ans
+
+
+def _main():
+    N = NI()
+
+    points = [NLI() for _ in range(N)]
+
+    kdtree = kDTree(points)
+    Q = NI()
+    for i in range(Q):
+        sx, tx, sy, ty = NMI()
+        ans = kdtree.find_points(sx, tx, sy, ty)
+        ans.sort()
+        if ans:
+            print(*ans, sep="\n")
+        print()
 
 
 def main():
