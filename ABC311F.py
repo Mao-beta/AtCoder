@@ -140,6 +140,50 @@ class segtree():
         return str([self.get(i) for i in range(self.n)])
 
 
+
+def largest_rectangle_in_histogram(_H: list) -> int:
+    """
+    ヒストグラム内の最大長方形の面積 stack使用でO(N)
+    """
+    from collections import deque
+    H = _H.copy()
+    H.append(0)
+    res = 0
+    D = deque()
+    # i, h
+    D.append([0, 0])
+    for i, h in enumerate(H):
+        li = i
+        while D[-1][1] > h:
+            li, lh = D.pop()
+            res = max(res, (i-li)*lh)
+        D.append([li, h])
+
+    return res
+
+
+def largest_rectangle_in_grid(_G: list) -> int:
+    """
+    Gridは[壁：0, 空：1]
+    Grid内の[1のマス]のみ使った最大長方形の面積 O(HW)
+    各行ごとにヒストグラムと見てそれらの最大長方形を計算
+    """
+    G = [row[:] for row in _G]
+    H = len(G)
+    W = len(G[0])
+
+    # 注目しているマスから見て上に積みあがっている1のマスの個数を調べる
+    for h in range(H-1):
+        for w in range(W):
+            if G[h+1][w] != 0:
+                G[h+1][w] = G[h][w] + 1
+
+    res = 0
+    for row in G:
+        res = max(res, largest_rectangle_in_histogram(row))
+    return res
+
+
 def main():
     H, W = NMI()
     S = [list(SI()) for _ in range(H)]
