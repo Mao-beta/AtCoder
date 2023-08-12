@@ -23,9 +23,9 @@ EI = lambda m: [NLI() for _ in range(m)]
 class Bucket:
     def __init__(self, _data):
         self.data = _data[:]
-        self.cnts = Counter(self.data)
-        # for d in self.data:
-        #     self.cnts[d] += 1
+        self.cnts = [0] * 11
+        for d in self.data:
+            self.cnts[d] += 1
         self.state = 0 # 1: 昇順, -1: 降順 にソートすみ
 
 
@@ -67,13 +67,16 @@ class Bucket:
         return self.__str__()
 
 
-def pick_k(C: Counter, k: int, rev=False):
-    # Counterの値の小さいほうからk個とる
-    res = Counter()
+def pick_k(C, k: int, rev=False):
+    # Cの値の小さいほうからk個とる
+    res = [0] * 11
     if k == 0:
         return res
 
-    keys = sorted(list(C.keys()), reverse=rev)
+    keys = list(range(11))
+    if rev:
+        keys = keys[::-1]
+
     for key in keys:
         x = C[key]
         if k > x:
@@ -89,15 +92,11 @@ def pick_k(C: Counter, k: int, rev=False):
 
 
 def main():
-    N, Q = NMI()
-    A = NLI()
-    # sz = int(N**0.5)+1
+    N, Q = map(int, input().split())
+    A = list(map(int, input().split()))
     sz = 1000
-    bn = (N+sz-1) // sz
-    B = [[] for _ in range(bn)]
-    for i, a in enumerate(A):
-        B[i//sz].append(a)
-    B = [Bucket(b) for b in B]
+    bn = (N + sz - 1) // sz
+    B = [Bucket(A[i:i + sz]) for i in range(0, N, sz)]
 
     for _ in range(Q):
         C, L, R = NMI()
@@ -113,7 +112,7 @@ def main():
             # print(B[br])
             B[br].agg()
             # print(B[br])
-            cnts = Counter()
+            cnts = [0] * 11
             l, r = L%sz, L%sz + (R-L)
             for i in range(l, r):
                 cnts[B[br].data[i]] += 1
@@ -151,13 +150,15 @@ def main():
             # print(L, R, bl, br, IL, IR, rem_l, rem_r)
 
             # cntsを取得 stateを変更
-            cnts = Counter()
+            cnts = [0] * 11
             for bi in range(bl, br):
                 if C == 1:
                     B[bi].state = 1
                 elif C == 2:
                     B[bi].state = -1
-                cnts += B[bi].cnts
+
+                for x in range(11):
+                    cnts[x] += B[bi].cnts[x]
 
             # 端のbucketの遅延処理
             # 端の取得
