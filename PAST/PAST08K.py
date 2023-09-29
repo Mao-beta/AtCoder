@@ -148,23 +148,38 @@ class MCFGraph:
             prev_cost_per_flow = c
         return result
 
-
 def main():
-    N, C = NMI()
-    A = NLI()
-    G = MCFGraph(2*N+3)
-    S, T, end = 2*N, 2*N+1, 2*N+2
-
-    for i in range(N):
+    P, Q = NMI()
+    PQ = [list(SI()) for _ in range(P)]
+    AB = EI(P)
+    CD = EI(Q)
+    G = MCFGraph(P+Q+2)
+    S = P+Q
+    T = S+1
+    INF = 10**15
+    base = 0
+    for i in range(P):
+        base += AB[i][1]
         G.add_edge(S, i, 1, 0)
-        G.add_edge(i+N, T, 1, 0)
-        for j in range(i+1, N):
-            G.add_edge(i, j+N, 1, abs(A[j] - A[i]))
-        G.add_edge(i, end, 1, C)
-    G.add_edge(end, T, N, 0)
+    for i in range(Q):
+        base += CD[i][1]
+        G.add_edge(i+P, T, 1, 0)
+    for i in range(P):
+        a, b = AB[i]
+        for j in range(Q):
+            c, d = CD[j]
+            if PQ[i][j] == "0":
+                continue
+            w = a - b + c - d
+            if w <= 0:
+                continue
+            G.add_edge(i, j+P, 1, INF-w)
 
-    res = G.flow(S, T)
-    print(res[1])
+    res = G.slope(S, T)
+    ans = 0
+    for f, c in res:
+        ans = max(ans, base + INF * f - c)
+    print(ans)
 
 
 if __name__ == "__main__":
