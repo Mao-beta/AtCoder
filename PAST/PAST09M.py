@@ -20,24 +20,25 @@ SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
 
+from sortedcontainers import SortedList
+
 def main():
-    N = NI()
-    A = [SI() for _ in range(N)]
-    B = [["0"]*N for _ in range(N)]
-    for h in range(N):
-        for w in range(N):
-            ah, aw = h, w
-            if h == 0 and w > 0:
-                aw -= 1
-            elif w == N-1 and h > 0:
-                ah -= 1
-            elif h == N-1 and w < N-1:
-                aw += 1
-            elif w == 0 and h < N-1:
-                ah += 1
-            B[h][w] = A[ah][aw]
-    for row in B:
-        print("".join(row))
+    N, Q = NMI()
+    S = SLI()
+    L = SortedList()
+    for i, s in enumerate(S):
+        L.add((s, i))
+    for _ in range(Q):
+        x, t = SMI()
+        x = int(x)-1
+        s, i = L[x]
+        L.discard((s, i))
+        L.add((t, i))
+    
+    ans = ["" for _ in range(N)]
+    for s, i in L:
+        ans[i] = s
+    print(*ans, sep=" ")
 
 
 if __name__ == "__main__":
