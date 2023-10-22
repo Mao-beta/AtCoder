@@ -1,3 +1,4 @@
+import random
 import sys
 import math
 import bisect
@@ -173,6 +174,125 @@ def solve(N, D, Q, W):
     assert len(solver.ans) == solver.N
     solver.output_ans()
 
+
+def solve_randommatch(N, D, Q, W, root=None, f=None):
+
+    judge = Judge(N, D, Q, W)
+    if root is None:
+        root = int(N ** 0.5)
+
+    # r個ずつ適当に比較を繰り返してスコアをためる
+    IDs = list(range(N))
+    counts = [0] * N
+
+    # 1週目は全部使う
+    first_IDs = list(range(N)) * 2
+    for i in range((N+2*root-1)//(2*root)):
+        L = first_IDs[2 * root * i: 2 * root * i + root]
+        R = first_IDs[2 * root * i + root: 2 * root * i + 2 * root]
+        judge.query(L, R)
+        for idx in L + R:
+            counts[idx] += 1
+
+    while judge.Q > 0:
+        L = random.sample(IDs, root)
+        rem = set(IDs) - set(L)
+        R = random.sample(rem, root)
+        judge.query(L, R)
+        for idx in L+R:
+            counts[idx] += 1
+
+    Y = [win / c for c, win in zip(counts, judge.win)]
+
+    def expected_value_of_rank(rank, N, lambda_val):
+        K = rank + 1  # rankは0から始まるため、Kはrank + 1
+        return sum(1 / (N - i) for i in range(K)) / lambda_val
+
+    def expected_values_of_ranks(ranks, N, lambda_val=1e-5):
+        return [expected_value_of_rank(rank, N, lambda_val) for rank in ranks]
+
+    E = expected_values_of_ranks(list(range(N)), N)
+
+    YI = [[y, i] for i, y in enumerate(Y)]
+    YI.sort()
+    estimated = [[E[r], i] for r, (y, i) in enumerate(YI)]
+    EW = [0] * N
+    for e, i in estimated:
+        EW[i] = e
+
+
+
+    if IS_LOCAL:
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        sns.scatterplot(x=W, y=EW)
+        sns.lineplot(x=[0, max(W+EW)], y=[0, max(W+EW)], c="r")
+        path = Path("./randommatch") / ("WvsEW_" + f)
+        title = f"{path.stem}.txt, N: {N}, D: {D}, Q: {Q}, itr: {round(sum(counts) / N)}"
+        plt.title(title)
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close()
+
+
+
+
+    def greedy_partition(W, D):
+        # 各グループの総和を保持するリストを初期化
+        group_sums = [0] * D
+
+        # グループを表す2次元リストを初期化
+        groups = [[] for _ in range(D)]
+        groups_id = [[] for _ in range(D)]
+
+        # 重みを降順にソート
+        sorted_weights = sorted([[w, i] for i, w in enumerate(W)], reverse=True)
+
+        for w, i in sorted_weights:
+            # 現時点で最小の合計重みを持つグループを見つける
+            min_group_idx = group_sums.index(min(group_sums))
+
+            # そのグループに重みを追加
+            groups[min_group_idx].append(w)
+            groups_id[min_group_idx].append(i)
+
+            # グループの合計重みを更新
+            group_sums[min_group_idx] += w
+
+        return groups, groups_id
+
+    groups, groups_id = greedy_partition(EW, D)
+    ans = [0] * N
+    for d, IDs in enumerate(groups_id):
+        for i in IDs:
+            ans[i] = d
+
+    print(*ans, flush=True)
+
+    if IS_LOCAL:
+        import numpy as np
+        def calc_score(result_ids):
+            sums = []
+            for i, ids in enumerate(result_ids):
+                group = [W[id] for id in ids]
+                sums.append(np.sum(group))
+            return round(np.std(sums) * 100)
+
+        def estimate_score(result):
+            sums = []
+            for i, ws in enumerate(result):
+                group = [w for w in ws]
+                sums.append(np.sum(group))
+            return round(np.std(sums) * 100)
+
+        res = calc_score(groups_id)
+        est = estimate_score(groups)
+        return res, est
+
+    else:
+        return
+
+
 def main():
     if IS_LOCAL:
         in_files = sorted(list(Path("./in/").glob("*.txt")))
@@ -184,13 +304,26 @@ def main():
                 W = list(map(int, f.readline().split()))
                 Inputs.append([N, D, Q, W])
 
+        Results = []
         for i, (N, D, Q, W) in enumerate(Inputs):
-            if i == 1:
-                solve(N, D, Q, W)
+            if i <= 100:
+                f = f"{str(i).zfill(4)}.png"
+
+                score_sum = 0
+                r = min(int(50*N/Q), N//2)
+                score, est = solve_randommatch(N, D, Q, W, root=r, f=f)
+                score_sum += score
+
+                Results.append([N, D, Q, score, est])
+
+        import pandas as pd
+        df = pd.DataFrame(Results, columns=["N", "D", "Q", "score", "est"])
+        df.to_csv("./res_score_est_sqrt.csv", index=False)
 
     else:
         N, D, Q = NMI()
-        solve(N, D, Q, None)
+        solve_randommatch(N, D, Q, W=None, root=N//2, f=None)
+
 
 
 if __name__ == "__main__":
