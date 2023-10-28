@@ -21,8 +21,13 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    for i in range(N, 1000):
+        i = str(i)
+        if int(i[0]) * int(i[1]) == int(i[2]):
+            print(i)
+            return
+
 
 if __name__ == "__main__":
     main()

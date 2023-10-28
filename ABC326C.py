@@ -21,8 +21,16 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N, M = NMI()
+    A = NLI()
+    A.sort()
+    ans = 0
+    for i in range(N):
+        l = A[i]
+        r = l + M
+        ans = max(ans, bisect.bisect_left(A, r) - i)
+    print(ans)
+
 
 if __name__ == "__main__":
     main()

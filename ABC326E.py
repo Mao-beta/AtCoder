@@ -21,8 +21,19 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    A = NLI()
+    E = 0
+    C = 0
+    inv = pow(N, -1, MOD99)
+    for i in range(N-1, -1, -1):
+        C += A[i]
+        e = (E + C) * inv % MOD99
+        E += e
+        E %= MOD99
+        C %= MOD99
+    print(e % MOD99)
+
 
 if __name__ == "__main__":
     main()

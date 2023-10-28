@@ -21,8 +21,29 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N, Q = NMI()
+    Prev = [0] * (N+1)
+    Post = [0] * (N+1)
+    for _ in range(Q):
+        q, *X = NMI()
+        if q == 1:
+            x, y = X
+            Post[x] = y
+            Prev[y] = x
+        elif q == 2:
+            x, y = X
+            Post[x] = 0
+            Prev[y] = 0
+        else:
+            x = X[0]
+            while Prev[x] > 0:
+                x = Prev[x]
+            ans = []
+            while x > 0:
+                ans.append(x)
+                x = Post[x]
+            print(len(ans), *ans)
+
 
 if __name__ == "__main__":
     main()

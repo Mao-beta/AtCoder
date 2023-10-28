@@ -21,8 +21,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    A, B = NMI()
+    if B-A == 1 and A%3:
+        print("Yes")
+    else:
+        print("No")
+
 
 if __name__ == "__main__":
     main()

@@ -21,8 +21,15 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    H, W = NMI()
+    S = [SI() for _ in range(H)]
+    X = []
+    for h in range(H):
+        for w in range(W):
+            if S[h][w] == "o":
+                X.append([h, w])
+    print(abs(X[0][0] - X[1][0]) + abs(X[0][1] - X[1][1]))
+
 
 if __name__ == "__main__":
     main()

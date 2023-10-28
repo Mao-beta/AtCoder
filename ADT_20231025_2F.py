@@ -21,8 +21,18 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    ans = 0
+    for K in range(1, 19):
+        if N >= 10**K:
+            num = 9 * 10**(K-1)
+            ans += (num+1) * num // 2
+        else:
+            num = N - 10**(K-1) + 1
+            ans += (num+1) * num // 2
+            break
+    print(ans % MOD99)
+
 
 if __name__ == "__main__":
     main()

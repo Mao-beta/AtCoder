@@ -4,7 +4,7 @@ import bisect
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
 from functools import lru_cache
-from itertools import accumulate, combinations, permutations, product
+from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -21,8 +21,17 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N, M, P = NMI()
+    A = NLI()
+    B = NLI()
+    B.sort()
+    C = list(accumulate([0]+B))
+    ans = 0
+    for a in A:
+        idx = bisect.bisect_left(B, P-a)
+        ans += C[idx] + P * (M - idx) + a * idx
+    print(ans)
+
 
 if __name__ == "__main__":
     main()

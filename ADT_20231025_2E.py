@@ -21,8 +21,15 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N, X = NMI()
+    A = NLI()
+    S = set(A)
+    for a in A:
+        if a+X in S:
+            print("Yes")
+            return
+    print("No")
+
 
 if __name__ == "__main__":
     main()

@@ -21,8 +21,17 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    A = NLI()
+    mada = [1] * N
+    for i, a in enumerate(A):
+        a -= 1
+        if mada[i]:
+            mada[a] = 0
+    ans = [i+1 for i in range(N) if mada[i]]
+    print(len(ans))
+    print(*ans)
+
 
 if __name__ == "__main__":
     main()

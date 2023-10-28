@@ -21,8 +21,15 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    N = bin(N)[2:]
+    ans = ["A"]
+    for n in N[1:]:
+        ans.append("B")
+        if n == "1":
+            ans.append("A")
+    print("".join(ans))
+
 
 if __name__ == "__main__":
     main()

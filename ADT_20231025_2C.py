@@ -21,8 +21,13 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    R, C = NMI()
+    x = max(abs(R-8), abs(C-8))
+    if x % 2:
+        print("black")
+    else:
+        print("white")
+
 
 if __name__ == "__main__":
     main()

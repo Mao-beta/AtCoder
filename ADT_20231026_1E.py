@@ -4,7 +4,7 @@ import bisect
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
 from functools import lru_cache
-from itertools import accumulate, combinations, permutations, product
+from itertools import accumulate, combinations, permutations
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
@@ -21,8 +21,20 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    A = NLI()
+    B = [0] * (N+1)
+    ans = []
+    for i, a in enumerate(A):
+        B[a] += 1
+        if B[a] == 2:
+            ans.append([i, a])
+
+    ans.sort()
+    ans = [a for i, a in ans]
+    print(*ans)
+
+
 
 if __name__ == "__main__":
     main()

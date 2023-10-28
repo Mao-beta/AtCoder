@@ -21,8 +21,26 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    S = SI()
+    W = NLI()
+    WS = [[w, int(s)] for w, s in zip(W, S)]
+    WS.sort()
+    WS.append([10**10, 2])
+    adult = S.count("1")
+    ans = max(adult, N-adult)
+    now = adult
+    for i in range(N):
+        w, s = WS[i]
+        if s == 0:
+            now += 1
+        else:
+            now -= 1
+        if w == WS[i+1][0]:
+            continue
+        ans = max(ans, now)
+    print(ans)
+
 
 if __name__ == "__main__":
     main()

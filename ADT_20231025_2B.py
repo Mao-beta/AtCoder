@@ -21,8 +21,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    N = NI()
+    if -2 ** 31 <= N < 2 ** 31:
+        print("Yes")
+    else:
+        print("No")
+
 
 if __name__ == "__main__":
     main()

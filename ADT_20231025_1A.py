@@ -21,8 +21,14 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
-    
+    A, B = NMI()
+    if A == 0:
+        print("Silver")
+    elif B == 0:
+        print("Gold")
+    else:
+        print("Alloy")
+
 
 if __name__ == "__main__":
     main()
