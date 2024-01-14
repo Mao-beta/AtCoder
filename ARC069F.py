@@ -1,15 +1,23 @@
 import sys
 import math
-from collections import defaultdict
-from collections import deque
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
 
 
 from typing import List, Tuple
@@ -101,9 +109,37 @@ def two_sat(n: int , clause: List[Tuple[int, bool, int, bool]]) -> List[bool] | 
         answer[i]=(ids[2*i]<ids[2*i+1])
     return answer
 
-
 def main():
-    pass
+    N = NI()
+    XY = EI(N)
+
+    ok = 0
+    ng = 10**9+1
+
+    while abs(ok-ng) > 1:
+        D = (ok+ng) // 2
+
+        clause = []
+        for i in range(N):
+            for j in range(i+1, N):
+                xi, yi = XY[i]
+                xj, yj = XY[j]
+                if abs(xi-xj) < D:
+                    clause.append((i, not True, j, not True))
+                if abs(xi-yj) < D:
+                    clause.append((i, not True, j, not False))
+                if abs(yi-xj) < D:
+                    clause.append((i, not False, j, not True))
+                if abs(yi-yj) < D:
+                    clause.append((i, not False, j, not False))
+
+        ans = two_sat(N, clause)
+        if ans is None:
+            ng = D
+        else:
+            ok = D
+
+    print(ok)
 
 
 if __name__ == "__main__":
