@@ -1,0 +1,202 @@
+import sys
+import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
+
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
+
+
+# https://github.com/tatyam-prime/SortedSet/blob/main/SortedSet.py
+# https://github.com/tatyam-prime/SortedSet/blob/main/SortedMultiset.py
+import math
+from bisect import bisect_left, bisect_right, insort
+from typing import Generic, Iterable, Iterator, TypeVar, Union, List
+
+T = TypeVar('T')
+
+class SortedMultiset(Generic[T]):
+    BUCKET_RATIO = 50
+    REBUILD_RATIO = 170
+
+    def _build(self, a=None) -> None:
+        "Evenly divide `a` into buckets."
+        if a is None: a = list(self)
+        size = self.size = len(a)
+        bucket_size = int(math.ceil(math.sqrt(size / self.BUCKET_RATIO)))
+        self.a = [a[size * i // bucket_size: size * (i + 1) // bucket_size] for i in range(bucket_size)]
+
+    def __init__(self, a: Iterable[T] = []) -> None:
+        "Make a new SortedMultiset from iterable. / O(N) if sorted / O(N log N)"
+        a = list(a)
+        if not all(a[i] <= a[i + 1] for i in range(len(a) - 1)):
+            a = sorted(a)
+        self._build(a)
+
+    def __iter__(self) -> Iterator[T]:
+        for i in self.a:
+            for j in i: yield j
+
+    def __reversed__(self) -> Iterator[T]:
+        for i in reversed(self.a):
+            for j in reversed(i): yield j
+
+    def __len__(self) -> int:
+        return self.size
+
+    def __repr__(self) -> str:
+        return "SortedMultiset" + str(self.a)
+
+    def __str__(self) -> str:
+        s = str(list(self))
+        return "{" + s[1: len(s) - 1] + "}"
+
+    def _find_bucket(self, x: T) -> List[T]:
+        "Find the bucket which should contain x. self must not be empty."
+        for a in self.a:
+            if x <= a[-1]: return a
+        return a
+
+    def __contains__(self, x: T) -> bool:
+        if self.size == 0: return False
+        a = self._find_bucket(x)
+        i = bisect_left(a, x)
+        return i != len(a) and a[i] == x
+
+    def count(self, x: T) -> int:
+        "Count the number of x."
+        return self.index_right(x) - self.index(x)
+
+    def add(self, x: T) -> None:
+        "Add an element. / O(√N)"
+        if self.size == 0:
+            self.a = [[x]]
+            self.size = 1
+            return
+        a = self._find_bucket(x)
+        insort(a, x)
+        self.size += 1
+        if len(a) > len(self.a) * self.REBUILD_RATIO:
+            self._build()
+
+    def discard(self, x: T) -> bool:
+        "Remove an element and return True if removed. / O(√N)"
+        if self.size == 0: return False
+        a = self._find_bucket(x)
+        i = bisect_left(a, x)
+        if i == len(a) or a[i] != x: return False
+        a.pop(i)
+        self.size -= 1
+        if len(a) == 0: self._build()
+        return True
+
+    def lt(self, x: T) -> Union[T, None]:
+        "Find the largest element < x, or None if it doesn't exist."
+        for a in reversed(self.a):
+            if a[0] < x:
+                return a[bisect_left(a, x) - 1]
+
+    def le(self, x: T) -> Union[T, None]:
+        "Find the largest element <= x, or None if it doesn't exist."
+        for a in reversed(self.a):
+            if a[0] <= x:
+                return a[bisect_right(a, x) - 1]
+
+    def gt(self, x: T) -> Union[T, None]:
+        "Find the smallest element > x, or None if it doesn't exist."
+        for a in self.a:
+            if a[-1] > x:
+                return a[bisect_right(a, x)]
+
+    def ge(self, x: T) -> Union[T, None]:
+        "Find the smallest element >= x, or None if it doesn't exist."
+        for a in self.a:
+            if a[-1] >= x:
+                return a[bisect_left(a, x)]
+
+    def __getitem__(self, x: int) -> T:
+        "Return the x-th element, or IndexError if it doesn't exist."
+        if x < 0: x += self.size
+        if x < 0: raise IndexError
+        for a in self.a:
+            if x < len(a): return a[x]
+            x -= len(a)
+        raise IndexError
+
+    def index(self, x: T) -> int:
+        "Count the number of elements < x."
+        ans = 0
+        for a in self.a:
+            if a[-1] >= x:
+                return ans + bisect_left(a, x)
+            ans += len(a)
+        return ans
+
+    def index_right(self, x: T) -> int:
+        "Count the number of elements <= x."
+        ans = 0
+        for a in self.a:
+            if a[-1] > x:
+                return ans + bisect_right(a, x)
+            ans += len(a)
+        return ans
+
+
+
+def main():
+    N = NI()
+    A = NLI()
+    G = [[] for _ in range(N+1)]
+
+    S = SortedMultiset()
+    T = SortedMultiset()
+
+    for i, a in enumerate(A, start=1):
+        G[a].append(i)
+        if a < i:
+            print(0)
+            return
+        if a not in T:
+            T.add(a)
+
+    # print(G)
+
+    for i, g in enumerate(G):
+        if g:
+            if g[-1] != i:
+                # print(g, i)
+                print(0)
+                return
+            S.add(g[0])
+
+    # print(G)
+    # print(S)
+    # print(T)
+    ans = 1
+    while S and T:
+        x = S[-1]
+        k = len(T) - T.index(x)
+        ans *= k
+        ans %= MOD99
+        S.discard(x)
+        T.discard(T[-1])
+
+
+    print(ans)
+
+
+if __name__ == "__main__":
+    main()

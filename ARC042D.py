@@ -20,26 +20,68 @@ SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
 
-def main():
-    x, y = NMI()
-    N = NI()
-    XY = EI(N) * 2
-    ans = 10**9
-    for i in range(N):
-        A, B = XY[i], XY[i+1]
-        px, py = B[0]-A[0], B[1]-A[1]
-        qx, qy = x-A[0], y-A[1]
-        rx, ry = x-B[0], y-B[1]
-        q2 = qx**2 + qy**2
-        pq = px * qx + py * qy
-        p2 = px**2 + py**2
-        r2 = rx**2 + ry**2
-        d2 = q2 - pq**2 / p2
-        if pq > p2 or pq < 0:
-            ans = min(ans, min(math.sqrt(q2), math.sqrt(r2)))
+# X^K ≡ Y (mod M) となるような K を求める O(√M)
+def mod_log(X, Y, M):
+    # https://drken1215.hatenablog.com/entry/2020/11/04/045400
+
+    # X^0 - X^√M までの余りと、それが何回目かを全探索して辞書で持つ
+    # Yの方から√M回ぶん（Giant-step）ずつ戻ると、上記に存在する余りになる（ならなければそもそも存在しない）
+    # Xの累乗をMで割った余りの周期はM以下なのでGiant-stepで目的の値を飛び越すことはない
+
+    X %= M
+    Y %= M
+
+    lo = -1
+    hi = M
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if mid * mid >= M:
+            hi = mid
         else:
-            ans = min(ans, min(math.sqrt(q2), math.sqrt(r2), math.sqrt(d2)))
-    print(ans)
+            lo = mid
+
+    sqrtM = hi
+
+    apow = dict()
+    amari = X
+    for r in range(1, sqrtM+1):
+        if amari not in apow:
+            apow[amari] = r
+        amari = amari * X % M
+
+
+    A = pow(pow(X, M-2, M), sqrtM, M)
+    amari = Y
+    for q in range(sqrtM):
+        if amari == 1 and q > 0:
+            return q * sqrtM
+        elif amari in apow:
+            return q * sqrtM + apow[amari]
+        amari = amari * A % M
+
+    return -1
+
+
+def main():
+    X, P, A, B = NMI()
+    cutoff = 1<<24
+    if B-A <= cutoff:
+        now = pow(X, A-1, P)
+        ans = P-1
+        for i in range(A, B+1):
+            now = now * X % P
+            ans = min(ans, now)
+        print(ans)
+
+    else:
+        xa_inv = pow(X, -A, P)
+        for r in range(cutoff+1):
+            t = r * xa_inv % P
+            k = mod_log(X, t, P)
+            if k < 0 or k > B-A:
+                continue
+            print(r)
+            return
 
 
 if __name__ == "__main__":
