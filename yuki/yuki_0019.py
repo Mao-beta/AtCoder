@@ -1,15 +1,23 @@
 import sys
 import math
-from collections import defaultdict
-from collections import deque
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
 
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
 
 
 # 強連結成分分解(SCC): グラフGに対するSCCを行う
@@ -71,16 +79,29 @@ def make_adjlist_d(n, edges):
 
 
 def main():
-    N, M = NMI()
-    edges = [NLI() for _ in range(M)]
-    inv_edges = [e[::-1] for e in edges]
-    G = make_adjlist_d(N, edges)
-    RG = make_adjlist_d(N, inv_edges)
+    N = NI()
+    L = []
+    G = [[] for _ in range(N)]
+    RG = [[] for _ in range(N)]
+    for i in range(N):
+        l, s = NMI()
+        s -= 1
+        L.append(l)
+        G[s].append(i)
+        RG[i].append(s)
     label, group = scc(N, G, RG)
     G0, GP = construct(N, G, label, group)
-    print(len(GP))
-    for gp in GP:
-        print(len(gp), *gp)
+    ans = 0
+    dims = [0] * len(G0)
+    for i, (g0, gp) in enumerate(zip(G0, GP)):
+        for g in g0:
+            dims[g] = 1
+        ls = [L[g] for g in gp]
+        ls.sort()
+        ans += sum(ls)
+        if dims[i] == 0:
+            ans += ls[0]
+    print(f"{ans / 2:.1f}")
 
 
 if __name__ == "__main__":

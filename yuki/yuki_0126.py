@@ -1,0 +1,41 @@
+import sys
+import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
+
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
+
+
+def main():
+    A, B, S = NMI()
+    if abs(A-S) <= abs(B-S):
+        ans = abs(A-S) + abs(S-0)
+        print(ans)
+    elif A == 0 and S == 1:
+        print(2)
+    elif S == 1:
+        print(A)
+    elif A == 0:
+        ans = abs(B-S) + abs(S-1) + 2
+        print(ans)
+    else:
+        ans = abs(B-S) + min(abs(S-1) + abs(A), abs(S-A) + abs(A))
+        print(ans)
+
+
+if __name__ == "__main__":
+    main()

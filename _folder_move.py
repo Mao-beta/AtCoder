@@ -68,6 +68,22 @@ def main():
 
 
     for path in target_paths:
+        contest = path.stem[:4]
+
+        if contest not in ["yuki"]:
+            continue
+
+        dst_dir = Path(f"./{contest}")
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        dst_path = dst_dir/path.name
+        while dst_path.exists():
+            filename = dst_path.stem + "_"
+            suffix = path.suffix
+            dst_path = dst_dir/(filename+suffix)
+        shutil.move(path, dst_path)
+
+
+    for path in target_paths:
         contest = path.stem[:8]
 
         if contest != "tenkei90":
