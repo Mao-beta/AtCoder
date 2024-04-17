@@ -1,4 +1,3 @@
-import shutil
 import sys
 import math
 import bisect
@@ -7,10 +6,12 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
+sys.set_int_max_str_digits(10**6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
 
+input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
@@ -21,16 +22,15 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    contest_name = input("input contest name: ")
-    num = int(input("input number of problems: "))
-    S = [chr(ord("A") + i) for i in range(num)]
-    check = input(f"Do you make {contest_name}{S[0]} ~ {contest_name}{S[-1]}? (Y/else): ")
-    check = check.lower()
-    if check == "y":
-        for s in S:
-            shutil.copy("_atcoder_template.py", f"./{contest_name}{s}.py")
-    else:
-        print("canceled.")
+    N = NI()
+    AC = EI(N)
+    M = defaultdict(lambda: 10**10)
+    for a, c in AC:
+        M[c] = min(M[c], a)
+    ans = 0
+    for c, m in M.items():
+        ans = max(ans, m)
+    print(ans)
 
 
 if __name__ == "__main__":

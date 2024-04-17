@@ -1,4 +1,3 @@
-import shutil
 import sys
 import math
 import bisect
@@ -8,9 +7,10 @@ from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
 sys.setrecursionlimit(1000000)
-MOD = 10 ** 9 + 7
+MOD = 573
 MOD99 = 998244353
 
+input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
@@ -21,16 +21,24 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    contest_name = input("input contest name: ")
-    num = int(input("input number of problems: "))
-    S = [chr(ord("A") + i) for i in range(num)]
-    check = input(f"Do you make {contest_name}{S[0]} ~ {contest_name}{S[-1]}? (Y/else): ")
-    check = check.lower()
-    if check == "y":
-        for s in S:
-            shutil.copy("_atcoder_template.py", f"./{contest_name}{s}.py")
-    else:
-        print("canceled.")
+    S = SI()
+    cnt = Counter(S)
+    N = len(S)
+    C = [[0]*1001 for _ in range(1001)]
+    C[0][0] = 1
+    C[1][0] = 1
+    C[1][1] = 1
+    for n in range(2, 1001):
+        for r in range(n+1):
+            if r == 0 or r == n:
+                C[n][r] = 1
+            else:
+                C[n][r] = (C[n-1][r-1] + C[n-1][r]) % MOD
+    ans = 1
+    for x, k in cnt.items():
+        ans = ans * C[N][k] % MOD
+        N -= k
+    print((ans-1) % MOD)
 
 
 if __name__ == "__main__":

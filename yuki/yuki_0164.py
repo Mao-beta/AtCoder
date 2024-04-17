@@ -1,4 +1,3 @@
-import shutil
 import sys
 import math
 import bisect
@@ -11,6 +10,7 @@ sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
 
+input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
@@ -20,17 +20,27 @@ SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
 
+def f(s):
+    try:
+        return int(s)
+    except:
+        return ord(s) - ord("A") + 10
+
+
 def main():
-    contest_name = input("input contest name: ")
-    num = int(input("input number of problems: "))
-    S = [chr(ord("A") + i) for i in range(num)]
-    check = input(f"Do you make {contest_name}{S[0]} ~ {contest_name}{S[-1]}? (Y/else): ")
-    check = check.lower()
-    if check == "y":
-        for s in S:
-            shutil.copy("_atcoder_template.py", f"./{contest_name}{s}.py")
-    else:
-        print("canceled.")
+    N = NI()
+    V = [[f(s) for s in SI()] for _ in range(N)]
+
+    ans = 36**12
+
+    for v in V:
+        tmp = 0
+        M = max(v) + 1
+        for i, x in enumerate(v[::-1]):
+            tmp += x * M**i
+        ans = min(ans, tmp)
+
+    print(ans)
 
 
 if __name__ == "__main__":
