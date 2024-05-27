@@ -244,12 +244,17 @@ def display(N, A):
     for i in range(1, N):
         ans[i].append("PRRRQLLLPRRQLLPRQB")
 
+    IJ = [[-1, -1] for _ in range(25)]
     A = [deque(a) for a in A]
     G = [[-1]*N for _ in range(N)]
     for i in range(N):
         for j in range(N-1):
             a = A[i].popleft()
             G[i][N-2-j] = a
+            IJ[a] = [i, N-2-j]
+        IJ[A[i][0]] = [i, -1]
+
+    # print(*IJ)
 
     def yoko_move(i, j, i2, j2):
         # 2点間の移動をあらわす文字列 横から
@@ -344,7 +349,163 @@ def display(N, A):
         print("".join(row))
 
 
+
+class MoveString:
+    def __init__(self):
+        pass
+
+    def left(self, i):
+        return "L" * i
+
+    def right(self, i):
+        return "R" * i
+
+    def up(self, i):
+        return "U" * i
+
+    def down(self, i):
+        return "D" * i
+
+    def yoko(self, x, y):
+        if y > x:
+            return self.right(y-x)
+        else:
+            return self.left(x-y)
+
+    def tate(self, x, y):
+        if y > x:
+            return self.down(y-x)
+        else:
+            return self.up(x-y)
+
+    def pick(self):
+        return "P"
+
+    def put(self):
+        return "Q"
+
+    def move(self, si, sj, ti, tj, yoko_first=True):
+        res = ""
+        if yoko_first:
+            res += self.yoko(sj, tj)
+            res += self.tate(si, ti)
+        else:
+            res += self.tate(si, ti)
+            res += self.yoko(sj, tj)
+        return res
+
+    def bring(self, si, sj, ti, tj, yoko_first=True):
+        res = self.pick() + self.move(si, sj, ti, tj, yoko_first) + self.put()
+        return res
+
+
+class Game:
+    def __init__(self, A):
+        self.N = 5
+        self.A = [deque(Ai) for Ai in A]
+        self.IJ = [[-1, -1] for _ in range(25)]
+        self.B = [[-1]*5 for _ in range(5)]
+        self.ans = [[] for _ in range(5)]
+        self.arms = [[i, 0] for i in range(5)]
+
+    def search(self, a):
+        i, j = self.IJ[a]
+        return i, j
+
+    def enter(self, i):
+        # i行目の在庫を0列目に置く
+        assert self.B[i][0] == -1
+        assert self.A[i]
+        a = self.A[i].popleft()
+        self.B[i][0] = a
+        self.IJ[a] = [i, 0]
+
+    def display(self):
+        # 左4列埋めて下4つのアームは爆破
+        self.ans[0].append("PRRRQLLLPRRQLLPRQ")
+        for i in range(1, N):
+            self.ans[i].append("PRRRQLLLPRRQLLPRQB")
+
+        for i in range(N):
+            for j in range(N - 1):
+                a = self.A[i].popleft()
+                self.B[i][N - 2 - j] = a
+                self.IJ[a] = [i, N - 2 - j]
+            self.IJ[A[i][0]] = [i, -1]
+            self.arms[i] = [-1, -1]
+
+        self.arms[0] = [0, 1]
+
+
+
+
+    def display_and_greedy(self):
+        M = MoveString()
+
+        self.display()
+        self.debug()
+
+        targets = {0, 5, 10, 15, 20}
+
+        # 1ターンごとの処理
+        while targets:
+            # targetsの中から行けるものを探す
+
+            pass
+            # ok = False
+            # for j in range(N):
+            #     for i in range(N):
+            #         if self.B[i][j] in targets:
+            #             a = self.B[i][j]
+            #             ok = True
+            #             self.ans[0].append(M.bring(ni, nj, i, j))
+            #             ti, tj = a // N, N - 1
+            #             self.ans[0] += tate_move(i, j, ti, tj)
+            #             self.ans[0].append("Q")
+            #             ni, nj = ti, tj
+            #             targets.discard(a)
+            #             if a % N < 4:
+            #                 targets.add(a + 1)
+            #             self.B[i][j] = -1
+            #             if self.A[i] and j == 0:
+            #                 self.B[i][j] = self.A[i].popleft()
+            #         if ok:
+            #             break
+            #     if ok:
+            #         break
+            #
+            # if not ok:
+            #     for i in range(N):
+            #         if self.A[i] and G[i][0] >= 0:
+            #             flg = False
+            #             a = G[i][0]
+            #             for h in range(N):
+            #                 for w in range(1, N - 1):
+            #                     if G[h][w] >= 0:
+            #                         continue
+            #                     flg = True
+            #                     ans[0] += tate_move(ni, nj, i, 0)
+            #                     ans[0].append("P")
+            #                     ans[0] += tate_move(i, 0, h, w)
+            #                     ans[0].append("Q")
+            #                     ni, nj = h, w
+            #                     G[h][w] = a
+            #                     G[i][0] = A[i].popleft()
+            #                     break
+            #                 if flg:
+            #                     break
+
+    def debug(self):
+        print("board:", *self.B, sep="\n", file=sys.stderr)
+        print("arms:", self.arms, file=sys.stderr)
+
+
+def main(N, A):
+    G = Game(A)
+    G.display_and_greedy()
+
+
 if __name__ == "__main__":
     N = NI()
     A = EI(N)
-    display(N, A)
+    main(N, A)
