@@ -6,6 +6,7 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
+sys.set_int_max_str_digits(10**6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -21,9 +22,26 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    # print(2805809122647241657291203110048311680855276911363905944633000283076745832106265365728441872963411744653909480460457178972689763449114507184488685135847380515259606554214869019093639691691371012237 % 20240531)
-    print(138623296130286387115595095308927996051846510912381989614452322573787507457500268433098018671714281836475015426248312308243778952692224684445713659184503633588447188179740394117804502840927)
-    print(20240531**23)
+    N, K = NMI()
+    A = NLI()
+    A.sort()
+
+    if min(A) >= 0:
+        print("Yes")
+        print(*A)
+        return
+
+    if K > 0:
+        print("Yes")
+        print(*A)
+        return
+
+    if sum(A) >= K:
+        print("Yes")
+        print(*A[::-1])
+        return
+
+    print("No")
 
 
 if __name__ == "__main__":
