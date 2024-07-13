@@ -22,7 +22,20 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N = NI()
+    S = SI()
+    P = {(0, 0)}
+    x, y = 0, 0
+    DXY = {"R": [1, 0], "L": [-1, 0], "U": [0, 1], "D": [0, -1]}
+    for s in S:
+        dx, dy = DXY[s]
+        nx, ny = x+dx, y+dy
+        if (nx, ny) in P:
+            print("Yes")
+            return
+        P.add((nx, ny))
+        x, y = nx, ny
+    print("No")
 
 
 if __name__ == "__main__":
