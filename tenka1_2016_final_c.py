@@ -83,5 +83,40 @@ def main():
     print(dp[-1])
 
 
+def main2():
+    S = SI()
+    M = NI()
+    P = [SI() for _ in range(M)]
+    W = [NI() for _ in range(M)]
+    N = len(S)
+    trie = [0] * 27
+    for T, w in zip(P, W):
+        now = trie
+        for t in T:
+            t = ord(t) - ord("a")
+            if now[t] == 0:
+                now[t] = [0] * 27
+            now = now[t]
+        now[-1] = w
+
+    dp = [0] * (N+1)
+    for l in range(N):
+        now = trie
+        ok = True
+        for g in range(200):
+            i = l + g
+            if i >= N:
+                break
+            s = ord(S[i]) - ord("a")
+            if ok and now[s] != 0:
+                now = now[s]
+                dp[l+g+1] = max(dp[l+g+1], dp[l] + now[-1])
+            else:
+                ok = False
+                dp[l+g+1] = max(dp[l+g+1], dp[l])
+
+    print(dp[-1])
+
+
 if __name__ == "__main__":
-    main()
+    main2()
