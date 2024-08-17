@@ -6,7 +6,7 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
-sys.set_int_max_str_digits(10**6)
+sys.set_int_max_str_digits(10 ** 6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -22,7 +22,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N, P = NMI()
+    k = 0
+    while N > 0:
+        k += N // P
+        N //= P
+    print(pow(P, k, MOD99))
 
 
 if __name__ == "__main__":

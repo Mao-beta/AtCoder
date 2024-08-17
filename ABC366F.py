@@ -22,7 +22,20 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N, K = NMI()
+    AB = EI(N)
+    AB.sort(key=lambda x: (x[0]-1)/x[1])
+    dp = [[-1]*(K+1) for _ in range(N+1)]
+    dp[0][0] = 1
+    for i in range(N):
+        a, b = AB[i]
+        for k in range(K+1):
+            if dp[i][k] < 0:
+                continue
+            dp[i+1][k] = max(dp[i+1][k], dp[i][k])
+            if k < K:
+                dp[i+1][k+1] = max(dp[i+1][k+1], dp[i][k] * a + b)
+    print(dp[-1][K])
 
 
 if __name__ == "__main__":

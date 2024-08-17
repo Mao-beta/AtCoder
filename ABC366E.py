@@ -22,7 +22,18 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N, D = NMI()
+    XY = EI(N)
+    X = []
+    Y = []
+    for x, y in XY:
+        X.append(x)
+        Y.append(y)
+    X.sort()
+    Y.sort()
+
+
+
 
 
 if __name__ == "__main__":

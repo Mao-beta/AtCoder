@@ -22,24 +22,16 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    Q = NI()
-    C = Counter()
-    ans = 0
-    for _ in range(Q):
-        t, *X = NMI()
-        if t == 1:
-            x = X[0]
-            C[x] += 1
-            if C[x] == 1:
-                ans += 1
-        elif t == 2:
-            x = X[0]
-            C[x] -= 1
-            if C[x] == 0:
-                ans -= 1
-        else:
-            print(ans)
-
+    T = NI()
+    for _ in range(T):
+        N, K = NMI()
+        ans = [1 << (K-1)] * N
+        for b in range(K-1, -1, -1):
+            B = 1 << b
+            r = 1 << (K-1-b)
+            for i in range(N):
+                ans[i] += B * int((i % r)<(r>>1))
+        print(*ans)
 
 
 if __name__ == "__main__":

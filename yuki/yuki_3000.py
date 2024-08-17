@@ -6,7 +6,7 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
-sys.set_int_max_str_digits(10**6)
+sys.set_int_max_str_digits(10 ** 6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -22,24 +22,21 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    Q = NI()
-    C = Counter()
-    ans = 0
-    for _ in range(Q):
-        t, *X = NMI()
-        if t == 1:
-            x = X[0]
-            C[x] += 1
-            if C[x] == 1:
-                ans += 1
-        elif t == 2:
-            x = X[0]
-            C[x] -= 1
-            if C[x] == 0:
-                ans -= 1
-        else:
-            print(ans)
-
+    S = SI()
+    D = {}
+    alphabets = set("abcdefghijklmnopqrstuvwxyz")
+    for s, t in zip("pfnovu", "orange"):
+        D[s] = t
+        alphabets.discard(t)
+    for s, t in zip("axqwuf", "cipher"):
+        D[s] = t
+        alphabets.discard(t)
+    for s, t in zip("mbgrihcdejkolsty", "bqsuftlmdxynzvwj"):
+        D[s] = t
+        alphabets.discard(t)
+    D["z"] = alphabets.pop()
+    T = [D[s] for s in S]
+    print("".join(T))
 
 
 if __name__ == "__main__":
