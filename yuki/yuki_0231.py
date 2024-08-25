@@ -4,8 +4,9 @@ import bisect
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
 from functools import lru_cache
-from itertools import accumulate, combinations, permutations
+from itertools import accumulate, combinations, permutations, product
 
+sys.set_int_max_str_digits(10 ** 6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -22,17 +23,16 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    P = [math.log10(i/10) if i >= 10 else 0 for i in range(101)]
-
-    for _ in range(N):
-        A, B = NMI()
-        x = B * math.log10(A)
-        Z = math.floor(x)
-        XY = x - Z
-        idx = bisect.bisect_left(P, XY)-1
-        if idx == -1:
-            idx = 10
-        print(idx//10, idx%10, Z)
+    GD = EI(N)
+    GD = [[g, d, i] for i, (g, d) in enumerate(GD, start=1)]
+    GD.sort(key=lambda x: 30000*x[1] - x[0])
+    g, d, i = GD[0]
+    if (g - 30000 * d) * 6 >= 30000 * 100:
+        print("YES")
+        for _ in range(6):
+            print(i)
+    else:
+        print("NO")
 
 
 
