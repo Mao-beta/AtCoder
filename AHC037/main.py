@@ -87,41 +87,94 @@ class UnionFind:
         return '\n'.join('{}: {}'.format(r, self.members[r]) for r in self.roots)
 
 
-def MST(N, edges):
-    """
-    要UnionFind
-    N頂点の最小全域木の長さ
-    edges = [[u, v, cost], ....] (0-index)
-    """
-    uf = UnionFind(N)
-    edges.sort(key=lambda x: x[-1])
-    res = 0
-    res_E = []
-    for a, b, c in edges:
-        if uf.is_same(a, b):
-            continue
-        else:
-            res += c
-            uf.unite(a, b)
-    return res, uf
+INF = 10**15
 
+def cost(x0, y0, x1, y1):
+    if x1 >= x0 and y1 >= y0:
+        return x1-x0 + y1-y0
+    else:
+        return INF
 
 def main():
     N = NI()
     AB = [[0, 0]] + EI(N)
-    G = [[] for _ in range(N+1)]
-    for i in range(N+1):
-        for j in range(N+1):
-            ai, bi = AB[i]
-            aj, bj = AB[j]
-            cost = abs(aj-ai + bj-bi)
-            if ai <= aj and bi <= bj:
-                G[i].append([i, j, cost])
-                G[j].append([i, j, cost])
-            elif ai >= aj and bi >= bj:
-                G[i].append([j, i, cost])
-                G[j].append([j, i, cost])
+    AB.sort()
+
+    ans = []
+    for j in range(1, N+1):
+        tmp = INF
+        ti = 0
+        for i in range(j):
+            c = cost(*AB[i], *AB[j])
+            if c < tmp:
+                ti = i
+                tmp = c
+        ans.append([*AB[ti], *AB[j]])
+
+    print(len(ans))
+    for row in ans:
+        print(*row)
+
+
+def main2():
+    N = NI()
+    M = 10**9
+    div = 100
+    gap = M // div
+    grid = [[0, 0, 0]]
+    for i in range(div):
+        for j in range(div):
+            if i == j == 0:
+                continue
+            grid.append([i*gap, j*gap, -(i*div + j)])
+
+    AB = [NLI() + [i] for i in range(1, N+1)]
+    raw_AB = [x[:] for x in AB]
+
+    AB = grid + AB
+    AB.sort()
+    C = Counter()
+    for j in range(1, N+len(grid)):
+        tmp = INF
+        ti = 0
+        aj, bj, idxj = AB[j]
+        for i in range(j):
+            ai, bi, idxi = AB[i]
+            c = cost(ai, bi, aj, bj)
+            if c < tmp:
+                ti = i
+                tmp = c
+        ai, bi, idxi = AB[ti]
+        C[idxi] += 1
+
+    for idxi, k in C.items():
+        if idxi <= 0 and k >= 4:
+            idxi *= -1
+            i, j = divmod(idxi, div)
+            raw_AB.append([i*gap, j*gap, -idxi])
+
+    # print(raw_AB)
+
+    raw_AB.sort()
+    ans = []
+    for j in range(1, len(raw_AB)):
+        tmp = INF
+        ti = 0
+        aj, bj, idxj = raw_AB[j]
+        for i in range(j):
+            ai, bi, idxi = raw_AB[i]
+            c = cost(ai, bi, aj, bj)
+            if c < tmp:
+                ti = i
+                tmp = c
+        ai, bi, idxi = raw_AB[ti]
+        ans.append([ai, bi, aj, bj])
+
+
+    print(len(ans))
+    for row in ans:
+        print(*row)
 
 
 if __name__ == "__main__":
-    main()
+    main2()
