@@ -22,7 +22,14 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    A = NLI()
+    for i in range(4):
+        B = A[:]
+        B[i], B[i + 1] = B[i + 1], B[i]
+        if B == sorted(A):
+            print("Yes")
+            exit()
+    print("No")
 
 
 if __name__ == "__main__":
