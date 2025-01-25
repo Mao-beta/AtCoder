@@ -16,6 +16,18 @@ SI = lambda: input()
 # 入力: <N>: 頂点サイズ, <G>: 順方向の有向グラフ, <RG>: 逆方向の有向グラフ
 # 出力: (<ラベル数>, <各頂点のラベル番号>) トポロジカルソート済
 # 計算量: O(V+E)
+
+def make_G_RG(N, edges, in_origin=1):
+    G = [[] for _ in range(N)]
+    RG = [[] for _ in range(N)]
+    for u, v in edges:
+        u -= in_origin
+        v -= in_origin
+        G[u].append(v)
+        RG[v].append(u)
+    return G, RG
+
+
 def scc(N, G, RG):
     order = []
     used = [0]*N
