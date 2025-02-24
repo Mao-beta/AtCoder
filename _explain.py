@@ -1,97 +1,54 @@
-import sys
-import math
-import bisect
-from heapq import heapify, heappop, heappush
-from collections import deque, defaultdict, Counter
-from functools import lru_cache
-from itertools import accumulate, combinations, permutations, product
+from collections import deque
+H, W, M = map(int, input().split())
+RCS = [list(map(int, input().split())) for _ in range(M)]
+INF = 1000
+G = [INF]*(H*W)
 
-sys.setrecursionlimit(1000000)
-MOD = 10 ** 9 + 7
-MOD99 = 998244353
+def f(g, r, c):
+    return (g+INF)*INF**2 + r*INF + c
+def inv(grc):
+    gr, c = divmod(grc, INF)
+    g, r = divmod(gr, INF)
+    g -= INF
+    return g, r, c
 
-input = lambda: sys.stdin.readline().strip()
-NI = lambda: int(input())
-NMI = lambda: map(int, input().split())
-NLI = lambda: list(NMI())
-SI = lambda: input()
-SMI = lambda: input().split()
-SLI = lambda: list(SMI())
-EI = lambda m: [NLI() for _ in range(m)]
-
-
-# 高速エラストテネス　sieve[n]はnの最小の素因数
-def make_prime_table(n):
-    sieve = list(range(n + 1))
-    sieve[0] = -1
-    sieve[1] = -1
-    for i in range(4, n + 1, 2):
-        sieve[i] = 2
-    for i in range(3, int(n ** 0.5) + 1, 2):
-        if sieve[i] != i:
+DH = [1, -1, 0, 0]
+DW = [0, 0, 1, -1]
+D = deque()
+for r, c, s in RCS:
+    r -= 1
+    c -= 1
+    G[r*W+c] = -(s+1)
+    D2 = deque()
+    D2.append(r*W+c)
+    while D2:
+        h, w = divmod(D2.popleft(), W)
+        print(h, w)
+        g = G[h*W+w]
+        for dh, dw in zip(DH, DW):
+            nh, nw = h+dh, w+dw
+            if not(0 <= nh < H and 0 <= nw < W):
+                continue
+            if G[nh*W+nw] <= g:
+                continue
+            if g+1 == 0:
+                D.append(nh*W+nw)
+                G[nh*W+nw] = g+1
+            else:
+                D2.append(nh*W+nw)
+                G[nh*W+nw] = g+1
+print("#")
+while D:
+    h, w = divmod(D.popleft(), W)
+    print(h, w)
+    g = G[h*W+w]
+    for dh, dw in zip(DH, DW):
+        nh, nw = h+dh, w+dw
+        if not(0 <= nh < H and 0 <= nw < W):
             continue
-        for j in range(i * i, n + 1, i * 2):
-            if sieve[j] == j:
-                sieve[j] = i
-    return sieve
-
-prime_table = make_prime_table(10**6+2)
-# 素数列挙
-primes = [p for i, p in enumerate(prime_table) if i == p]
-
-# 素因数分解　上のprime_tableと組み合わせて使う
-def prime_factorize(n):
-    result = []
-    while n != 1:
-        p = prime_table[n]
-        e = 0
-        while n % p == 0:
-            n //= p
-            e += 1
-        result.append((p, e))
-    return result
-
-
-# Nの素因数分解を辞書で返す(単体)
-def prime_fact(n):
-    root = int(n**0.5) + 1
-    prime_dict = {}
-    for i in range(2, root):
-        cnt = 0
-        while n % i == 0:
-            cnt += 1
-            n = n // i
-        if cnt:
-            prime_dict[i] = cnt
-    if n != 1:
-        prime_dict[n] = 1
-    return prime_dict
-
-# 約数列挙（単体）
-def divisors(x):
-    res = set()
-    for i in range(1, int(x**0.5) + 2):
-        if x % i == 0:
-            res.add(i)
-            res.add(x//i)
-    return res
-
-
-def main():
-    N = 10**12
-    ans = 0
-
-    for q in primes:
-        if q**2 > N:
-            break
-        maxp = N // q ** 2
-        if maxp >= q:
-            maxp = q-1
-        idx = bisect.bisect_right(primes, maxp)
-        ans += idx
-
-    print(ans)
-
-
-if __name__ == "__main__":
-    main()
+        if G[nh*W+nw] <= g+1:
+            continue
+        D.append(nh*W+nw)
+        G[nh*W+nw] = g+1
+ans = max(G)
+print(ans)
