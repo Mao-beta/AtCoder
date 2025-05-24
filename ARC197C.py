@@ -21,17 +21,6 @@ SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
 
-def compress(S):
-    """ 座標圧縮 """
-
-    S = set(S)
-    zipped, unzipped = {}, {}
-    for i, a in enumerate(sorted(S)):
-        zipped[a] = i
-        unzipped[i] = a
-    return zipped, unzipped
-
-
 class segtree():
     n = 1
     size = 1
@@ -152,16 +141,20 @@ class segtree():
         return str([self.get(i) for i in range(self.n)])
 
 
+
 def main():
-    N = NI()
-    B = NLI()
-    Z, UZ = compress(B)
-    seg_up = segtree([0] * N, max, 0)
-    seg_dn = segtree([0] * N, max, 0)
-    for i, b in enumerate(B):
-        seg_up.set(Z[b], seg_dn.prod(0, Z[b])+1)
-        seg_dn.set(Z[b], seg_up.prod(Z[b]+1, N)+1)
-    print(max(seg_up.prod(0, N), seg_dn.prod(0, N)))
+    Q = NI()
+    AB = EI(Q)
+    L = 3 * 10 ** 6
+    seg = segtree([1]*L, lambda x, y: x+y, 0)
+    used = set()
+    for a, b in AB:
+        if a not in used:
+            for x in range(a, L, a):
+                seg.set(x, 0)
+            used.add(a)
+        ans = seg.max_right(0, lambda x: x <= b)
+        print(ans)
 
 
 if __name__ == "__main__":
