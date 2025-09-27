@@ -1,0 +1,53 @@
+import sys
+import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
+
+sys.set_int_max_str_digits(10**6)
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
+
+
+def solve(N, K):
+    # print(N, K)
+    if N == 1:
+        if K == 0:
+            return [-1]
+        else:
+            return [1]
+    if N == 2:
+        if K <= 1:
+            return [-1]
+        else:
+            return [1, 2]
+    if K <= 1:
+        return [-1]
+    if K == N:
+        return list(range(1, N+1))
+    ans = list(range(N, K, -1)) + list(range(1, K+1))
+    return ans
+
+
+def main():
+    T = NI()
+    for _ in range(T):
+        N, K = NMI()
+        ans = solve(N, K)
+        print(*ans)
+
+
+if __name__ == "__main__":
+    main()
