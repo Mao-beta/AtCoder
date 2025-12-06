@@ -61,17 +61,17 @@ class Comb:
 
 def main():
     N, M = NMI()
-    # {(1+a)(1+b+b^2+...)-1}^inf [a^N b^M]
-    # {(a+b)/(1-b)}^inf
-    # 1 / {1 - (a+b)/(1-b)}
-    # (1-b)/(1-a-2b)
-    # 1/(1-a-2b) - b/(1-a-2b) [a^N b^M]
-    # 1/(1-a-2b) [a^N b^M] - 1/(1-a-2b) [a^N b^(M-1)]
-    # (a+2b)^(N+M) [a^N b^M] - (a+2b)^(N+M-1) [a^N b^(M-1)]
     com = Comb(10**6, MOD99)
-    ans = com.C(N+M, N) * pow(2, M, MOD99)
-    ans -= com.C(N+M-1, N) * pow(2, M-1, MOD99)
-    print(ans % MOD99)
+    A = sorted(NLI())
+    B = deque(sorted(NLI()))
+    ans = 0
+    prev = 0
+    cum = 0
+    for i, a in enumerate(A):
+        if i > 0:
+
+        while B and B[0] <= a:
+
 
 
 if __name__ == "__main__":

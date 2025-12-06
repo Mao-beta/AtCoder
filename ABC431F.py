@@ -20,6 +20,18 @@ SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
+from typing import List
+from itertools import groupby
+
+# RUN LENGTH ENCODING str -> list(tuple())
+# example) "aabbbbaaca" -> [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)]
+def runLengthEncode(S: str) -> "List[tuple[str, int]]":
+    grouped = groupby(S)
+    res = []
+    for k, v in grouped:
+        res.append((k, int(len(list(v)))))
+    return res
+
 
 class Comb:
     """nCrのnもrも10**7くらいまで"""
@@ -60,18 +72,22 @@ class Comb:
 
 
 def main():
-    N, M = NMI()
-    # {(1+a)(1+b+b^2+...)-1}^inf [a^N b^M]
-    # {(a+b)/(1-b)}^inf
-    # 1 / {1 - (a+b)/(1-b)}
-    # (1-b)/(1-a-2b)
-    # 1/(1-a-2b) - b/(1-a-2b) [a^N b^M]
-    # 1/(1-a-2b) [a^N b^M] - 1/(1-a-2b) [a^N b^(M-1)]
-    # (a+2b)^(N+M) [a^N b^M] - (a+2b)^(N+M-1) [a^N b^(M-1)]
+    N, D = NMI()
+    A = sorted(NLI())
+    R = runLengthEncode(A)
     com = Comb(10**6, MOD99)
-    ans = com.C(N+M, N) * pow(2, M, MOD99)
-    ans -= com.C(N+M-1, N) * pow(2, M-1, MOD99)
-    print(ans % MOD99)
+    Ls = deque()
+    l = 0
+    ans = 1
+    for a, k in R:
+        while Ls and Ls[0][0] < a-D:
+            la, lk = Ls.popleft()
+            l -= lk
+        ans = ans * com.C(k+l, k) % MOD99
+        Ls.append([a, k])
+        l += k
+        # print(k + l, k, ans, Ls)
+    print(ans)
 
 
 if __name__ == "__main__":

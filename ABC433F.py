@@ -60,18 +60,35 @@ class Comb:
 
 
 def main():
-    N, M = NMI()
-    # {(1+a)(1+b+b^2+...)-1}^inf [a^N b^M]
-    # {(a+b)/(1-b)}^inf
-    # 1 / {1 - (a+b)/(1-b)}
-    # (1-b)/(1-a-2b)
-    # 1/(1-a-2b) - b/(1-a-2b) [a^N b^M]
-    # 1/(1-a-2b) [a^N b^M] - 1/(1-a-2b) [a^N b^(M-1)]
-    # (a+2b)^(N+M) [a^N b^M] - (a+2b)^(N+M-1) [a^N b^(M-1)]
+    S = SI()
+    N = len(S)
     com = Comb(10**6, MOD99)
-    ans = com.C(N+M, N) * pow(2, M, MOD99)
-    ans -= com.C(N+M-1, N) * pow(2, M-1, MOD99)
-    print(ans % MOD99)
+    # iより左/右にjが何個あるか
+    L = [[0]*10 for _ in range(N+1)]
+    R = [[0]*10 for _ in range(N+1)]
+    for i in range(N):
+        s = int(S[i])
+        for j in range(10):
+            L[i+1][j] = L[i][j] + int(s==j)
+    for i in range(N, 0, -1):
+        s = int(S[i-1])
+        for j in range(10):
+            R[i-1][j] = R[i][j] + int(s==j)
+    # print(*L, sep='\n')
+    # print(*R, sep='\n')
+    ans = 0
+    for i in range(1, N):
+        s = int(S[i-1])
+        t = s+1
+        if s == 9:
+            continue
+        ls = L[i][s]
+        lss = L[i-1][s]
+        rt = R[i][t]
+        # print(ls, lss, rt, com.C(ls+rt, ls), com.C(lss, rt), com.C(ls+rt, ls) - com.C(lss, rt))
+        ans += com.C(ls+rt, ls) - com.C(lss+rt, rt)
+        ans %= MOD99
+    print(ans)
 
 
 if __name__ == "__main__":
