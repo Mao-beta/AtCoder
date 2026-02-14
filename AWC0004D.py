@@ -22,8 +22,25 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, M = NMI()
+    LR = EI(M)
+    LR = [[x-1, y] for x, y in LR]
+    L2R = [[] for _ in range(N)]
+    hq = []
+    for l, r in LR:
+        L2R[l].append(r)
+    for l in range(N):
+        for r in L2R[l]:
+            heappush(hq, r)
+        if hq and hq[0] <= l:
+            print("No")
+            return
+        if hq:
+            heappop(hq)
+    if hq:
+        print("No")
+    else:
+        print("Yes")
 
 
 if __name__ == "__main__":

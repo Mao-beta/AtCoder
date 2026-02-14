@@ -98,12 +98,15 @@ class Dijkstra():
 
 
 def main():
-    K = NI()
-    G = Dijkstra(K)
-    for i in range(K):
-        G.add(i, (i+1)%K, 1)
-        G.add(i, i*10%K, 0)
-    print(G.shortest_path(1)[0]+1)
+    N, M = NMI()
+    XYC = EI(M)
+    XYC = [[x-1, y-1, w] for x, y, w in XYC]
+    G = Dijkstra(N)
+    for x, y, c in XYC:
+        G.add(x, y, c)
+    D = G.shortest_path(XYC[0][1])
+    ans = D[XYC[0][0]] + XYC[0][2]
+    print(ans if ans < float("inf") else -1)
 
 
 if __name__ == "__main__":

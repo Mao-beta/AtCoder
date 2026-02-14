@@ -22,8 +22,8 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    X, Y = NMI()
+    print(X * 2**Y)
 
 
 if __name__ == "__main__":

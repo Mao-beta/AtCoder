@@ -22,8 +22,18 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, K = NMI()
+    A = NLI()
+    C = list(accumulate([0]+A))
+    # print(C)
+    D = Counter()
+    ans = 0
+    D[C[-1]] += 1
+    for l in range(N-1, -1, -1):
+        ans += D[C[l]+K]
+        D[C[l]] += 1
+        # print(D, l, C[l]+K)
+    print(ans)
 
 
 if __name__ == "__main__":

@@ -22,8 +22,13 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, K = NMI()
+    now = 0
+    for i in range(10**8+5):
+        now += N+i
+        if now >= K:
+            print(i)
+            return
 
 
 if __name__ == "__main__":

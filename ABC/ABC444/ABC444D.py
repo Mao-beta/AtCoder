@@ -23,7 +23,25 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    #
+    A = NLI()
+    ans = [0]
+    A.sort()
+    idx = 0
+    for k in range(max(A)):
+        while idx < N and k >= A[idx]:
+            idx += 1
+        ans[k] += N - idx
+        x, r = divmod(ans[k], 10)
+        ans.append(x)
+        ans[k] = r
+    while ans[-1] == 0:
+        ans.pop()
+    while ans[-1] >= 10:
+        x, r = divmod(ans[-1], 10)
+        ans[-1] = r
+        ans.append(x)
+    ans = ans[::-1]
+    print(*ans, sep="")
 
 
 if __name__ == "__main__":

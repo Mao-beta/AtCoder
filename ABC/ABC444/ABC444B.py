@@ -22,8 +22,14 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, K = NMI()
+    ans = 0
+    for i in range(1, N+1):
+        s = str(i)
+        res = sum(int(ss) for ss in s)
+        if res == K:
+            ans += 1
+    print(ans)
 
 
 if __name__ == "__main__":

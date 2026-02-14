@@ -21,7 +21,6 @@ SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
 
-
 MOD = 998244353
 _IMAG = 911660635
 _IIMAG = 86583718
@@ -278,6 +277,9 @@ class FPS:
     - 特定の値での多項式の評価
     - 逆数列の計算
     - 商と余りの計算
+    - Bostan–Mori 法による有理母関数 P(x)/Q(x) の係数抽出（k-th term）
+    - 線形漸化式（初期値 + 係数）からの k 項計算（Bostan–Mori 経由）
+
 
     注意：
     全ての演算は特定の法 (MOD = 998244353) における有限体上で行われます。
@@ -301,6 +303,17 @@ class FPS:
     - log(a, deg): 数列 a の対数を指定した次数まで計算します。
     - integral(a): 数列 a の積分を計算します。
     - fps_diff(a): 数列 a の微分を計算します。
+    - bostan_mori((P, Q), K):
+        有理母関数 A(x) = P(x)/Q(x) の [x^K] を返します（0-index）。
+        ここで P,Q は低次からの係数列で、Q[0] != 0 が必要です。
+        計算量は多項式乗算 M(n) を用いて O(M(d) log K) 程度です。
+
+    - kth_term_linear_recurrence(A0, C, K):
+        次数 d=len(C) の線形漸化式
+            a_n = C[0]*a_{n-1} + C[1]*a_{n-2} + ... + C[d-1]*a_{n-d} (n>=d)
+        と初期値 A0=[a_0,...,a_{d-1}] から a_K を返します。
+        内部で母関数 P/Q を構成して bostan_mori を呼びます。
+
 
     使用例：
     ```
@@ -581,55 +594,169 @@ class FPS:
     def fps_diff(a: list) -> list:
         return [i * x % MOD for i, x in enumerate(a) if i]
 
-
-class Comb:
-    """nCrのnもrも10**7くらいまで"""
-
-    def __init__(self, n, mod):
-        self.mod = mod
-        self.fac = [1] * (n + 1)
-        self.inv = [1] * (n + 1)
-        for i in range(1, n + 1):
-            self.fac[i] = self.fac[i - 1] * i % self.mod
-        self.inv[n] = pow(self.fac[n], self.mod - 2, self.mod)
-        for i in range(n - 1, 0, -1):
-            self.inv[i] = self.inv[i + 1] * (i + 1) % self.mod
-
-    def C(self, n, r):
-        if n < r: return 0
-        if n < 0 or r < 0: return 0
-        return self.fac[n] * self.inv[r] % self.mod * self.inv[n - r] % self.mod
-
-    def P(self, n, r):
-        if n < r: return 0
-        if n < 0 or r < 0: return 0
-        return self.fac[n] * self.inv[n - r] % self.mod
-
-    def H(self, n, r):
+    @classmethod
+    def bostan_mori(cls, pq, K: int) -> int:
         """
-        n個のものから重複を許してr個取り出す
-        """
-        if n == r == 0:
-            return 1
-        return self.C(n + r - 1, r)
+        Bostan–Mori 法で、有理母関数 A(x)=P(x)/Q(x) の係数 a_K=[x^K]A(x) を求めます（0-index）。
 
-    def multi(self, L):
-        res = self.fac[sum(L)]
-        for l in L:
-            res = res * self.inv[l] % self.mod
-        return res
+        Parameters
+        ----------
+        pq : tuple[list[int], list[int]] | list[list[int]]
+            (P, Q) もしくは [P, Q]。
+            P, Q は低次から高次への係数列（P[0] が定数項）。
+            Q[0] != 0 が必要です（形式冪級数として 1/Q が存在）。
+
+        K : int
+            取り出したい係数の添字（0-index）。K >= 0。
+
+        Returns
+        -------
+        int
+            a_K mod MOD（MOD=998244353）。
+
+        Notes
+        -----
+        - Q(-x) を用いて
+              P' = P * Q(-x)
+              Q' = Q * Q(-x)
+          を作り、K の偶奇に応じて P' の偶数/奇数係数だけを残し、K を半分にします。
+        - Q' は偶数次数しか残らないため、偶数係数のみを抽出して次数を半分にできます。
+        - 計算量は多項式乗算を M(n) として O(M(d) log K) 程度。
+        """
+        P, Q = pq
+        P = [x % MOD for x in (P if P else [0])]
+        Q = [x % MOD for x in Q]
+        cls.shrink(P)
+        cls.shrink(Q)
+
+        assert Q and Q[0] != 0
+        assert K >= 0
+
+        # P を Q で剰余に落としておく（任意だが、次数を抑えて安全）
+        if len(P) >= len(Q):
+            P = cls.mod(P, Q)
+            if not P:
+                P = [0]
+
+        while K > 0:
+            # Q(-x)
+            Qm = Q[:]
+            for i in range(1, len(Qm), 2):
+                Qm[i] = (-Qm[i]) % MOD
+
+            PQm = multiply(P, Qm)
+            QQm = multiply(Q, Qm)
+
+            # K の偶奇に応じて偶数/奇数係数を抽出
+            if K & 1:
+                P = PQm[1::2]
+            else:
+                P = PQm[0::2]
+            Q = QQm[0::2]  # 偶数次数のみ
+
+            cls.shrink(P)
+            cls.shrink(Q)
+            if not P:
+                P = [0]
+            assert Q and Q[0] != 0
+
+            K >>= 1
+
+        # K=0 のとき [x^0] P/Q = P(0)/Q(0)
+        return P[0] * pow(Q[0], MOD - 2, MOD) % MOD
+
+    @classmethod
+    def kth_term_linear_recurrence(cls, A0: list, C: list, K: int) -> int:
+        """
+        線形漸化式から a_K（0-index）を計算します。内部で母関数を構成して Bostan–Mori 法を用います。
+
+        Recurrence Definition
+        ---------------------
+        d = len(C) とし、次の形を仮定します（AtCoder で頻出の「直前から順」形式）:
+
+            a_n = C[0]*a_{n-1} + C[1]*a_{n-2} + ... + C[d-1]*a_{n-d}   (n >= d)
+
+        Initial Values
+        --------------
+            A0 = [a_0, a_1, ..., a_{d-1}]  （長さ d 以上なら先頭 d 個を利用）
+
+        Parameters
+        ----------
+        A0 : list[int]
+            初期値列。少なくとも d 個必要。
+
+        C : list[int]
+            漸化式係数列（長さ d）。
+
+        K : int
+            求めたい項番号（0-index）。K >= 0。
+
+        Returns
+        -------
+        int
+            a_K mod MOD（MOD=998244353）。
+
+        How it considers generating function
+        ------------------------------------
+        この漸化式の母関数 A(x)=Σ a_n x^n は
+
+            Q(x) = 1 - C[0]x - C[1]x^2 - ... - C[d-1]x^d
+            A(x) = P(x) / Q(x)
+
+        を満たし、P(x) は「A(x)Q(x) の d-1 次以下部分」です。
+        具体的には n<d に対し
+            P[n] = a_n - Σ_{i=1..n} C[i-1] * a_{n-i}
+        で求まります。
+        """
+        K = int(K)
+        assert K >= 0
+        d = len(C)
+        assert d >= 1
+        assert len(A0) >= d
+
+        A0 = [x % MOD for x in A0[:d]]
+        C = [x % MOD for x in C]
+
+        if K < d:
+            return A0[K]
+
+        # Q(x) = 1 - sum_{i=1..d} C[i-1] x^i
+        Q = [0] * (d + 1)
+        Q[0] = 1
+        for i, c in enumerate(C, start=1):
+            Q[i] = (-c) % MOD
+
+        # P(x) = (A(x)Q(x)) mod x^d を初期値から構成
+        P = [0] * d
+        for n in range(d):
+            val = A0[n]
+            lim = min(n, d - 1)
+            for i in range(1, lim + 1):
+                val -= C[i - 1] * A0[n - i] % MOD
+            P[n] = val % MOD
+
+        return cls.bostan_mori((P, Q), K)
+
 
 
 def main():
-    N, M, K = NMI()
-    com = Comb(10**6, MOD99)
-    A = [0] * (N+1)
-    for k in range(K+1):
-        x = com.C(N, k)
-        A[N-k] = x
-    ans = FPS.multipoint_eval(A, list(range(1, M+1)))
-    for a in ans:
-        print(a[0])
+    N, M = NMI()
+    A = NLI() + [1]
+    # Xの長さをN+1にして =M の数をかぞえる
+    # Aiごとに、(1+x^Ai+x^(2Ai)+...) = 1/(1-x^Ai)をかける
+    # それの[x^M]が答え -> bostan mori
+    Q = [1]
+    for a in A:
+        q = [0] * (1+a)
+        q[0] = 1
+        q[a] = -1
+        Q = multiply(Q, q)
+        # print(Q)
+    P = [0] * (len(Q))
+    P[0] = 1
+    # print(Q)
+    ans = FPS.bostan_mori([P, Q], M)
+    print(ans)
 
 
 if __name__ == "__main__":

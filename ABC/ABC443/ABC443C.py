@@ -22,8 +22,19 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, T = NMI()
+    A = NLI()
+    ans = T
+    prev = -100
+    for a in A:
+        if prev + 100 < a:
+            # print(prev, a)
+            prev = a
+            ans -= 100
+    # print(ans)
+    if T < prev+100:
+        ans += prev+100-T
+    print(ans)
 
 
 if __name__ == "__main__":

@@ -22,8 +22,27 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, Q = NMI()
+    A = NLI()
+    A.sort()
+    ans = [0] * Q
+    for qi in range(Q):
+        x, y = NMI()
+        msx = bisect.bisect_left(A, x)
+
+        ok = 10**10
+        ng = x-1
+        while abs(ok - ng) > 1:
+            m = (ok + ng) // 2
+            total = m - (x - 1)
+            a = bisect.bisect_right(A, m) - msx
+            if total - a >= y:
+                ok = m
+            else:
+                ng = m
+
+        ans[qi] = ok
+    print("\n".join(map(str, ans)))
 
 
 if __name__ == "__main__":

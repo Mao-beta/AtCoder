@@ -6,7 +6,7 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
-sys.set_int_max_str_digits(10**6)
+sys.set_int_max_str_digits(10 ** 6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -23,7 +23,22 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    #
+    D = NLI()
+    C = list(accumulate([0]+D+D))
+    Q = NI()
+    S = sum(D)
+    for _ in range(Q):
+        y, m, d, k = NMI()
+        yy, r = divmod(k, S)
+        y += yy
+        d += r
+        mm = bisect.bisect_left(C, d+C[m-1])
+        dd = d+C[m-1]-C[mm-1]
+        if mm > N:
+            mm -= N
+            y += 1
+        # print(C, d, d+C[m-1])
+        print(y, mm, dd)
 
 
 if __name__ == "__main__":

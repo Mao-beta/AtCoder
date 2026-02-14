@@ -23,7 +23,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    #
+    H = NLI()
+    M, m = 0, 0
+    for h in H:
+        M = max(M, h)
+        m = min(m, h)
+    print(2*(M-m))
 
 
 if __name__ == "__main__":

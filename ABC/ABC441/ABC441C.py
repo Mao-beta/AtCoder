@@ -22,8 +22,18 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, K, X = NMI()
+    A = NLI()
+    A.sort(reverse=True)
+    x = 0
+    ans = N-K
+    for i in range(N-K, N):
+        x += A[i]
+        ans += 1
+        if x >= X:
+            print(ans)
+            return
+    print(-1)
 
 
 if __name__ == "__main__":

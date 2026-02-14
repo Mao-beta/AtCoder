@@ -22,8 +22,26 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    T = NI()
+    for _ in range(T):
+        N, W = NMI()
+        C = NLI() * 2
+        cum = list(accumulate([0]+C))
+        ans = 10**60
+        for x in range(2*W):
+            tmp = 0
+            for l in range(x-2*W, N, 2*W):
+                r = l + W
+                l = max(l, 0)
+                r = min(r, N)
+                if l >= r:
+                    continue
+                tmp += cum[r] - cum[l]
+                # print(x, l, r)
+            ans = min(ans, tmp)
+            # print(x, tmp)
+        print(ans)
+
 
 
 if __name__ == "__main__":

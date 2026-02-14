@@ -22,8 +22,22 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    Q = NI()
+    V = 0
+    ison = False
+    for _ in range(Q):
+        A = NI()
+        if A == 1:
+            V += 1
+        elif A == 2:
+            if V > 0:
+                V -= 1
+        else:
+            ison = not ison
+        if ison and V >= 3:
+            print("Yes")
+        else:
+            print("No")
 
 
 if __name__ == "__main__":

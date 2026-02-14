@@ -6,7 +6,7 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
-sys.set_int_max_str_digits(10**6)
+sys.set_int_max_str_digits(10 ** 6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -98,12 +98,21 @@ class Dijkstra():
 
 
 def main():
-    K = NI()
-    G = Dijkstra(K)
-    for i in range(K):
-        G.add(i, (i+1)%K, 1)
-        G.add(i, i*10%K, 0)
-    print(G.shortest_path(1)[0]+1)
+    N, M = NMI()
+    LRX = EI(M)
+    # Bi: [0, i)における0の数
+    # Br - Bl <= r-l-x
+    # 0 <= B_i+1 - Bi <= 1
+    LRX = [[x-1, y, w] for x, y, w in LRX]
+    G = Dijkstra(N+1)
+    for l, r, x in LRX:
+        G.add(l, r, r-l-x)
+    for i in range(N):
+        G.add(i, i+1, 1)
+        G.add(i+1, i, 0)
+    D = G.shortest_path(0)
+    ans = [1-D[i+1]+D[i] for i in range(N)]
+    print(*ans)
 
 
 if __name__ == "__main__":

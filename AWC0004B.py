@@ -22,8 +22,12 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, T = NMI()
+    AB = EI(N)
+    ans = 0
+    for a, b in AB:
+        ans += max(a-b*T, 0)
+    print(ans)
 
 
 if __name__ == "__main__":

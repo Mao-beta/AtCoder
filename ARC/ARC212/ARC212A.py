@@ -22,8 +22,17 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    K = NI()
+    ans = 0
+    for ab in range(2, K):
+        for cd in range(2, K):
+            ef = K - ab - cd
+            if ef < 2:
+                continue
+            tmp = (ab-1) * (cd-1) * (ef-1) * min(ab+cd, cd+ef, ef+ab)
+            ans += tmp
+            ans %= MOD99
+    print(ans)
 
 
 if __name__ == "__main__":

@@ -23,7 +23,30 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    #
+    # 左右反転
+    S = [SI()[::-1] for _ in range(N)]
+    # print(*S, sep='\n')
+    INF = 10**8
+    # i段目まで決めて白黒境界がj
+    dp = [INF]*(N+1)
+    dp[0] = 0
+    for i in range(N):
+        dp2 = [INF] * (N+1)
+        # dp[i+1][j] <- min(dp[i][:j+1])+add
+        b = S[i].count("#")
+        w = 0
+        cum = dp[0]
+        for j in range(N+1):
+            dp2[j] = cum + w+b
+            if j < N:
+                cum = min(cum, dp[j+1])
+                if S[i][j] == ".":
+                    w += 1
+                else:
+                    b -= 1
+        dp = dp2
+        # print(dp)
+    print(min(dp))
 
 
 if __name__ == "__main__":

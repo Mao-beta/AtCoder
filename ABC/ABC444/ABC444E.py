@@ -156,24 +156,62 @@ class SortedMultiset(Generic[T]):
         return ans
 
 
-def main():
-    N, M = NMI()
-    L2RI = [[] for _ in range(M)]
-    MS = SortedMultiset()
-    for i in range(N):
-        l, r = NMI()
-        l -= 1
-        L2RI[l].append([r, i])
-        MS.add(r)
-    MS.add(M+1)
+def main(N, D, A):
     ans = 0
-    for l in range(M):
-        rmin = MS[0]
-        ans += rmin - l - 1
-        for r, i in L2RI[l]:
-            MS.discard(r)
-    print(ans)
+    X = deque()
+    MS = SortedMultiset([-10**18, 10**18])
+    Z = defaultdict(int)
+    l = 0
+    for r in range(1, N+1):
+        t = l
+        a = A[r-1]
+        lt = MS.lt(a)
+        if lt >= a-D+1:
+            t = max(t, Z[lt]+1)
+        ge = MS.ge(a)
+        if ge < a+D:
+            t = max(t, Z[ge]+1)
+        for i in range(t-l):
+            x = X.popleft()
+            MS.discard(x)
+        Z[a] = r-1
+        X.append(a)
+        MS.add(a)
+        # print(X, Z, t, l, lt, ge)
+        l = t
+        ans += r-l
+    return ans
+
+
+def guchoku(N, D, A):
+    ans = 0
+    for l in range(N):
+        for r in range(l+1, N+1):
+            X = sorted(A[l:r])
+            ok = True
+            for i in range(len(X)-1):
+                if X[i+1] - X[i] < D:
+                    ok = False
+            if ok:
+                ans += 1
+    return ans
 
 
 if __name__ == "__main__":
-    main()
+    # from random import randint
+    # for _ in range(100):
+    #     N = 5
+    #     D = randint(1, 5)
+    #     A = [randint(1, 10) for _ in range(N)]
+    #     print(N, D, A)
+    #     ans = main(N, D, A)
+    #     gu = guchoku(N, D, A)
+    #     assert gu == ans, (N, D, A, gu, ans)
+    #     print("####")
+    # exit()
+    N, D = NMI()
+    A = NLI()
+    ans = main(N, D, A)
+    print(ans)
+    # gu = guchoku(N, D, A)
+    # print(ans, gu)

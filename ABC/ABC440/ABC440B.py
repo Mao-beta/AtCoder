@@ -23,7 +23,10 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 def main():
     N = NI()
-    #
+    T = [1000] + NLI()
+    T = [[t, i] for i, t in enumerate(T)]
+    T.sort()
+    print(T[0][1], T[1][1], T[2][1])
 
 
 if __name__ == "__main__":

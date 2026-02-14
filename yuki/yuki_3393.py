@@ -6,7 +6,7 @@ from collections import deque, defaultdict, Counter
 from functools import lru_cache
 from itertools import accumulate, combinations, permutations, product
 
-sys.set_int_max_str_digits(10**6)
+sys.set_int_max_str_digits(10 ** 6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
 MOD99 = 998244353
@@ -34,13 +34,6 @@ class Dijkstra():
     * ベルマンフォード法より高速なので、負のコストがないならばこちらを使うとよい
     """
 
-    class Edge():
-        """ 重み付き有向辺 """
-
-        def __init__(self, _to, _cost):
-            self.to = _to
-            self.cost = _cost
-
     def __init__(self, V):
         """ 重み付き有向辺
         無向辺を表現したいときは、_fromと_toを逆にした有向辺を加えればよい
@@ -66,7 +59,7 @@ class Dijkstra():
 
     def add(self, _from, _to, _cost):
         """ 2頂点と、辺のコストを追加する """
-        self.G[_from].append(self.Edge(_to, _cost))
+        self.G[_from].append([_to, _cost])
         self._E += 1
 
     def shortest_path(self, s):
@@ -81,29 +74,43 @@ class Dijkstra():
         que = []  # プライオリティキュー（ヒープ木）
         d = [float("inf")] * self.V
         d[s] = 0
-        heapq.heappush(que, (0, s))  # 始点の(最短距離, 頂点番号)をヒープに追加する
+        heapq.heappush(que, 0 * self.V + s)  # 始点の(最短距離, 頂点番号)をヒープに追加する
 
         while len(que) != 0:
-            cost, v = heapq.heappop(que)
+            cost_v = heapq.heappop(que)
+            cost, v = divmod(cost_v, self.V)
             # キューに格納されている最短経路の候補がdの距離よりも大きければ、他の経路で最短経路が存在するので、処理をスキップ
             if d[v] < cost: continue
 
             for i in range(len(self.G[v])):
                 # 頂点vに隣接する各頂点に関して、頂点vを経由した場合の距離を計算し、今までの距離(d)よりも小さければ更新する
                 e = self.G[v][i]  # vのi個目の隣接辺e
-                if d[e.to] > d[v] + e.cost:
-                    d[e.to] = d[v] + e.cost  # dの更新
-                    heapq.heappush(que, (d[e.to], e.to))  # キューに新たな最短経路の候補(最短距離, 頂点番号)の情報をpush
+                if d[e[0]] > d[v] + e[1]:
+                    d[e[0]] = d[v] + e[1]  # dの更新
+                    heapq.heappush(que, d[e[0]] * self.V + e[0])  # キューに新たな最短経路の候補(最短距離, 頂点番号)の情報をpush
         return d
 
 
 def main():
-    K = NI()
-    G = Dijkstra(K)
-    for i in range(K):
-        G.add(i, (i+1)%K, 1)
-        G.add(i, i*10%K, 0)
-    print(G.shortest_path(1)[0]+1)
+    N, M, C = NMI()
+    UVW = EI(M)
+    UVW = [[x-1, y-1, w] for x, y, w in UVW]
+    G = Dijkstra(2*N)
+    for u, v, w in UVW:
+        G.add(u, v, w+C)
+        G.add(v, u, w+C)
+    D = G.shortest_path(0)
+    for u, v, w in UVW:
+        G.add(u+N, v+N, w+C)
+        G.add(v+N, u+N, w+C)
+        G.add(u, v+N, C)
+        G.add(v, u+N, C)
+    D2 = G.shortest_path(N-1)
+    ans = []
+    for i in range(1, N):
+        res = min(D[i] + min(D2[i], D2[i+N]), D[N-1])
+        ans.append(str(res))
+    print(*ans, sep="\n")
 
 
 if __name__ == "__main__":

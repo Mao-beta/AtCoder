@@ -22,8 +22,25 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    N = NI()
-    #
+    N, M = NMI()
+    S = set(SI())
+    T = set(SI())
+    Q = NI()
+    for _ in range(Q):
+        t = True
+        a = True
+        W = SI()
+        for w in W:
+            if w not in S:
+                t = False
+            if w not in T:
+                a = False
+        if t and not a:
+            print("Takahashi")
+        elif a and not t:
+            print("Aoki")
+        else:
+            print("Unknown")
 
 
 if __name__ == "__main__":
