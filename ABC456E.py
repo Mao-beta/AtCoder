@@ -1,0 +1,140 @@
+import sys
+import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
+
+
+sys.set_int_max_str_digits(10**6)
+sys.setrecursionlimit(1000000)
+MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
+input = lambda: sys.stdin.readline().strip()
+NI = lambda: int(input())
+NMI = lambda: map(int, input().split())
+NLI = lambda: list(NMI())
+SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
+
+
+# 強連結成分分解(SCC): グラフGに対するSCCを行う
+# 入力: <N>: 頂点サイズ, <G>: 順方向の有向グラフ, <RG>: 逆方向の有向グラフ
+# 出力: (<ラベル数>, <各頂点のラベル番号>) トポロジカルソート済
+# 計算量: O(V+E)
+
+def make_G_RG(N, edges, in_origin=1):
+    G = [[] for _ in range(N)]
+    RG = [[] for _ in range(N)]
+    for u, v in edges:
+        u -= in_origin
+        v -= in_origin
+        G[u].append(v)
+        RG[v].append(u)
+    return G, RG
+
+
+def scc(N, G, RG):
+    order = []
+    used = [0]*N
+    group = [None]*N
+    def dfs(s):
+        used[s] = 1
+        for t in G[s]:
+            if not used[t]:
+                dfs(t)
+        order.append(s)
+    def rdfs(s, col):
+        group[s] = col
+        used[s] = 1
+        for t in RG[s]:
+            if not used[t]:
+                rdfs(t, col)
+    for i in range(N):
+        if not used[i]:
+            dfs(i)
+    used = [0]*N
+    label = 0
+    for s in reversed(order):
+        if not used[s]:
+            rdfs(s, label)
+            label += 1
+    return label, group
+
+
+def construct(N, G, label, group):
+    """
+    縮約後のグラフを構築: トポソ済み
+    G0: 各強連結成分の遷移先の集合
+    GP: 各強連結成分内の元の頂点のリスト
+    """
+    G0 = [set() for i in range(label)]
+    GP = [[] for i in range(label)]
+    for v in range(N):
+        lbs = group[v]
+        for w in G[v]:
+            lbt = group[w]
+            if lbs == lbt:
+                continue
+            G0[lbs].add(lbt)
+        GP[lbs].append(v)
+    return G0, GP
+
+
+def make_adjlist_d(n, edges):
+    res = [[] for _ in range(n)]
+    for edge in edges:
+        res[edge[0]].append(edge[1])
+    return res
+
+
+def main():
+    T = NI()
+    for _ in range(T):
+        N, M = NMI()
+        UV = EI(M)
+        UV = [[x-1, y-1] for x, y in UV]
+        W = NI()
+        S = [SI() for _ in range(N)]
+        ok = False
+        for s in S:
+            if s.count("o") == len(s):
+                ok = True
+        if ok:
+            print("Yes")
+            continue
+
+        edges = []
+        for u in range(N):
+            for d in range(W):
+                if S[u][d] == "o" and S[u][(d+1)%W] == "o":
+                    edges.append([u*W+d, u*W+(d+1)%W])
+
+        for u, v in UV:
+            for d in range(W):
+                if S[u][d] == "o" and S[v][(d+1)%W] == "o":
+                    edges.append([u*W+d, v*W+(d+1)%W])
+                if S[v][d] == "o" and S[u][(d+1)%W] == "o":
+                    edges.append([v*W+d, u*W+(d+1)%W])
+
+        G, RG = make_G_RG(N*W, edges, in_origin=0)
+        label, group = scc(N*W, G, RG)
+        G0, GP = construct(N*W, G, label, group)
+        # print(G0)
+        # print(GP)
+        ok = False
+        for gp in GP:
+            if len(gp) > 1:
+                print("Yes")
+                ok = True
+                break
+        if not ok:
+            print("No")
+
+
+if __name__ == "__main__":
+    main()
