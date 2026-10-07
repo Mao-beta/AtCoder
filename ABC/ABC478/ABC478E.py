@@ -1,16 +1,24 @@
 import sys
 import math
+import bisect
+from heapq import heapify, heappop, heappush
+from collections import deque, defaultdict, Counter
+from functools import lru_cache
+from itertools import accumulate, combinations, permutations, product
 
-from collections import defaultdict
-from collections import deque
-
+sys.set_int_max_str_digits(10**6)
 sys.setrecursionlimit(1000000)
 MOD = 10 ** 9 + 7
+MOD99 = 998244353
+
 input = lambda: sys.stdin.readline().strip()
 NI = lambda: int(input())
 NMI = lambda: map(int, input().split())
 NLI = lambda: list(NMI())
 SI = lambda: input()
+SMI = lambda: input().split()
+SLI = lambda: list(SMI())
+EI = lambda m: [NLI() for _ in range(m)]
 
 
 class SCC:
@@ -45,6 +53,17 @@ class SCC:
 
       となる。
     - add_edge() 後に SCC 情報を要求すると、自動的に再計算される。
+
+    Examples
+    --------
+    # >>> scc = SCC(4)
+    # >>> scc.add_edge(0, 1)
+    # >>> scc.add_edge(1, 0)
+    # >>> scc.add_edge(1, 2)
+    # >>> scc.add_edge(2, 3)
+    # >>> scc.add_edge(3, 2)
+    # >>> scc.scc()
+    [[0, 1], [2, 3]]
     """
 
     __slots__ = (
@@ -89,6 +108,10 @@ class SCC:
         -----
         AtCoder 用途を想定し、頂点番号の範囲チェックは行わない。
         入力が 1-indexed の場合は呼び出し側で 1 を引く。
+
+        Examples
+        --------
+        # >>> scc.add_edge(u - 1, v - 1)
         """
         self.g[u].append(v)
         self.rg[v].append(u)
@@ -213,6 +236,12 @@ class SCC:
             ids[u] < ids[v]
 
         が成り立つ。
+
+        Examples
+        --------
+        # >>> ids = scc.scc_ids()
+        # >>> ids[3]
+        1
         """
         if not self._built:
             self._build()
@@ -227,6 +256,10 @@ class SCC:
         -------
         int
             SCC の総数。
+
+        Examples
+        --------
+        # >>> k = scc.group_count()
         """
         if not self._built:
             self._build()
@@ -245,6 +278,12 @@ class SCC:
             groups[c] は SCC ラベル c に属する頂点を持つ。
 
             SCC 自体も縮約 DAG のトポロジカル順に並ぶ。
+
+        Examples
+        --------
+        # >>> groups = scc.scc()
+        # >>> groups
+        [[0, 1], [2, 3]]
         """
         ids = self.scc_ids()
         k = self._group_count
@@ -281,6 +320,13 @@ class SCC:
               c < d
 
           となる。
+
+        Examples
+        --------
+        # >>> dag = scc.dag()
+        # >>> for v in range(len(dag)):
+        # ...     for to in dag[v]:
+        # ...         pass
         """
         ids = self.scc_ids()
         k = self._group_count
@@ -299,90 +345,28 @@ class SCC:
         return [list(to) for to in dag_set]
 
 
-# 強連結成分分解(SCC): グラフGに対するSCCを行う
-# 入力: <N>: 頂点サイズ, <G>: 順方向の有向グラフ, <RG>: 逆方向の有向グラフ
-# 出力: (<ラベル数>, <各頂点のラベル番号>) トポロジカルソート済
-# 計算量: O(V+E)
-
-def make_G_RG(N, edges, in_origin=1):
-    G = [[] for _ in range(N)]
-    RG = [[] for _ in range(N)]
-    for u, v in edges:
-        u -= in_origin
-        v -= in_origin
-        G[u].append(v)
-        RG[v].append(u)
-    return G, RG
-
-
-def scc(N, G, RG):
-    order = []
-    used = [0]*N
-    group = [None]*N
-    def dfs(s):
-        used[s] = 1
-        for t in G[s]:
-            if not used[t]:
-                dfs(t)
-        order.append(s)
-    def rdfs(s, col):
-        group[s] = col
-        used[s] = 1
-        for t in RG[s]:
-            if not used[t]:
-                rdfs(t, col)
-    for i in range(N):
-        if not used[i]:
-            dfs(i)
-    used = [0]*N
-    label = 0
-    for s in reversed(order):
-        if not used[s]:
-            rdfs(s, label)
-            label += 1
-    return label, group
-
-
-def construct(N, G, label, group):
-    """
-    縮約後のグラフを構築: トポソ済み
-    G0: 各強連結成分の遷移先の集合
-    GP: 各強連結成分内の元の頂点のリスト
-    """
-    G0 = [set() for i in range(label)]
-    GP = [[] for i in range(label)]
-    for v in range(N):
-        lbs = group[v]
-        for w in G[v]:
-            lbt = group[w]
-            if lbs == lbt:
-                continue
-            G0[lbs].add(lbt)
-        GP[lbs].append(v)
-    return G0, GP
-
-
-def make_adjlist_d(n, edges):
-    res = [[] for _ in range(n)]
-    for edge in edges:
-        res[edge[0]].append(edge[1])
-    return res
-
-
 def main():
-    N, M = NMI()
-    edges = [NLI() for _ in range(M)]
-    inv_edges = [e[::-1] for e in edges]
-    G = make_adjlist_d(N, edges)
-    RG = make_adjlist_d(N, inv_edges)
-    label, group = scc(N, G, RG)
-    G0, GP = construct(N, G, label, group)
-    print(len(GP))
-    for gp in GP:
-        print(len(gp), *gp)
+    N, Q = NMI()
+    TUV = EI(Q)
+    TUV = [[x, y-1, w-1] for x, y, w in TUV]
+
+    scc = SCC(N)
+    for t, u, v in TUV:
+        scc.add_edge(u, v)
+
+    ids = scc.scc_ids()
+    for t, u, v in TUV:
+        if t == 1:
+            if u == v or ids[u] >= ids[v]:
+                print("No")
+                return
+        else:
+            if ids[u] > ids[v]:
+                print("No")
+                return
+    print("Yes")
+    print(*[i+1 for i in ids])
 
 
 if __name__ == "__main__":
     main()
-
-
