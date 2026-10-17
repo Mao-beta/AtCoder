@@ -1,0 +1,169 @@
+{
+  "snippet_dirs": [
+    "snippets",
+    "library"
+  ],
+  "extra_template_dirs": [],
+  "default_provenance": "unknown",
+  "provenance": {},
+  "source_urls": {},
+  "keywords": {
+    "segtree": [
+      "区間集約",
+      "モノイド",
+      "セグメント木",
+      "最大右",
+      "最小左",
+      "boundary search"
+    ],
+    "lazy_segtree": [
+      "区間更新",
+      "遅延セグ木",
+      "lazy",
+      "range update",
+      "range add"
+    ],
+    "BIT": [
+      "Fenwick tree",
+      "フェニック木",
+      "転倒数",
+      "prefix sum",
+      "lower_bound"
+    ],
+    "UnionFind": [
+      "DSU",
+      "連結成分",
+      "集合併合",
+      "disjoint set"
+    ],
+    "WeightedUnionFind": [
+      "重み付きUnionFind",
+      "ポテンシャル",
+      "差分制約"
+    ],
+    "SegmentTreeBeats": [
+      "区間chmin",
+      "区間chmax",
+      "区間加算",
+      "セグ木Beats"
+    ],
+    "LCATree": [
+      "最小共通祖先",
+      "ダブリング",
+      "木上距離",
+      "kth ancestor"
+    ],
+    "03_polygon_convex": [
+      "凸包",
+      "多角形",
+      "面積",
+      "内部判定",
+      "polygon",
+      "convex hull"
+    ],
+    "02_line_segment": [
+      "交差判定",
+      "直線",
+      "線分",
+      "intersection",
+      "distance"
+    ],
+    "04_closest_pair": [
+      "最近点対",
+      "closest pair"
+    ],
+    "sequence": [
+      "座標圧縮",
+      "転倒数",
+      "最長増加部分列",
+      "ランレングス"
+    ],
+    "shortest_paths": [
+      "隣接リスト",
+      "最短路",
+      "0-1 BFS",
+      "ワーシャルフロイド"
+    ],
+    "polynomial": [
+      "NTT",
+      "FPS",
+      "形式的冪級数",
+      "多項式",
+      "ボスタンモリ",
+      "母関数"
+    ],
+    "combinatorics": [
+      "二項係数",
+      "組合せ",
+      "篩",
+      "素因数分解"
+    ],
+    "bipartite_matching": [
+      "二部マッチング"
+    ],
+    "rerooting": [
+      "全方位木DP"
+    ],
+    "range_arithmetic": [
+      "等差数列",
+      "区間加算",
+      "区間代入",
+      "区間和"
+    ],
+    "wavelet_matrix": [
+      "区間k番目",
+      "頻度",
+      "順位"
+    ],
+    "priority_sum": [
+      "下位k個",
+      "上位k個",
+      "和"
+    ],
+    "max_queue": [
+      "最大値",
+      "キー",
+      "削除"
+    ],
+    "aggregate_queue": [
+      "SWAG",
+      "キュー集約",
+      "スライディングウィンドウ",
+      "関数合成"
+    ],
+    "li_chao": [
+      "Li Chao",
+      "CHT",
+      "区間直線",
+      "線分追加",
+      "最小化DP"
+    ],
+    "lowlink": [
+      "二重連結成分",
+      "関節点",
+      "橋",
+      "block cut tree"
+    ],
+    "assignment": [
+      "最小費用割当",
+      "ハンガリアン",
+      "Hungarian"
+    ],
+    "linear_algebra": [
+      "掃き出し",
+      "ガウス消去",
+      "行列式",
+      "階数",
+      "逆行列",
+      "連立一次方程式"
+    ],
+    "bit_transforms": [
+      "FWHT",
+      "Walsh Hadamard",
+      "XOR畳み込み",
+      "GF2",
+      "解空間",
+      "二元体"
+    ]
+  }
+}

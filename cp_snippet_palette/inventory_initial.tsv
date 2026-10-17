@@ -1,0 +1,61 @@
+﻿種別	名前	略語	グループ	説明/クラス	メソッド	由来	公開URL	元ファイル
+File	01_point_core		geometry	Point	__add__, __eq__, __hash__, __init__, __iter__, __lt__, __mul__, __neg__, __repr__, __rmul__, __sub__, __truediv__, _divide, angle, angle_to, as_fraction, as_tuple, cross, cross3, dist, dist_sq, distance, distance_sq, dot, manhattan, manhattan_distance, norm, norm_sq, on_segment, orientation, rotate, rotate180, rotate270, rotate90	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/geometry/01_point_core.py
+File	02_line_segment		geometry	Line, Point, Segment	__add__, __eq__, __hash__, __init__, __iter__, __lt__, __mul__, __neg__, __repr__, __rmul__, __sub__, __truediv__, _divide, _line_intersection_point, abc, angle, angle_to, as_fraction, as_line, as_tuple, bbox, closest_point, coincident, contains, cross, cross3, direction, dist, dist_sq, distance, distance_sq, distance_sq_to_point, distance_sq_to_segment, distance_to_point, distance_to_segment, dot, intersection, intersection_point, intersects, length, length_sq, manhattan, manhattan_distance, midpoint, norm, norm_sq, on_segment, orientation, parallel, project_point, projection, reflect_point, reflection, rotate, rotate180, rotate270, rotate90, side	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/geometry/02_line_segment.py
+File	03_polygon_convex		geometry	Line, Point, Polygon, Segment	__add__, __eq__, __hash__, __init__, __iter__, __len__, __lt__, __mul__, __neg__, __repr__, __rmul__, __sub__, __truediv__, _divide, _line_intersection_point, abc, angle, angle_to, area, area2, as_fraction, as_line, as_tuple, bbox, centroid, closest_point, coincident, contains, contains_convex, contains_strict, convex_cut, convex_diameter_sq, convex_hull, cross, cross3, diameter, diameter_sq, direction, dist, dist_sq, distance, distance_sq, distance_sq_to_point, distance_sq_to_segment, distance_to_point, distance_to_segment, dot, intersection, intersection_point, intersects, is_ccw, is_convex, length, length_sq, locate, manhattan, manhattan_distance, midpoint, norm, norm_sq, on_segment, orientation, parallel, perimeter, project_point, projection, reflect_point, reflection, rotate, rotate180, rotate270, rotate90, side, signed_area	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/geometry/03_polygon_convex.py
+File	04_closest_pair		geometry	Point	__add__, __eq__, __hash__, __init__, __iter__, __lt__, __mul__, __neg__, __repr__, __rmul__, __sub__, __truediv__, _divide, angle, angle_to, as_fraction, as_tuple, closest_pair_sq, cross, cross3, dist, dist_sq, distance, distance_sq, dot, manhattan, manhattan_distance, norm, norm_sq, on_segment, orientation, rec, rotate, rotate180, rotate270, rotate90	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/geometry/04_closest_pair.py
+File	05_circle		geometry	Circle, Line, Point, Segment	__add__, __eq__, __hash__, __init__, __iter__, __lt__, __mul__, __neg__, __repr__, __rmul__, __sub__, __truediv__, _divide, _line_intersection_point, abc, angle, angle_to, as_fraction, as_line, as_tuple, bbox, circle_intersections, closest_point, coincident, contains, cross, cross3, direction, dist, dist_sq, distance, distance_sq, distance_sq_to_point, distance_sq_to_segment, distance_to_point, distance_to_segment, dot, intersection, intersection_point, intersects, intersects_circle, intersects_disk_segment, intersects_line, intersects_segment, length, length_sq, line_intersections, manhattan, manhattan_distance, midpoint, norm, norm_sq, on_circle, on_segment, orientation, parallel, project_point, projection, reflect_point, reflection, rotate, rotate180, rotate270, rotate90, side	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/geometry/05_circle.py
+File	BIT		structures	BIT	__getitem__, __init__, __len__, __repr__, add, all_sum, get, lower_bound, prefix_sum, prod, set, sum, to_list	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/BIT.py
+File	Deque		structures	Deque	__getitem__, __grow, __index, __init__, __iter__, __len__, __repr__, __reversed__, __setitem__, append, appendleft, clear, extend, extendleft, is_empty, is_full, pop, popleft, rotate	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/Deque.py
+File	Heapq		structures	Heapq	__bool__, __contains__, __init__, __len__, build, clean, compact, count, erase, pop, push, top	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/Heapq.py
+File	KindDeque		structures	KindDeque	__contains__, __getitem__, __init__, __iter__, __len__, __repr__, _remove_count, append, appendleft, clear, count, extend, extendleft, kind, pop, popleft, rotate	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/KindDeque.py
+File	lazy_segtree		structures	lazy_segtree	__getitem__, __init__, __len__, __str__, all_apply, all_prod, apply, apply_point, get, max_right, min_left, prod, push, set, to_list, update	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/lazy_segtree.py
+File	LCATree		structures	LCATree	__init__, __len__, distance, get_LCA, get_path, is_ancestor, jump, kth_ancestor, make_adjlist_nond, subtree_size	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/LCATree.py
+File	make_grid		structures	make_grid	make_grid	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/make_grid.py
+File	SegmentTreeBeats		structures	SegmentTreeBeats	__getitem__, __init__, __len__, __str__, _add_val, _query_max, _query_min, _query_stats, _query_sum, _update_max, _update_min, _update_val, add_val, addall, all_max, all_min, all_sum, get, push, query, query_max, query_min, query_sum, set, to_list, update, update_max, update_min, update_node_max, update_node_min, update_val, updateall	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/SegmentTreeBeats.py
+File	SegTree		structures	SegTree, segtree	__getitem__, __init__, __len__, __str__, add, all_prod, get, max_right, min_left, prod, query, set, to_list, update	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/SegTree.py
+File	segtree		structures	segtree	__getitem__, __init__, __len__, __str__, all_prod, get, max_right, min_left, prod, set, to_list, update	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/segtree.py
+File	UnionFind		structures	UnionFind	__init__, __len__, __repr__, all_group_members, find, group_count, groups, is_same, members, merge, roots, size, unite	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/UnionFind.py
+File	WeightedUnionFind		structures	WeightedUnionFind	__init__, __len__, __repr__, all_group_members, diff, find, get_weight, group_count, groups, is_consistent, is_same, members, roots, size, unite, weights	ai		/mnt/data/2026-10-17_cp_snippet_palette/snippets/structures/WeightedUnionFind.py
+チェックリスト（検出あり）	UnionFind		データ構造	連結判定・併合・集合サイズ				
+チェックリスト（検出あり）	WeightedUnionFind		データ構造	ポテンシャル・差分制約				
+チェックリスト（未検出）	RollbackUnionFind		データ構造	巻き戻し可能なDSU・オフライン動的連結性				
+チェックリスト（検出あり）	segtree		データ構造	区間集約とmax_right/min_left				
+チェックリスト（検出あり）	lazy_segtree		データ構造	区間更新・区間集約				
+チェックリスト（検出あり）	SegmentTreeBeats		データ構造	区間chmin/chmax/addとmin/max/sum				
+チェックリスト（検出あり）	BIT		データ構造	1点更新・累積和・lower_bound				
+チェックリスト（未検出）	SparseTable		データ構造	冪等演算の静的RMQ				
+チェックリスト（未検出）	DisjointSparseTable		データ構造	一般の結合演算に対する静的区間集約				
+チェックリスト（未検出）	WaveletMatrix		データ構造	区間k番目・頻度・rankなど				
+チェックリスト（未検出）	SortedMultiset		データ構造	順序付き多重集合				
+チェックリスト（未検出）	OrderedSet		データ構造	前後要素・順序統計				
+チェックリスト（検出あり）	Heapq		データ構造	削除可能priority queue				
+チェックリスト（検出あり）	Deque		データ構造	O(1)ランダムアクセスdeque				
+チェックリスト（検出あり）	KindDeque		データ構造	種類数を保持するdeque				
+チェックリスト（検出あり）	LCATree		木	LCA・距離・kth ancestor				
+チェックリスト（未検出）	HeavyLightDecomposition		木	木上経路クエリ				
+チェックリスト（未検出）	EulerTour		木	木のオイラーツアー				
+チェックリスト（未検出）	RerootingDP		木	全方位木DP				
+チェックリスト（未検出）	SCC		グラフ	強連結成分分解				
+チェックリスト（未検出）	TwoSAT		グラフ	2-SAT				
+チェックリスト（未検出）	LowLink		グラフ	橋・関節点				
+チェックリスト（未検出）	Dijkstra		グラフ	非負重み最短路				
+チェックリスト（未検出）	ZeroOneBFS		グラフ	0-1 BFS				
+チェックリスト（未検出）	Dinic		グラフ	最大流				
+チェックリスト（未検出）	MinCostFlow		グラフ	最小費用流				
+チェックリスト（未検出）	BipartiteMatching		グラフ	二部マッチング				
+チェックリスト（未検出）	Mo		クエリ	Mo's algorithm				
+チェックリスト（未検出）	HilbertOrder		クエリ	MoのHilbert order				
+チェックリスト（未検出）	RollingHash		文字列	部分文字列ハッシュ				
+チェックリスト（未検出）	ZAlgorithm		文字列	Z algorithm				
+チェックリスト（未検出）	SuffixArray		文字列	接尾辞配列				
+チェックリスト（未検出）	AhoCorasick		文字列	複数パターン照合				
+チェックリスト（未検出）	Trie		文字列	前方一致探索				
+チェックリスト（未検出）	NTT		数論・多項式	高速畳み込み				
+チェックリスト（未検出）	Sieve		数論・多項式	素数篩				
+チェックリスト（未検出）	CRT		数論・多項式	中国剰余定理				
+チェックリスト（未検出）	ModComb		数論・多項式	二項係数・組合せ				
+チェックリスト（検出あり）	Point		幾何	2D点とベクトル				
+チェックリスト（検出あり）	Segment		幾何	線分交差・距離				
+チェックリスト（検出あり）	Polygon		幾何	面積・内部判定・凸包				
+チェックリスト（検出あり）	Circle		幾何	円と交点				
+チェックリスト（検出あり）	ClosestPair		幾何	最近点対				

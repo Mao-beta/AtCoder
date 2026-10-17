@@ -1,5 +1,7 @@
 # Codex向け指示書: AtCoder用ライブラリの再編・検証・高速化
 
+> 過去の再編計画を保存した文書。以下の件数・未実装判定・`lib_*.py`への再編案は、現在の実装状況を示さない。2026-10-17時点では83用途を`cp_snippet_palette/library/`の51ファイルへ抽出済み。現在の利用方法は[LIBRARY_GUIDE.md](cp_snippet_palette/LIBRARY_GUIDE.md)、抽出元との対応は[LIBRARY_CANDIDATES.md](cp_snippet_palette/LIBRARY_CANDIDATES.md)、APIは[ACL_API.md](cp_snippet_palette/ACL_API.md)を参照する。本文は当時の計画として残す。
+
 ## 0. 背景と前提(必読)
 
 - このリポジトリは AtCoder の解答置き場。ルートおよび `ABC/`, `ARC/`, `yuki/` 等のコンテスト解答ファイル(約4,400本)は**使い捨てであり一切変更禁止**。作業対象はルートの `_*.py`(汎用ライブラリ、約30本・計8,090行)のみ。

@@ -1,1 +1,5 @@
 /venv/
+/AHC008/visualizer/target/
+/cp_snippet_palette/.palette_state.json
+/cp_snippet_palette/.palette_state.tmp
+/cp_snippet_palette/verify/build/

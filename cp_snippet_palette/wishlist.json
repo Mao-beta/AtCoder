@@ -1,0 +1,302 @@
+[
+  {
+    "name": "UnionFind",
+    "category": "データ構造",
+    "identifiers": [
+      "DSU"
+    ],
+    "description": "連結判定・併合・集合サイズ"
+  },
+  {
+    "name": "WeightedUnionFind",
+    "category": "データ構造",
+    "description": "ポテンシャル・差分制約",
+    "identifiers": []
+  },
+  {
+    "name": "RollbackUnionFind",
+    "category": "データ構造",
+    "description": "巻き戻し可能なDSU・オフライン動的連結性",
+    "identifiers": []
+  },
+  {
+    "name": "segtree",
+    "category": "データ構造",
+    "identifiers": [
+      "SegTree"
+    ],
+    "description": "区間集約とmax_right/min_left"
+  },
+  {
+    "name": "lazy_segtree",
+    "category": "データ構造",
+    "description": "区間更新・区間集約",
+    "identifiers": []
+  },
+  {
+    "name": "SegmentTreeBeats",
+    "category": "データ構造",
+    "description": "区間chmin/chmax/addとmin/max/sum",
+    "identifiers": []
+  },
+  {
+    "name": "BIT",
+    "category": "データ構造",
+    "identifiers": [
+      "FenwickTree"
+    ],
+    "description": "1点更新・累積和・lower_bound"
+  },
+  {
+    "name": "SparseTable",
+    "category": "データ構造",
+    "description": "冪等演算の静的RMQ",
+    "identifiers": []
+  },
+  {
+    "name": "DisjointSparseTable",
+    "category": "データ構造",
+    "description": "一般の結合演算に対する静的区間集約",
+    "identifiers": []
+  },
+  {
+    "name": "WaveletMatrix",
+    "category": "データ構造",
+    "description": "区間k番目・頻度・rankなど",
+    "identifiers": []
+  },
+  {
+    "name": "SortedMultiset",
+    "category": "データ構造",
+    "description": "順序付き多重集合",
+    "identifiers": []
+  },
+  {
+    "name": "OrderedSet",
+    "category": "データ構造",
+    "description": "前後要素・順序統計",
+    "identifiers": [
+      "SortedSet",
+      "AVLTree"
+    ]
+  },
+  {
+    "name": "Heapq",
+    "category": "データ構造",
+    "description": "削除可能priority queue",
+    "identifiers": []
+  },
+  {
+    "name": "Deque",
+    "category": "データ構造",
+    "description": "O(1)ランダムアクセスdeque",
+    "identifiers": []
+  },
+  {
+    "name": "KindDeque",
+    "category": "データ構造",
+    "description": "種類数を保持するdeque",
+    "identifiers": []
+  },
+  {
+    "name": "LCATree",
+    "category": "木",
+    "description": "LCA・距離・kth ancestor",
+    "identifiers": []
+  },
+  {
+    "name": "HeavyLightDecomposition",
+    "category": "木",
+    "identifiers": [
+      "HLD"
+    ],
+    "description": "木上経路クエリ"
+  },
+  {
+    "name": "EulerTour",
+    "category": "木",
+    "description": "木のオイラーツアー",
+    "identifiers": [
+      "euler_tour"
+    ]
+  },
+  {
+    "name": "RerootingDP",
+    "category": "木",
+    "description": "全方位木DP",
+    "identifiers": [
+      "rerooting"
+    ]
+  },
+  {
+    "name": "SCC",
+    "category": "グラフ",
+    "identifiers": [
+      "StronglyConnectedComponents"
+    ],
+    "description": "強連結成分分解"
+  },
+  {
+    "name": "TwoSAT",
+    "category": "グラフ",
+    "description": "2-SAT",
+    "identifiers": []
+  },
+  {
+    "name": "LowLink",
+    "category": "グラフ",
+    "description": "橋・関節点",
+    "identifiers": []
+  },
+  {
+    "name": "Dijkstra",
+    "category": "グラフ",
+    "description": "非負重み最短路",
+    "identifiers": []
+  },
+  {
+    "name": "ZeroOneBFS",
+    "category": "グラフ",
+    "description": "0-1 BFS",
+    "identifiers": [
+      "zero_one_bfs"
+    ]
+  },
+  {
+    "name": "Dinic",
+    "category": "グラフ",
+    "description": "最大流",
+    "identifiers": [
+      "MFGraph"
+    ]
+  },
+  {
+    "name": "MinCostFlow",
+    "category": "グラフ",
+    "description": "最小費用流",
+    "identifiers": [
+      "MCFGraph"
+    ]
+  },
+  {
+    "name": "BipartiteMatching",
+    "category": "グラフ",
+    "description": "二部マッチング",
+    "identifiers": [
+      "bipartite_matching"
+    ]
+  },
+  {
+    "name": "Mo",
+    "category": "クエリ",
+    "identifiers": [
+      "MoAlgorithm",
+      "mo_order",
+      "mo_solve"
+    ],
+    "description": "Mo's algorithm"
+  },
+  {
+    "name": "HilbertOrder",
+    "category": "クエリ",
+    "description": "MoのHilbert order",
+    "identifiers": []
+  },
+  {
+    "name": "RollingHash",
+    "category": "文字列",
+    "description": "部分文字列ハッシュ",
+    "identifiers": []
+  },
+  {
+    "name": "ZAlgorithm",
+    "category": "文字列",
+    "description": "Z algorithm",
+    "identifiers": [
+      "z_algorithm"
+    ]
+  },
+  {
+    "name": "SuffixArray",
+    "category": "文字列",
+    "description": "接尾辞配列",
+    "identifiers": [
+      "suffix_array"
+    ]
+  },
+  {
+    "name": "AhoCorasick",
+    "category": "文字列",
+    "description": "複数パターン照合",
+    "identifiers": []
+  },
+  {
+    "name": "Trie",
+    "category": "文字列",
+    "description": "前方一致探索",
+    "identifiers": []
+  },
+  {
+    "name": "NTT",
+    "category": "数論・多項式",
+    "description": "高速畳み込み",
+    "identifiers": [
+      "convolution"
+    ]
+  },
+  {
+    "name": "Sieve",
+    "category": "数論・多項式",
+    "description": "素数篩",
+    "identifiers": [
+      "smallest_prime_factors",
+      "primes_up_to"
+    ]
+  },
+  {
+    "name": "CRT",
+    "category": "数論・多項式",
+    "description": "中国剰余定理",
+    "identifiers": []
+  },
+  {
+    "name": "ModComb",
+    "category": "数論・多項式",
+    "description": "二項係数・組合せ",
+    "identifiers": [
+      "Comb"
+    ]
+  },
+  {
+    "name": "Point",
+    "category": "幾何",
+    "description": "2D点とベクトル",
+    "identifiers": []
+  },
+  {
+    "name": "Segment",
+    "category": "幾何",
+    "description": "線分交差・距離",
+    "identifiers": []
+  },
+  {
+    "name": "Polygon",
+    "category": "幾何",
+    "description": "面積・内部判定・凸包",
+    "identifiers": []
+  },
+  {
+    "name": "Circle",
+    "category": "幾何",
+    "description": "円と交点",
+    "identifiers": []
+  },
+  {
+    "name": "ClosestPair",
+    "category": "幾何",
+    "identifiers": [
+      "closest_pair"
+    ],
+    "description": "最近点対"
+  }
+]

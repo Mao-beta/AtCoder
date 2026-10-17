@@ -1,6 +1,6 @@
 # AtCoder Python環境
 
-確認日: 2026-09-12
+環境構築・動作確認: 2026-09-12。実行ファイル・パッケージメタデータの再確認: 2026-10-17。
 
 - プロジェクト: `D:\Kyopro\AtCoder`
 - 仮想環境: `D:\Kyopro\AtCoder\.venv`
@@ -12,9 +12,15 @@ PyCharmでの起動時にAppData配下のPython本体が見つからないエラ
 
 PyCharmでは `D:\Kyopro\AtCoder\.venv\Scripts\python.exe` を既存のインタープリターとして指定します。以前のエラーが表示されたままの場合は、PyCharmを再起動してから選択し直してください。
 
-[AtCoderの公式CPython環境](https://img.atcoder.jp/file/language-update/2025-10/082-3-13_cpython.toml)に記載された43種類のうち、39種類を導入しました。バージョンは `requirements-atcoder.txt` に固定しています。AC Library Python版も公式環境と同じコミットを使用しています。
+導入時に参照した[AtCoderの公式CPython環境](https://img.atcoder.jp/file/language-update/2025-10/082-3-13_cpython.toml)に記載された43種類のうち、39種類を導入しました。バージョンは `requirements-atcoder.txt` に固定しています。AC Library Python版も参照元と同じコミットを使用しています。2026-10-17に39種類のバージョンまたは配布元URLがこのファイルと一致することを再確認しました。AtCoder側の全言語環境を継続同期する設定ではありません。
 
 NumPy、SciPy、Numba、pandas、Polars、SymPy、NetworkX、sortedcontainers、AC Library Python版、PuLP、OR-Tools、Z3、scikit-learn、LightGBM、CPU版PyTorchなどを使用できます。
+
+## 提出用ライブラリの検証環境
+
+uvで別途用意したPyPyは`D:\Kyopro\.python\pypy-3.11.15-windows-x86_64-none\pypy3.exe`。2026-10-17にPython 3.11.15 / PyPy 7.3.23の起動を確認しました。上記CPython仮想環境とは別環境で、39種類のパッケージをPyPyにも導入したという意味ではありません。
+
+検索ツールはCPython仮想環境の`pythonw.exe`で起動し、提出用ライブラリはPyPyでも検証しています。対象と検証結果は[LIBRARY_GUIDE.md](cp_snippet_palette/LIBRARY_GUIDE.md)、検索ツールの操作は[LOCAL_USAGE.md](cp_snippet_palette/LOCAL_USAGE.md)を参照してください。Codonのコンパイル確認は未実施です。
 
 ## 未導入のライブラリ
 
@@ -37,6 +43,8 @@ uv pip check --python .venv\Scripts\python.exe
 ```
 
 ## 確認した動作
+
+以下のimport・計算・依存関係検査は環境構築と修復時の記録です。2026-10-17の文書照合では全importを再実行せず、実行環境とパッケージメタデータを確認しました。
 
 導入済みライブラリのバージョン、主要38種類のimport、NumbaのJITコンパイル、PyTorchのCPU計算、AC LibraryのDSU、sortedcontainers、PuLP/CBC、OR-Tools/CP-SATの動作を確認しました。
 

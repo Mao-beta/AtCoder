@@ -20,6 +20,8 @@ SMI = lambda: input().split()
 SLI = lambda: list(SMI())
 EI = lambda m: [NLI() for _ in range(m)]
 
+# ライブラリ https://github.com/Mao-beta/AtCoder
+
 
 def main():
     pass
