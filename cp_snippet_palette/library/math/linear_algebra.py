@@ -1,8 +1,22 @@
 """素数mod上の行列式・階数・逆行列・連立一次方程式。入力非破壊。
+
 正方行列はO(n^3)、矩形n*mの掃き出しはO(n*m*min(n,m))、空間O(n*m)。
+
 連立方程式の基底出力には、別途O(m*(m-rank))の時間・空間が必要。
+
 法は素数（既定998244353）を渡す。素数判定はしない。任意modの行列式には使えない。
 PyPy向け。Codon未確認。mod<2^31なら乗算・減算の1段の中間値は符号付き64bit内。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+
+行列は行ごとのlist。計算は素数mod上で行い、入力行列は変更しない。
+    a = [[1, 2], [3, 4]]
+    matrix_det(a, mod=7), matrix_rank(a, mod=7), inverse_matrix(a, mod=7)  # => (5, 2, [[5, 1], [5, 3]])
+    particular, basis = linear_equations([[1, 1]], [3], mod=7)
+    particular, basis  # 全解はparticular + t*basis[0]（各成分mod 7）
+    # => ([3, 0], [[6, 1]])
+    linear_equations([[0]], [1]) is None  # => True
+    linear_equations([], [], variables=2)  # => ([0, 0], [[1, 0], [0, 1]])
 """
 
 
@@ -53,21 +67,27 @@ def _eliminate(a, columns, mod, reduced=False):
 
 
 def matrix_det(a, mod=998244353):
-    """正方行列の行列式 mod 素数。0x0行列の行列式は1。"""
+    """正方行列の行列式 mod 素数。0x0行列の行列式は1。
+    入力: aは整数のN×N行列を行ごとに並べた二次元list、N=len(a)。modは素数。時間O(N³+N log mod)、追加空間O(N²)。各逆元を求めるコストも含む。
+    """
     rows, _ = _copy_matrix(a, mod, len(a))
     pivots, determinant = _eliminate(rows, len(a), mod)
     return determinant if len(pivots) == len(a) else 0
 
 
 def matrix_rank(a, mod=998244353):
-    """素数mod上の階数。行数または列数が0なら0。"""
+    """素数mod上の階数。行数または列数が0なら0。
+    入力: aはN行M列の整数の二次元list、modは素数。N=len(a)、Mは各行の長さ。時間O(N*M*min(N,M)+min(N,M)*log mod)、空間O(NM)。
+    """
     rows, columns = _copy_matrix(a, mod)
     pivots, _ = _eliminate(rows, columns, mod)
     return len(pivots)
 
 
 def inverse_matrix(a, mod=998244353):
-    """素数mod上の逆行列。特異ならNone、0x0なら[]。"""
+    """素数mod上の逆行列。特異ならNone、0x0なら[]。
+    入力: aは整数のN×N行列を行ごとに並べた二次元list、N=len(a)。modは素数。時間O(N³+N log mod)、追加空間O(N²)。各逆元を求めるコストも含む。
+    """
     n = len(a)
     rows, _ = _copy_matrix(a, mod, n)
     for i in range(n):
@@ -83,6 +103,8 @@ def linear_equations(a, b, mod=998244353, variables=None):
     全解はx + sum(t[i]*basis[i])。自由変数は0の特解を返す。
     aが空で列数を指定したい場合はvariablesを渡す。返す各ベクトルは長さm。
     基底はm-rank本。掃き出しに加えてO(m*(m-rank))の出力領域を使う。
+    入力: aはN行M列の整数係数行列、bは長さNの右辺の整数列、modは素数。variablesは列数Mを補う非負整数またはNone。
+    掃き出し時間O(N*M*min(N,M)+min(N,M)*log mod)、出力を含む空間O(NM+M²)。
     """
     if len(a) != len(b):
         raise ValueError("row and right-hand-side lengths differ")

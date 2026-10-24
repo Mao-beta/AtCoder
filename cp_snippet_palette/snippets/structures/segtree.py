@@ -1,24 +1,31 @@
-"""競プロ用スニペット。単体で貼り付け可能。2026-10-17版。"""
+"""セグメント木。APIはshakayami/ACL-for-pythonのsegtreeに準拠。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+添字は0始まり、区間は[l,r)。OPは結合的演算、Eは単位元の値。
+    seg = segtree([1, 2, 3, 4], lambda a, b: a + b, 0)
+    seg.prod(1, 3), seg.all_prod()  # => (5, 10)
+    seg.set(1, 7)
+    seg.max_right(0, lambda total: total <= 8)  # => 2
+    seg.min_left(4, lambda total: total <= 7)  # => 2
+    segtree([0] * 5, max, 0).get(0)  # => 0
+境界探索は判定(E)=Trueかつ、区間を伸ばすとTrueからFalseへ一度だけ変わること。
+"""
 
 
-class SegTree:
+class segtree:
     """一般のセグメント木。0-indexed / 半開区間 [l,r)。
 
-    SegTree(op, e, v)。v は初期配列、または要素が e の長さ N（整数）。
+    segtree(V, OP, E)。V は初期配列。全てEなら [E] * N を渡す。
     OP は結合的二項演算、E は左右の単位元。可換性は不要。
     set / prod / max_right / min_left: O(log N)、get / all_prod: O(1)。
     境界探索の判定関数 f は f(E)=True で、拡張に対して True→False に単調。
+    N=len(V)。構築O(N)時間・空間。OP(x,y)は集約値二つを同型の集約値へ結合する関数。各演算O(1)を前提に計算量を記載。
+    pは0..N-1、0<=l<=r<=N、xは新しい要素値。
     """
 
-    def __init__(self, op, e, v):
-        """ACL Python版と同じ SegTree(op, e, v)。vは長さまたは初期配列。"""
-        V, OP, E = v, op, e
-        if isinstance(V, int):
-            assert V >= 0
-            n = V
-            V = [E] * n
-        else:
-            n = len(V)
+    def __init__(self, V, OP, E):
+        """初期配列V、結合的演算OP、単位元Eから構築する。O(N)。"""
+        n = len(V)
         self.n = n
         self.op = OP
         self.e = E
@@ -143,10 +150,3 @@ class SegTree:
 
     def __str__(self):
         return str(self.to_list())
-
-
-class segtree(SegTree):
-    """旧引数順の互換用。新規コードは SegTree(op, e, v) を使う。"""
-
-    def __init__(self, V, OP, E):
-        super().__init__(OP, E, V)

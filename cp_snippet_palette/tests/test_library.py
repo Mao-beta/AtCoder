@@ -28,40 +28,53 @@ class LibraryTests(unittest.TestCase):
             return runpy.run_path(str(folder / (name + ".py")))
 
         m = snippet("UnionFind")
-        uf = m["DSU"](4)
+        uf = m["dsu"](4)
         self.assertEqual(uf.merge(1, 2), uf.leader(2))
         self.assertTrue(uf.same(1, 2))
         self.assertEqual(uf.size(1), 2)
         self.assertEqual(sorted(map(sorted, uf.groups())), [[0], [1, 2], [3]])
-        self.assertEqual(m["DSU"]().groups(), [])
-        fw = snippet("BIT")["FenwickTree"](3)
+        self.assertEqual(m["dsu"](0).groups(), [])
+        uf = snippet("WeightedUnionFind")["WeightedUnionFind"](4)
+        self.assertEqual(uf.merge(a=1, b=2, w=5), 1)
+        self.assertEqual(uf.merge(0, 2, 8), 1)
+        self.assertEqual(uf.merge(1, 2, 5), 1)
+        self.assertEqual((uf.diff(0, 1), uf.potential(2)), (3, 5))
+        self.assertEqual(uf.groups(), [[0, 1, 2], [3]])
+        self.assertTrue(uf.same(0, 2))
+        with self.assertRaises(ValueError):
+            uf.merge(0, 2, 9)
+        with self.assertRaises(ValueError):
+            uf.diff(0, 3)
+        fw = snippet("BIT")["fenwick_tree"](3)
         for i, x in enumerate([2, 5, 3]):
             fw.add(i, x)
         self.assertEqual(fw.sum(1, 3), 8)
         self.assertEqual(fw.sum(2, 2), 0)
-        self.assertEqual(snippet("BIT")["BIT"]([2, 5, 3]).sum(1), 7)
-        seg = snippet("segtree")["SegTree"](
-            op=lambda x, y: x + y, e="", v=["a", "b", "c"]
+        self.assertEqual(fw.sum0(2), 7)
+        self.assertEqual(fw.lower_bound(8), 2)
+        self.assertNotIn("BIT", snippet("BIT"))
+        seg = snippet("segtree")["segtree"](
+            V=["a", "b", "c"], OP=lambda x, y: x + y, E=""
         )
         seg.set(1, "xy")
         self.assertEqual(seg.prod(0, 3), "axyc")
         self.assertEqual(seg.max_right(0, lambda x: len(x) <= 3), 2)
         self.assertEqual(seg.min_left(3, lambda x: len(x) <= 3), 1)
-        self.assertEqual(snippet("segtree")["SegTree"](max, -1, 0).all_prod(), -1)
+        self.assertEqual(snippet("segtree")["segtree"]([], max, -1).all_prod(), -1)
         op = lambda x, y: (x[0] + y[0], x[1] + y[1])
         mapping = lambda f, x: (f[0] * x[0] + f[1] * x[1], x[1])
         composition = lambda f, g: (f[0] * g[0], f[0] * g[1] + f[1])
-        lazy = snippet("lazy_segtree")["LazySegTree"](
-            op=op,
-            e=(0, 0),
-            mapping=mapping,
-            composition=composition,
-            id_=(1, 0),
-            v=[(1, 1), (2, 1), (3, 1)],
+        lazy = snippet("lazy_segtree")["lazy_segtree"](
+            OP=op,
+            E=(0, 0),
+            MAPPING=mapping,
+            COMPOSITION=composition,
+            ID=(1, 0),
+            V=[(1, 1), (2, 1), (3, 1)],
         )
         lazy.apply(0, 3, (2, 1))
         lazy.apply(0, 2, (3, 4))
-        lazy.apply(1, f=(0, 9))
+        lazy.apply_point(1, (0, 9))
         self.assertEqual(lazy.to_list(), [(13, 1), (9, 1), (7, 1)])
         self.assertEqual(lazy.prod(0, 3), (29, 3))
         self.assertEqual(lazy.max_right(0, lambda x: x[0] <= 22), 2)
@@ -92,6 +105,32 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual([d.jump(0, k) for k in range(5)], [0, 1, 2, -1, -1])
         with self.assertRaises(ValueError):
             d.jump(0, 9)
+
+    def test_lca_zero_indexed(self):
+        Tree = runpy.run_path(str(ROOT.parent / "snippets/structures/LCATree.py"))["LCATree"]
+        edges = [(0, 1), (0, 2), (2, 3), (2, 4)]
+        tree = Tree(5, edges)
+        self.assertEqual(tree.root, 0)
+        self.assertEqual(tree.parent[0], [-1, 0, 0, 2, 2])
+        self.assertEqual(tree.depth, [0, 1, 1, 2, 2])
+        self.assertEqual((tree.lca(0, 4), tree.lca(3, 4)), (0, 2))
+        self.assertEqual(tree.get_path(1, 4), [1, 0, 2, 4])
+        self.assertEqual(tree.distance(1, 4), 3)
+        self.assertEqual([tree.jump(1, 4, k) for k in range(5)], [1, 0, 2, 4, -1])
+        self.assertEqual([tree.kth_ancestor(4, k) for k in range(4)], [4, 2, 0, -1])
+        self.assertTrue(tree.is_ancestor(0, 0))
+        self.assertFalse(tree.is_ancestor(1, 4))
+        self.assertEqual((tree.subtree_size(0), tree.subtree_size(2)), (5, 3))
+        self.assertEqual(Tree(5, edges, root=4).lca(1, 3), 2)
+        single = Tree(1, [])
+        self.assertEqual((single.lca(0, 0), single.jump(0, 0, 1)), (0, -1))
+        for n, bad_edges, root in [(0, [], 0), (1, [], 1), (2, [(0, 2)], 0),
+                                   (3, [(0, 1)], 0), (3, [(0, 1), (1, 2), (2, 0)], 0)]:
+            with self.assertRaises(ValueError):
+                Tree(n, bad_edges, root)
+        for vertex in (-1, 5):
+            with self.assertRaises(AssertionError):
+                tree.lca(vertex, 0)
 
     def test_grid(self):
         m = lib("basic/grid")
@@ -142,22 +181,15 @@ class LibraryTests(unittest.TestCase):
 
     def test_scc_two_sat(self):
         m = lib("graphs/scc")
-        s = m["SCCGraph"](4)
-        for u, v in [(0, 1), (1, 0), (1, 2), (2, 3)]:
-            s.add_edge(u, v)
-        ids = s.scc_ids()
+        edges = [(0, 1), (1, 0), (1, 2), (2, 3)]
+        ids = m["scc_ids"](4, edges)
         self.assertEqual(ids[0], ids[1])
         self.assertLess(ids[1], ids[2])
-        t = m["TwoSAT"](2)
-        t.add_clause(0, True, 0, True)
-        t.add_clause(0, False, 1, True)
-        self.assertTrue(t.satisfiable())
-        self.assertEqual(t.answer(), [True, True])
-        self.assertEqual(t.solve(), [True, True])
-        t.add_clause(1, False, 1, False)
-        self.assertFalse(t.satisfiable())
-        self.assertIsNone(t.solve())
-        self.assertTrue(m["TwoSAT"]().satisfiable())
+        self.assertEqual(m["scc"](4, edges), [[0, 1], [2], [3]])
+        clause = [(0, True, 0, True), (0, False, 1, True)]
+        self.assertEqual(m["two_sat"](2, clause), [True, True])
+        self.assertIsNone(m["two_sat"](2, clause + [(1, False, 1, False)]))
+        self.assertEqual(m["two_sat"](0, []), [])
 
     def test_lowlink(self):
         c = lib("graphs/lowlink")["LowLink"]
@@ -193,9 +225,9 @@ class LibraryTests(unittest.TestCase):
         for i, ch in enumerate("abcd"):
             values[h.pos[i]] = ch
         seg = m["BiSegTree"](values, lambda a, b: a + b, "")
-        self.assertEqual(m["path_fold_noncomm"](h, seg, 2, 3), "cbd")
-        self.assertEqual(m["path_fold_noncomm"](h, seg, 3, 0), "dba")
-        self.assertEqual(m["path_fold_noncomm"](h, seg, 2, 3, edge=True), "cd")
+        self.assertEqual(m["path_prod"](h, seg, 2, 3), "cbd")
+        self.assertEqual(m["path_prod"](h, seg, 3, 0), "dba")
+        self.assertEqual(m["path_prod"](h, seg, 2, 3, edge=True), "cd")
 
     def test_centroid(self):
         c = lib("graphs/centroid_decomposition")["CentroidDecomposition"]
@@ -205,16 +237,23 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(p.count(-1), 1)
 
     def test_flow_and_mst(self):
-        mf = lib("graphs/max_flow")["MFGraph"](4)
+        mf = lib("graphs/max_flow")["mf_graph"](4)
         for u, v, capacity in [(0, 1, 3), (0, 2, 2), (1, 2, 1), (1, 3, 2), (2, 3, 3)]:
             mf.add_edge(u, v, capacity)
         self.assertEqual(mf.flow(0, 3), 5)
+        self.assertEqual(mf.get_edge(0).From, 0)
+        self.assertEqual(mf.get_edge(0).Flow, 3)
+        self.assertEqual(mf.edges()[0], {"from": 0, "to": 1, "cap": 3, "flow": 3})
+        self.assertEqual(mf.edges(False)[0].To, 1)
         self.assertEqual(mf.min_cut(0), [True, False, False, False])
-        mc = lib("graphs/min_cost_flow")["MCFGraph"](3)
-        mc.add_edge(0, 1, 2, 3)
+        mc = lib("graphs/min_cost_flow")["mcf_graph"](3)
+        self.assertIsNone(mc.add_edge(0, 1, 2, 3))
         mc.add_edge(1, 2, 2, 4)
         mc.add_edge(0, 2, 1, 10)
         self.assertEqual(mc.flow(0, 2, 3), (3, 24))
+        self.assertEqual(
+            mc.get_edge(0), {"from": 0, "to": 1, "cap": 2, "flow": 2, "cost": 3}
+        )
         with self.assertRaises(ValueError):
             mc.flow(0, 2)
         m = lib("graphs/mst")
@@ -251,12 +290,14 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(m["edit_distance"]("kitten", "sitting"), 3)
         self.assertEqual(m["lcs_length"]("abcbdab", "bdcaba"), 4)
         m = lib("strings/suffix_array")
-        self.assertEqual(m["suffix_array"]([2, 0, 2, 0], upper=2), [3, 1, 2, 0])
+        self.assertEqual(m["String"]([2, 0, 2, 0]).suffix_array(), [3, 1, 2, 0])
         for value in ["banana", "漢字漢", [5, 2, 3, 2, -1], [], [2, 2, 1, 1, 0]]:
-            sa = m["suffix_array"](value)
+            sa = m["String"](value).suffix_array()
             self.assertEqual(sa, sorted(range(len(value)), key=lambda i: value[i:]))
-        self.assertEqual(m["lcp_array"]("banana", [5, 3, 1, 0, 4, 2]), [1, 3, 0, 0, 2])
-        self.assertEqual(m["z_algorithm"]("aaaa"), [4, 3, 2, 1])
+        self.assertEqual(
+            m["String"]("banana").lcp_array([5, 3, 1, 0, 4, 2]), [1, 3, 0, 0, 2]
+        )
+        self.assertEqual(m["String"]("aaaa").z_algorithm(), [4, 3, 2, 1])
 
     def test_trie_and_hash(self):
         m = lib("strings/trie")
@@ -279,7 +320,7 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(list(s), [1, 3, 3])
         self.assertTrue(s.discard(3))
         self.assertFalse(s.discard(8))
-        self.assertEqual((s.index(3), s.index_right(3)), (1, 2))
+        self.assertEqual((s.bisect_left(3), s.bisect_right(3)), (1, 2))
         self.assertEqual(list(m["SortedSet"]([3, 1, 3])), [1, 3])
         tree = lib("structures/avl_tree")["AVLTree"]()
         rng = random.Random(42)
@@ -292,6 +333,17 @@ class LibraryTests(unittest.TestCase):
         remaining = sorted(keys[20:])
         self.assertEqual([tree.kth(i) for i in range(len(tree))], remaining)
         self.assertEqual([tree[k] for k in remaining], [2 * k for k in remaining])
+        self.assertEqual(tree.get(99, "missing"), "missing")
+        self.assertFalse(tree.discard(99))
+        with self.assertRaises(KeyError):
+            _ = tree[99]
+        with self.assertRaises(KeyError):
+            del tree[99]
+        with self.assertRaises(IndexError):
+            tree.kth(len(tree))
+        for key in (0, 17, 35):
+            self.assertEqual(tree.ge(key), next((x for x in remaining if x >= key), None))
+            self.assertEqual(tree.lt(key), next((x for x in reversed(remaining) if x < key), None))
 
     def test_binary_and_wavelet(self):
         t = lib("structures/binary_trie")["BinaryTrie"](5)
@@ -309,13 +361,35 @@ class LibraryTests(unittest.TestCase):
         bits.set(31, 0)
         bits.build()
         self.assertEqual(bits.rank(64, 1), 1)
+        self.assertEqual([bits.select(1, k) for k in (-1, 0, 1)], [-1, 32, -1])
+        self.assertEqual([bits.select(0, k) for k in (0, 31, 32, 62, 63)], [0, 31, 33, 63, -1])
+        self.assertIsNone(m["FullyIndexableDictionary"](0).select(0, 0, None))
         a = [-3, 8, -3, 1]
         w = m["WaveletMatrix"](a)
         self.assertEqual([w[i] for i in range(4)], a)
         self.assertEqual([w.kth_smallest(0, 4, k) for k in range(4)], sorted(a))
         self.assertEqual(w.count_less(1, 4, 2), 2)
-        self.assertEqual(w.select(-3, 3), -1)
+        self.assertEqual([w.select(-3, k) for k in (-1, 0, 1, 2)], [-1, 0, 2, -1])
+        self.assertEqual(w.select(8, 0, default=0), 1)
         self.assertEqual(w.sum(2, 2), 0)
+        for values in ([], [0], [-3, 8, -3, 1], [5, 5]):
+            w = m["WaveletMatrix"](values)
+            for bad in (-len(values) - 1, len(values)):
+                with self.assertRaises(IndexError):
+                    w.get(bad)
+            for l in range(len(values) + 1):
+                for r in range(l, len(values) + 1):
+                    ordered = sorted(values[l:r])
+                    for method in (w.kth_smallest, w.kth_largest):
+                        expected = ordered[::-1] if method == w.kth_largest else ordered
+                        self.assertEqual([method(l, r, k) for k in range(r - l)], expected)
+                        for k in (-1, r - l):
+                            with self.assertRaises(IndexError):
+                                method(l, r, k)
+            for value in set(values) | {99}:
+                positions = [i for i, x in enumerate(values) if x == value]
+                self.assertEqual([w.select(value, k) for k in range(len(positions))], positions)
+                self.assertIsNone(w.select(value, len(positions), default=None))
 
     def test_mo(self):
         m = lib("structures/mo")
@@ -366,7 +440,10 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(t.argmin(), (6, 6))
         cls = lib("structures/li_chao")["LiChaoInt"]
         for mode in ["min", "max"]:
-            lc = cls(-10, 10, mode)
+            lc = cls(-10, 11, mode)
+            self.assertIsNone(lc.query(-10))
+            with self.assertRaises(ValueError):
+                lc.query(11)
             lines = [(2, 5), (-3, 2), (0, 10**90)]
             for a, b in lines:
                 lc.add_line(a, b)
@@ -382,16 +459,29 @@ class LibraryTests(unittest.TestCase):
         b.add(2, 4)
         b.add(90, 5)
         self.assertEqual(b.sum(0, 91), 9)
+        self.assertEqual(b.sum0(r=91), 9)
         self.assertEqual(b.lower_bound(5), 90)
         self.assertEqual(b.lower_bound(10), 100)
         b = m["DynamicFenwickTree2D"](10**9, 10**9)
         b.add(2, 3, 7)
         b.add(5, 6, -2)
         self.assertEqual(b.sum(0, 0, 6, 7), 5)
+        self.assertEqual(b.sum0(6, 7), 5)
         with self.assertRaises(IndexError):
             b.add(-1, 2, 1)
 
     def test_arithmetic_and_sqrt(self):
+        Beats = runpy.run_path(str(ROOT.parent / "snippets/structures/SegmentTreeBeats.py"))["SegmentTreeBeats"]
+        beats = Beats(V=[1, 5, 3, 7])
+        beats.chmin(l=0, r=4, x=4)
+        beats.chmax(0, 2, 2)
+        beats.add(1, 3, 10)
+        self.assertEqual(beats.prod(0, 4), (2, 14, 33))
+        beats.assign(2, 4, 0)
+        beats.set(0, -1)
+        self.assertEqual(beats.to_list(), [-1, 14, 0, 0])
+        self.assertEqual((beats.min(0, 4), beats.max(0, 4), beats.sum(0, 4)), (-1, 14, 13))
+        self.assertEqual(Beats([]).prod(0, 0), (math.inf, -math.inf, 0))
         a = [2, -1, 5, 4, 7, 3, 0]
         t = lib("structures/range_arithmetic")["ArithmeticSegmentTree"](a)
         t.add(1, 6, 2, -1)
@@ -411,14 +501,36 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(b.sum(2, 7), sum(a[2:7]))
 
     def test_small_structures(self):
+        Heap = runpy.run_path(str(ROOT.parent / "snippets/structures/Heapq.py"))["Heapq"]
+        heap = Heap([3, 1, 3])
+        self.assertTrue(heap.discard(3))
+        self.assertFalse(heap.discard(9))
+        self.assertEqual((heap.top(), heap.pop(), heap.pop()), (1, 1, 3))
+        for method in (heap.top, heap.pop):
+            with self.assertRaises(IndexError):
+                method()
         c = lib("structures/cartesian_tree")["CartesianTree"]([3, 1, 1, 2])
         self.assertEqual((c.root, c.parent), (1, [1, -1, 1, 2]))
         linked = lib("structures/linked_list")["LinkedList"]()
         i = linked.append(3)
-        linked.insert_after(0, 2)
-        linked.insert_after(i, 4)
+        self.assertEqual(i, 0)
+        front = linked.insert_after(-1, 2)
+        back = linked.insert_after(i, 4)
+        self.assertEqual((front, back), (1, 2))
+        self.assertEqual(list(linked), [2, 3, 4])
         linked.erase(i)
         self.assertEqual(list(linked), [2, 4])
+        linked.erase(front)
+        linked.erase(back)
+        self.assertEqual((len(linked), list(linked), linked.head, linked.tail), (0, [], -1, -1))
+        self.assertEqual(linked.append(7), 3)
+        self.assertEqual(list(linked), [7])
+        for node in (-2, -1, 0, 4):
+            with self.assertRaises(IndexError):
+                linked.erase(node)
+        for node in (-2, 0, 4):
+            with self.assertRaises(IndexError):
+                linked.insert_after(node, 8)
         b = lib("structures/bit_set")["BitSet"](130)
         b.set(129)
         b.set(5)
@@ -460,9 +572,12 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(m["factorize_trial"](72), {2: 3, 3: 2})
         self.assertEqual(m["divisors"](12), [1, 2, 3, 4, 6, 12])
         f = lib("math/factorize64")
-        self.assertFalse(f["is_prime"](-3))
-        self.assertFalse(f["is_prime"](341550071728321))
-        self.assertEqual(f["factorize"](1000003 * 1000033), {1000003: 1, 1000033: 1})
+        self.assertFalse(f["is_probable_prime"](-3))
+        self.assertEqual(sorted(f["divisors"](12)), [1, 2, 3, 4, 6, 12])
+        self.assertEqual(f["totient"](12), 4)
+        self.assertEqual(f["lcm"](6, 8), 24)
+        self.assertFalse(f["is_probable_prime"](341550071728321))
+        self.assertEqual(f["prime_fact"](1000003 * 1000033), {1000003: 1, 1000033: 1})
 
     def test_bit_transforms_and_scalar(self):
         m = lib("math/bit_transforms")
@@ -475,19 +590,19 @@ class LibraryTests(unittest.TestCase):
             min(max(x ^ v for v in [0, 2, 5]) for x in range(8)),
         )
         self.assertEqual(m["solve_gf2"]([0b11, 0b10], [1, 0], 2), (2, 1))
-        self.assertEqual(m["solve_gf2"]([1, 1], [0, 1], 1), (1, None))
+        self.assertIsNone(m["solve_gf2"]([1, 1], [0, 1], 1))
         m = lib("math/scalar")
         with m["ModContext"](11):
             a, b = m["Modint"](10), m["Modint"](3)
-            self.assertEqual((a // b).val(), 7)
             self.assertEqual((a / b).val(), 7)
             self.assertEqual(b.inv().val(), 4)
-            self.assertEqual(b.pow(4).val(), 4)
+            self.assertEqual((b ** 4).val(), 4)
             self.assertEqual(m["raw"](3).mod(), 11)
             with m["ModContext"](7):
                 self.assertEqual(m["Modint"](10).val(), 3)
             self.assertEqual(m["Modint"](10).val(), 10)
-        c = m["ModInt"](3, 8)
+        with m["ModContext"](8):
+            c = m["Modint"](3)
         self.assertEqual(int(5 / c), 7)
         self.assertEqual(m["Fraction"](2, 4), m["Fraction"](1, 2))
 
@@ -498,9 +613,9 @@ class LibraryTests(unittest.TestCase):
 
     def test_polynomial(self):
         m = lib("math/polynomial")
-        self.assertEqual(m["convolution"](998244353, [1, 2], [3, 4]), [3, 10, 8])
+        self.assertEqual(m["FFT"](998244353).convolution([1, 2], [3, 4]), [3, 10, 8])
         with self.assertRaises(ValueError):
-            m["convolution"](1000000007, [1], [1])
+            m["FFT"](1000000007).convolution([1] * 41, [1] * 41)
         mod = m["FPS_MOD"]
         a = list(range(65))
         b = [i * i - 100 for i in range(70)]
@@ -508,7 +623,7 @@ class LibraryTests(unittest.TestCase):
         for i, x in enumerate(a):
             for j, y in enumerate(b):
                 expected[i + j] = (expected[i + j] + x * y) % mod
-        self.assertEqual(m["convolution"](a, b), expected)
+        self.assertEqual(m["FFT"](998244353).convolution(a, b), expected)
         self.assertEqual(m["fps_inverse"]([1, -1], 6), [1] * 6)
         self.assertEqual(
             m["fps_exp"](m["fps_log"]([1, 2, 3], 8), 8), [1, 2, 3, 0, 0, 0, 0, 0]
@@ -516,7 +631,9 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(m["fps_power"]([0], 0, 4), [1, 0, 0, 0])
         self.assertEqual(m["fps_power"]([0, 1], 3, 5), [0, 0, 0, 1, 0])
         root = m["fps_sqrt"]([1, 2, 1], 5)
-        self.assertEqual(m["convolution"](root, root)[:5], [1, 2, 1, 0, 0])
+        self.assertEqual(
+            m["FFT"](998244353).convolution(root, root)[:5], [1, 2, 1, 0, 0]
+        )
         self.assertEqual(m["polynomial_gcd"]([-1, 0, 1], [-1, 1]), [mod - 1, 1])
         self.assertEqual(m["polynomial_gcd"]([], []), [])
         self.assertEqual(m["bostan_mori"]([0, 2], [2, -2, -2], 10), 55)
@@ -525,16 +642,22 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(m["stirling_second"](4), [0, 1, 7, 6, 1])
         self.assertEqual(m["stirling_first"](4), [0, mod - 6, 11, mod - 6, 1])
         self.assertEqual(
-            m["polynomial_interpolation"]([0, 1, 2], [1, 6, 17]).poly, [1, 2, 3]
+            m["polynomial_interpolation"]([0, 1, 2], [1, 6, 17]).Func, [1, 2, 3]
         )
         inv = m["polynomial_inverse"]([1, 1], [1, 0, 1])
-        F = m["FormalPowerSeries"]
-        result = F(m["convolution"]([1, 1], inv)) % F([1, 0, 1])
-        result.shrink()
-        self.assertEqual(result.poly, [1])
+        F = m["FPS"]
+        self.assertEqual(F([1, -1]).inv(d=5).Func, [1] * 5)
+        self.assertEqual(F([1, 2, 1]).log(5).exp(5).Func, [1, 2, 1, 0, 0])
+        self.assertEqual(F([1, 1]).powfps(3, 4).Func, [1, 3, 3, 1])
+        self.assertEqual(F([1, 2, 1]).sqrt(3).Func, [1, 1, 0])
+        self.assertEqual(F([0, 1]).sqrt(3).Func, [])
+        self.assertEqual(F([1, 2, 3]).diff().integral().Func, [0, 2, 3])
+        result = F(m["FFT"](998244353).convolution([1, 1], inv)) % F([1, 0, 1])
+        result.reduce()
+        self.assertEqual(result.Func, [1])
         common = [3, 2, 1]
-        f = m["convolution"](common, [0] * 70 + [1])
-        g = m["convolution"](common, [1] + [0] * 69 + [1])
+        f = m["FFT"](998244353).convolution(common, [0] * 70 + [1])
+        g = m["FFT"](998244353).convolution(common, [1] + [0] * 69 + [1])
         self.assertEqual(m["polynomial_gcd"](f, g), common)
 
     def test_geometry(self):
@@ -544,8 +667,20 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(m["convex_diameter_sq"](hull), 8)
         polygon = m["ConvexPolygon"](points)
         self.assertEqual(
-            [polygon.contains(p) for p in [(1, 1), (1, 0), (3, 1)]], [2, 1, 0]
+            [polygon.locate(p) for p in [(1, 1), (1, 0), (3, 1)]], [1, 0, -1]
         )
+        self.assertIs(polygon.contains((1, 0)), True)
+        self.assertIs(polygon.contains_strict((1, 0)), False)
+        self.assertEqual(m["ConvexPolygon"]([]).locate((0, 0)), -1)
+        self.assertEqual(m["ConvexPolygon"]([(0, 0)]).locate((0, 0)), 0)
+        for filename in ("02_line_segment", "03_polygon_convex", "05_circle"):
+            geom = runpy.run_path(str(ROOT.parent / "snippets/geometry" / (filename + ".py")))
+            Point, Line = geom["Point"], geom["Line"]
+            line = Line(Point(0, 0), Point(2, 2))
+            cross = line.intersection(Line(Point(0, 2), Point(2, 0)))
+            self.assertIsInstance(cross, Point)
+            self.assertEqual(cross.as_tuple(), (1, 1))
+            self.assertIsNone(line.intersection(line))
         union = lib("geometry/rectangle_union")["rectangle_union_area"]
         self.assertEqual(union([(0, 0, 2, 2), (1, 1, 3, 3), (0, 0, 2, 2)]), 7)
         self.assertEqual(union([]), 0)

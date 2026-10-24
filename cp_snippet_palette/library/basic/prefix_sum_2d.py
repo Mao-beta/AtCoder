@@ -1,10 +1,18 @@
 """2次元累積和。出典: _test.py: cum_2D/area_sum。
 0-indexed・半開区間。前計算O(HW)、長方形和O(1)。入力は変更しない。
 PyPy向け。Codonでは累積和・引き算の途中も符号付き64bit以内。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    p = prefix_sum_2d([[1, 2, 3], [4, 5, 6]])
+    rectangle_sum(p, 0, 1, 2, 3)  # => 16
 """
 
 
 def prefix_sum_2d(grid):
+    """長方形grid(H×W)から(H+1)×(W+1)の累積和を返す。
+    p[r][c]はgrid[0:r,0:c]の和。先頭行・列は0。O(HW)、入力非破壊。
+    入力: gridは加減算できる数値の二次元列。H=len(grid)、Wは各行の長さ。出力空間O(HW)。
+    """
     h = len(grid)
     w = len(grid[0]) if h else 0
     prefix = [[0] * (w + 1) for _ in range(h + 1)]
@@ -19,7 +27,10 @@ def prefix_sum_2d(grid):
 
 
 def rectangle_sum(prefix, top, left, bottom, right):
-    """[top,bottom) × [left,right)。空区間は0。"""
+    """prefix_sum_2dの戻り値から[top,bottom)×[left,right)の和をO(1)で返す。
+    引数順は行・列・行・列。空区間は0。境界は元のグリッド内に指定する。
+    prefixは累積和の二次元list。top/bottomは上下の行境界、left/rightは左右の列境界の整数。追加空間O(1)。
+    """
     if not (0 <= top <= bottom < len(prefix) and 0 <= left <= right < len(prefix[0])):
         raise IndexError("rectangle out of range")
     return (

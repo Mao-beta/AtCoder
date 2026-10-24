@@ -1,6 +1,7 @@
 import sys
 import math
 import bisect
+from AtCoder.cp_snippet_palette.snippets.structures import segtree
 from heapq import heapify, heappop, heappush
 from collections import deque, defaultdict, Counter
 from functools import lru_cache
@@ -112,7 +113,7 @@ class segtree():
         任意の整数 x≤y<r について f(prod(y,r))=True である。また、f(e)=True である。
         ->rから左にprodを伸ばしていくとき、はじめて条件がFalseになるlをさがす
         """
-        assert 0 <= r and r <= self.n
+        assert 0 <= r and r < self.n
         assert f(self.e)
         if r == 0:
             return 0

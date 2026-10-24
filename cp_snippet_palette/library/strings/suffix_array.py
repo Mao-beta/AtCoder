@@ -1,6 +1,14 @@
-"""SA-IS・LCP・Z。出典: _Strings.py (ACL for Python)。
-添字0始まり。整数列の座標圧縮を修正し、Unicodeと空入力に対応。
-前処理O(n log n)、SA-IS/LCP/ZはO(n)。PyPy向け、Codon未確認。
+"""SA-IS・LCP・Z。shakayami/ACL-for-pythonのString(s)形式。
+Unicode・空入力対応。前処理O(N log N)、SA-IS/LCP/ZはO(N)。PyPy向け、Codon未確認。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    text = String('banana')
+    sa = text.suffix_array()
+    sa, text.lcp_array(sa)  # => ([5, 3, 1, 0, 4, 2], [1, 3, 0, 0, 2])
+    String('ababa').z_algorithm()  # => [5, 0, 3, 0, 1]
+    String([2, 0, 2, 0]).suffix_array()  # => [3, 1, 2, 0]
+    longest_common_substring('xabcy', 'zabcw')  # => (1, 4, 1, 4)
+longest_common_substring(s,t)は独自拡張。共通区間(a,b,c,d)を返す。
 """
 
 
@@ -106,7 +114,7 @@ class _SuffixArray:
             assert 0 <= d and d <= upper
         return _SuffixArray.sa_is(s, upper)
 
-    def suffix_array(s):
+    def _suffix_array(s):
         # 文字列 S に対し、i 文字目から j 文字目までの文字からなる連続部分文字列を S[i:j] とおきます。
         # S の suffix array とは、(1,2,…,N) の順列 P であって、
         # 1≤i≤N−1 に対し S[Pi:N] < S[Pi+1:N]を満たす唯一のものを指します。
@@ -125,7 +133,7 @@ class _SuffixArray:
                 s2[idx[i]] = now
             return _SuffixArray.sa_is(s2, now)
 
-    def lcp_array(s, sa):
+    def _lcp_array(s, sa):
         """
         lcp-array(Longest Common Prefix)を求めます。
         呼び出す際には事前にsuffix_arrayのリストを持つことが要求されます。
@@ -151,7 +159,7 @@ class _SuffixArray:
             lcp[rnk[i] - 1] = h
         return lcp
 
-    def z_algorithm(s):
+    def _z_algorithm(s):
         """
         文字列が与えられた時、各 i について
         「S と S[i:] の最長共通接頭辞の長さ」
@@ -174,17 +182,93 @@ class _SuffixArray:
         return z
 
 
-def suffix_array(s, upper=None):
-    """suffix_array(s[, upper])。upper指定時は整数列0<=s[i]<=upper。"""
+def _suffix_array(s, upper=None):
+    """sの各接尾辞を辞書順に並べた開始位置のlist。空の接尾辞は含めない。
+    sは文字列または整数列。upper指定時は0<=s[i]<=upperを保証する。
+    upperなしの整数列は内部で座標圧縮する。入力非破壊。
+    """
     values = list(s)
     if upper is not None:
         return _SuffixArray.suffix_array_upper(values, upper)
-    return _SuffixArray.suffix_array(values)
+    return _SuffixArray._suffix_array(values)
 
 
-def lcp_array(values, sa):
-    return _SuffixArray.lcp_array(values, sa)
+def _lcp_array(values, sa):
+    """valuesとsuffix_array(values)の結果saから、隣り合う接尾辞の共通接頭辞長を返す。
+    結果[i]=LCP(values[sa[i]:],values[sa[i+1]:])。長さmax(0,n-1)、O(n)。
+    """
+    return _SuffixArray._lcp_array(values, sa)
 
 
-def z_algorithm(values):
-    return _SuffixArray.z_algorithm(values)
+def longest_common_substring(s, t):
+    """文字列s,tの最長共通部分文字列を区間(a,b,c,d)で返す。
+    s[a:b]==t[c:d]。共通文字なしなら(0,0,0,0)。複数解の選び方は未指定。
+    Unicodeにも対応。座標圧縮O(N log N)、SA-ISとLCP部分O(N)、空間O(N)。
+    例: longest_common_substring('xabcy','zabcw')は(1,4,1,4)。
+    計算量のN=len(s)+len(t)+1。s/tはstr。
+    """
+    if not s or not t:
+        return 0, 0, 0, 0
+    alphabet = {c: i + 1 for i, c in enumerate(sorted(set(s) | set(t)))}
+    values = [alphabet[c] for c in s] + [0] + [alphabet[c] for c in t]
+    sa = _suffix_array(values, len(alphabet))
+    lcp = _lcp_array(values, sa)
+    n, best, result = len(s), 0, (0, 0, 0, 0)
+    for i, length in enumerate(lcp):
+        u, v = sa[i], sa[i + 1]
+        if (u < n and v > n) or (v < n and u > n):
+            if length > best:
+                if u > v:
+                    u, v = v, u
+                best = length
+                result = u, u + length, v - n - 1, v - n - 1 + length
+    return result
+
+
+def _z_algorithm(values):
+    """各位置iでvalues全体とvalues[i:]の共通接頭辞長を返す。文字列・列に対応。
+    長さnのlistでz[0]=n。空なら[]、O(n)。
+    """
+    return _SuffixArray._z_algorithm(values)
+
+
+class String:
+    """String(s)。文字列・整数列のSA/LCP/Zを求める。入力は変更しない。
+    APIはshakayami/ACL-for-pythonに準拠。Unicode・空入力にも対応する。
+    入力: sはstrまたは比較可能な整数列。N=len(s)。構築は参照を保存するだけなのでO(1)時間・空間、構築後に元の列を変更しない。
+    SAの前処理O(N log(N+1))、LCPはSA指定時O(N)、ZはO(N)。各結果の空間O(N)。
+    """
+
+    def __init__(self, s):
+        """入力: sはstrまたは比較可能な整数列。N=len(s)。構築は参照を保存するだけなのでO(1)時間・空間、構築後に元の列を変更しない。
+        SAの前処理O(N log(N+1))、LCPはSA指定時O(N)、ZはO(N)。各結果の空間O(N)。
+        """
+        self._s = s
+
+    def suffix_array(self):
+        """接尾辞を辞書順に並べた開始添字。空接尾辞は含めない。前処理込みO(N log N)。"""
+        return _suffix_array(self._s)
+
+    def lcp_array(self, sa=None):
+        """隣り合う接尾辞の共通接頭辞長。sa省略時はSAを計算する。SA指定時O(N)。
+        saはsuffix_array()の結果の整数list、またはNone。省略時の時間はSA構築も含みO(N log(N+1))。
+        """
+        if sa is None:
+            sa = self.suffix_array()
+        return _lcp_array(self._s, sa)
+
+    def z_algorithm(self):
+        """各iについてsとs[i:]の共通接頭辞長。z[0]=N、空なら[]。O(N)。"""
+        return _z_algorithm(self._s)
+
+    def __len__(self):
+        return len(self._s)
+
+    def __getitem__(self, idx):
+        return self._s[idx]
+
+    def __str__(self):
+        return str(self._s)
+
+    def __repr__(self):
+        return f"String({self._s!r})"

@@ -1,11 +1,20 @@
 """線形漸化式。出典: LibraryChecker/LC_Mutipoint_Evaluation.py。
+
 係数c[j]はa[n-j-1]に掛かる。modは素数。PyPy向け。
 Codonでは積を取る前にmodで正規化し、mod²を64bit以内にする。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    coefficients = berlekamp_massey([0, 1, 1, 2, 3, 5, 8, 13])
+    coefficients, linear_recurrence([0, 1], coefficients, 10)  # => ([1, 1], 55)
 """
 
 
 def berlekamp_massey(values, mod=998244353):
-    """O(N²)。与えられた列に適合する最短の線形漸化式係数を返す。"""
+    """与えられた先頭項valuesに適合する最短漸化式の係数cを返す。O(N²)。
+    a[n]=sum(c[j]*a[n-j-1]) mod modという係数順。modは素数。
+    未知のk次漸化式を推定するには通常2k項以上を用意する。有限列の先は仮定が必要。
+    valuesは整数の先頭項列、N=len(values)。剰余演算をO(1)とした説明で、逆元も数えるとO(N²+N log mod)時間、O(N)空間。
+    """
     if mod < 2:
         raise ValueError("prime mod required")
     a = [x % mod for x in values]
@@ -33,7 +42,11 @@ def berlekamp_massey(values, mod=998244353):
 
 
 def linear_recurrence(initial, coefficients, n, mod=998244353):
-    """O(k² log n)。initialは先頭k項。nは0-indexed。空の漸化式は零列。"""
+    """a[n]を返す。initialは先頭k項、coefficientsは長さk。nは0-indexed。
+    a[t]=sum(coefficients[j]*a[t-j-1]) mod mod。空の漸化式は零列。
+    modは素数。O(k² log n)、入力非破壊。
+    initial/coefficientsは整数列、k=len(coefficients)=len(initial)。nは求める項の非負整数添字。追加空間O(k)。
+    """
     k = len(coefficients)
     if n < 0 or mod < 2 or len(initial) != k:
         raise ValueError("invalid recurrence parameters")

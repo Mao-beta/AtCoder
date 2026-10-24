@@ -1,10 +1,24 @@
-"""競プロ用スニペット。単体で貼り付け可能。2026-10-17版。"""
+"""遅延評価セグメント木。APIはshakayami/ACL-for-pythonに準拠。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+区間加算・区間和の例。集約値は(和,要素数)、更新値は加算量。
+    op = lambda x, y: (x[0]+y[0], x[1]+y[1])
+    mapping = lambda f, x: (x[0]+f*x[1], x[1])
+    composition = lambda f, g: f+g  # 先にg、その後f
+    seg = lazy_segtree([(v, 1) for v in [1, 2, 3]], op, (0, 0), mapping, composition, 0)
+    seg.apply(0, 2, 5)  # [6,7,3]。区間は[l,r)
+    seg.apply_point(2, 4)  # [6,7,7]
+    seg.prod(0, 3), seg.get(1)  # => ((20, 3), (7, 1))
+一次関数x <- a*x+bでは、composition(f,g)はgの後にfを適用する。
+    compose = lambda f, g: (f[0]*g[0], f[0]*g[1]+f[1])
+    compose((2, 1), (3, 4))  # => (6, 9)
+"""
 
 
-class LazySegTree:
+class lazy_segtree:
     """遅延評価セグメント木。0-indexed / 半開区間 [l,r)。
 
-    LazySegTree(op, e, mapping, composition, id_, v)（ACL Python版）
+    lazy_segtree(V, OP, E, MAPPING, COMPOSITION, ID)。Vは初期配列。
     - OP(x,y): 結合的集約。E は左右の単位元。
     - MAPPING(f,x): 更新操作 f を集約値 x に適用。
     - COMPOSITION(f,g): 「先に g、その後 f」の合成操作。
@@ -16,17 +30,17 @@ class LazySegTree:
     MAPPING(f,E)==E も満たすこと（空区間は更新後も空区間）。
     更新操作は値の共有によって破壊されないよう、関数は非破壊的に実装する。
     更新・区間取得・境界探索は O(log N)、all_prod は O(1)。
+    入力: Vは集約値の初期列、N=len(V)。
+    OP/Eは結合演算/単位元、MAPPINGは(f,x)へ更新適用、COMPOSITIONは(f,g)へgの後にfの合成を返す関数、IDは恒等更新。
+    構築O(N)時間・空間（各演算O(1)）。pは0..N-1、0<=l<=r<=N、xは集約値、fは更新値、gは集約値をboolへ変換する境界探索の判定関数。
     """
 
-    def __init__(self, op, e, mapping, composition, id_, v):
-        V, OP, E = v, op, e
-        MAPPING, COMPOSITION, ID = mapping, composition, id_
-        if isinstance(V, int):
-            assert V >= 0
-            n = V
-            V = [E] * n
-        else:
-            n = len(V)
+    def __init__(self, V, OP, E, MAPPING, COMPOSITION, ID):
+        """入力: Vは集約値の初期列、N=len(V)。
+        OP/Eは結合演算/単位元、MAPPINGは(f,x)へ更新適用、COMPOSITIONは(f,g)へgの後にfの合成を返す関数、IDは恒等更新。
+        構築O(N)時間・空間（各演算O(1)）。pは0..N-1、0<=l<=r<=N、xは集約値、fは更新値、gは集約値をboolへ変換する境界探索の判定関数。
+        """
+        n = len(V)
         self.n = n
         self.log = (n - 1).bit_length() if n else 0
         self.size = 1 << self.log
@@ -124,16 +138,8 @@ class LazySegTree:
         for i in range(1, self.log + 1):
             update(p >> i)
 
-    def apply(self, left, right=None, f=None):
-        """apply(p, f=f) は1点、apply(l, r, f) は半開区間。O(log N)。
-
-        Python版ACLと同じく、1点更新では必ず f= を指定する。
-        """
-        assert f is not None
-        if right is None:
-            self.apply_point(left, f)
-            return
-        l, r = left, right
+    def apply(self, l, r, f):
+        """半開区間[l,r)にfを適用する。1点にはapply_point(p,f)。O(log N)。"""
         assert 0 <= l <= r <= self.n
         if l == r:
             return
@@ -238,10 +244,3 @@ class LazySegTree:
 
     def __str__(self):
         return str(self.to_list())
-
-
-class lazy_segtree(LazySegTree):
-    """旧引数順の互換用。新規コードはLazySegTreeを使う。"""
-
-    def __init__(self, V, OP, E, MAPPING, COMPOSITION, ID):
-        super().__init__(OP, E, MAPPING, COMPOSITION, ID, V)

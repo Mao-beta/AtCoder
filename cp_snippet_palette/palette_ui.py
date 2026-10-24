@@ -8,12 +8,15 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import textwrap
 import tokenize
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font as tkfont
 import webbrowser
 
 import cp_palette as core
+from purpose_browser import PurposeBrowser
 
 
 THEMES = {
@@ -24,6 +27,7 @@ THEMES = {
         text="#e7edf4",
         muted="#a2b3c5",
         accent="#6ce0bd",
+        signature="#91caff",
         selected="#264e51",
         code="#101923",
         border="#344558",
@@ -41,6 +45,7 @@ THEMES = {
         text="#172b3c",
         muted="#536b7d",
         accent="#087d69",
+        signature="#185e9b",
         selected="#d1eee6",
         code="#fbfcfe",
         border="#c6d2dc",
@@ -79,6 +84,8 @@ class PaletteApp:
         self.rendered_key = None
         self.syntax_cache = {}
         self.docs_cache = {}
+        self.document_views = []
+        self.navigator = None
         self.find_matches = []
         self.find_index = -1
         self.link_number = 0
@@ -94,6 +101,7 @@ class PaletteApp:
         self.style = ttk.Style(self.root)
         self.style.theme_use("clam")
         self.root.option_add("*Font", ("Yu Gothic UI", 10))
+        self.tree_font = tkfont.Font(root=self.root, family="Yu Gothic UI", size=self.preferences.font_size)
         self._build()
         self.apply_theme()
         self._bindings()
@@ -107,8 +115,8 @@ class PaletteApp:
     def _build(self):
         root = self.root
         root.columnconfigure(0, weight=1)
-        root.rowconfigure(2, weight=1)
-        header = ttk.Frame(root, padding=(20, 15, 20, 7))
+        root.rowconfigure(1, weight=1)
+        header = ttk.Frame(root, padding=(24, 20, 24, 16))
         header.grid(row=0, column=0, sticky="ew")
         ttk.Label(
             header, text="CP", style="Accent.TLabel", font=("Segoe UI", 20, "bold")
@@ -116,28 +124,40 @@ class PaletteApp:
         ttk.Label(header, text="Snippet Palette", font=("Segoe UI", 18, "bold")).pack(
             side="left"
         )
-        ttk.Label(header, text="探す → 確認 → コピー", style="Muted.TLabel").pack(
-            side="left", padx=18
-        )
         ttk.Button(header, text="ヘルプ  F1", command=self.show_help).pack(side="right")
+        ttk.Button(
+            header,
+            text="目的から探す  F6",
+            command=self.show_navigator,
+        ).pack(side="right", padx=(8, 0))
         self.theme_button = ttk.Button(header, command=self.toggle_theme, width=9)
         self.theme_button.pack(side="right", padx=8)
 
-        search = ttk.Frame(root, padding=(20, 0, 20, 8))
-        search.grid(row=1, column=0, sticky="ew")
+        self.splitter = ttk.Panedwindow(root, orient="horizontal")
+        self.splitter.grid(row=1, column=0, sticky="nsew", padx=24)
+        left = ttk.Frame(self.splitter, width=380, padding=(0, 0, 16, 0))
+        right = ttk.Frame(self.splitter, width=720, style="Surface.TFrame")
+        self.splitter.add(left, weight=2)
+        self.splitter.add(right, weight=4)
+        left.columnconfigure(0, weight=1)
+        left.rowconfigure(2, weight=1)
+
+        search = ttk.Frame(left)
+        search.grid(row=0, column=0, sticky="ew")
         search.columnconfigure(0, weight=1)
+        ttk.Label(search, text="検索", style="Section.TLabel").grid(
+            row=0, column=0, sticky="w", pady=(0, 12))
         self.query = ttk.Entry(
             search, textvariable=self.query_var, font=("Yu Gothic UI", 14)
         )
-        self.query.grid(row=0, column=0, sticky="ew", ipady=7)
+        self.query.grid(row=1, column=0, sticky="ew", ipady=5)
         ttk.Button(search, text="クリア", command=lambda: self.query_var.set("")).grid(
-            row=0, column=1, padx=(8, 0)
+            row=1, column=1, padx=(8, 0)
         )
         hint = ttk.Frame(search)
-        hint.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(5, 7))
-        ttk.Label(hint, text="名前・日本語・API名   例：", style="Muted.TLabel").pack(
-            side="left"
-        )
+        hint.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(4, 12))
+        ttk.Label(search, text="名前・目的・API名で検索", style="Muted.TLabel").grid(
+            row=2, column=0, columnspan=2, sticky="w", pady=(8, 0))
         for example in ("セグ木", "最短路", "二項係数", "fps_inverse"):
             ttk.Button(
                 hint,
@@ -146,11 +166,11 @@ class PaletteApp:
                 command=lambda q=example: self.search_for(q),
             ).pack(side="left", padx=(0, 5))
         filters = ttk.Frame(search)
-        filters.grid(row=2, column=0, columnspan=2, sticky="ew")
+        filters.grid(row=4, column=0, columnspan=2, sticky="ew")
         for label, value in [
             ("すべて", ""),
-            ("コード / File", "File"),
-            ("PyCharm / Live", "Live"),
+            ("File · コード", "File"),
+            ("Live · 略語", "Live"),
         ]:
             ttk.Radiobutton(
                 filters,
@@ -160,41 +180,45 @@ class PaletteApp:
                 command=self.filter_changed,
                 style="Filter.TRadiobutton",
             ).pack(side="left", padx=(0, 4))
+        facets = ttk.Frame(search)
+        facets.grid(row=5, column=0, columnspan=2, sticky="ew", pady=(12, 0))
+        facets.columnconfigure(0, weight=1)
+        facets.columnconfigure(1, weight=1)
+        ttk.Label(facets, text="分野", style="Muted.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 4))
+        ttk.Label(facets, text="表示範囲", style="Muted.TLabel").grid(row=0, column=1, sticky="w", padx=(8, 0), pady=(0, 4))
         self.group = ttk.Combobox(
-            filters, textvariable=self.group_var, state="readonly", width=17
+            facets, textvariable=self.group_var, state="readonly", width=14
         )
-        self.group.pack(side="left", padx=(12, 5))
+        self.group.grid(row=1, column=0, sticky="ew")
         self.scope = ttk.Combobox(
-            filters,
+            facets,
             textvariable=self.scope_var,
             values=list(SCOPES),
             state="readonly",
-            width=13,
+            width=12,
         )
-        self.scope.pack(side="left")
-        self.count = ttk.Label(filters, style="Muted.TLabel")
+        self.scope.grid(row=1, column=1, sticky="ew", padx=(8, 0))
+        results = ttk.Frame(left, padding=(0, 16, 0, 8))
+        results.grid(row=1, column=0, sticky="ew")
+        ttk.Label(results, text="候補", style="Section.TLabel").pack(side="left")
+        self.count = ttk.Label(results, style="Muted.TLabel")
         self.count.pack(side="right")
-
-        splitter = ttk.Panedwindow(root, orient="horizontal")
-        splitter.grid(row=2, column=0, sticky="nsew", padx=20, pady=(0, 8))
-        left = ttk.Frame(splitter, width=420)
-        right = ttk.Frame(splitter, width=650)
-        splitter.add(left, weight=2)
-        splitter.add(right, weight=3)
-        left.rowconfigure(0, weight=1)
-        left.columnconfigure(0, weight=1)
+        list_frame = ttk.Frame(left)
+        list_frame.grid(row=2, column=0, sticky="nsew")
+        list_frame.rowconfigure(0, weight=1)
+        list_frame.columnconfigure(0, weight=1)
         self.tree = ttk.Treeview(
-            left, columns=("kind",), show="tree headings", selectmode="browse"
+            list_frame, columns=("kind",), show="tree", selectmode="browse"
         )
         self.tree.heading("#0", text="スニペット / 用途")
         self.tree.heading("kind", text="種類")
-        self.tree.column("#0", width=345, minwidth=210)
+        self.tree.column("#0", width=290, minwidth=150)
         self.tree.column("kind", width=62, stretch=False)
         self.tree.grid(row=0, column=0, sticky="nsew")
-        scroll = ttk.Scrollbar(left, command=self.tree.yview)
-        scroll.grid(row=0, column=1, sticky="ns")
+        scroll = ttk.Scrollbar(list_frame, command=self.tree.yview)
+        scroll.grid(row=0, column=1, sticky="ns", padx=(4, 0))
         self.tree.configure(yscrollcommand=scroll.set)
-        self.empty = ttk.Frame(left, padding=14)
+        self.empty = ttk.Frame(list_frame, padding=14)
         ttk.Label(
             self.empty,
             text="該当する候補がありません",
@@ -205,34 +229,38 @@ class PaletteApp:
         ttk.Button(
             self.empty, text="検索・絞り込みをリセット", command=self.reset
         ).pack(pady=12)
+        ttk.Label(left, text="↑↓ 候補を選択    Enter コピー", style="Muted.TLabel").grid(
+            row=3, column=0, sticky="w", pady=(8, 0))
 
         right.columnconfigure(0, weight=1)
         right.rowconfigure(2, weight=1)
-        titlebar = ttk.Frame(right, padding=(12, 3, 0, 4))
+        titlebar = ttk.Frame(right, padding=(20, 16, 20, 8), style="Surface.TFrame")
         titlebar.grid(row=0, column=0, sticky="ew")
         titlebar.columnconfigure(0, weight=1)
+        self.kind_badge = ttk.Label(titlebar, text="", style="Badge.TLabel")
+        self.kind_badge.grid(row=0, column=0, sticky="w")
         self.title = ttk.Label(
-            titlebar, text="候補を選択", font=("Segoe UI", 16, "bold")
+            titlebar, text="候補を選択", style="Surface.TLabel", font=("Yu Gothic UI", 18, "bold"), wraplength=580
         )
-        self.title.grid(row=0, column=0, sticky="w")
+        self.title.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(8, 0))
         self.favorite = ttk.Button(
             titlebar, text="☆ お気に入り", command=self.toggle_favorite
         )
         self.favorite.grid(row=0, column=1, padx=(8, 0))
         self.detail = ttk.Label(
-            right, style="Muted.TLabel", padding=(12, 0, 0, 8), wraplength=600
+            right, style="SurfaceMuted.TLabel", padding=(20, 0, 20, 12), wraplength=580
         )
         self.detail.grid(row=1, column=0, sticky="ew")
         right.bind(
             "<Configure>",
-            lambda event: self.detail.configure(wraplength=max(240, event.width - 18)),
+            self._resize_details,
         )
         self.tabs = ttk.Notebook(right)
-        self.tabs.grid(row=2, column=0, sticky="nsew", padx=(12, 0))
+        self.tabs.grid(row=2, column=0, sticky="nsew", padx=16)
         self.code_page = ttk.Frame(self.tabs)
         self.api_page = ttk.Frame(self.tabs)
+        self.tabs.add(self.api_page, text="  使い方・解説・API  ")
         self.tabs.add(self.code_page, text="  コード  ")
-        self.tabs.add(self.api_page, text="  API・verify  F2  ")
         self.code_page.columnconfigure(0, weight=1)
         self.code_page.rowconfigure(2, weight=1)
         toolbar = ttk.Frame(self.code_page, padding=(7, 6))
@@ -306,51 +334,61 @@ class PaletteApp:
             ),
         )
         self.api_page.columnconfigure(0, weight=1)
-        self.api_page.rowconfigure(0, weight=1)
+        self.api_page.rowconfigure(1, weight=1)
+        reading_bar = ttk.Frame(self.api_page, padding=(10, 6))
+        reading_bar.grid(row=0, column=0, columnspan=2, sticky="ew")
+        ttk.Label(
+            reading_bar, text="Ctrl＋ホイールで拡大・縮小", style="Muted.TLabel"
+        ).pack(side="left")
+        for label, delta in [("＋", 1), ("−", -1)]:
+            ttk.Button(
+                reading_bar, text=label, width=3,
+                command=lambda d=delta: self.resize_font(d),
+            ).pack(side="right", padx=2)
         self.api = tk.Text(
             self.api_page,
             wrap="word",
-            padx=14,
-            pady=12,
+            padx=20,
+            pady=16,
             borderwidth=0,
             state="disabled",
             undo=False,
             exportselection=False,
         )
-        self.api.grid(row=0, column=0, sticky="nsew")
+        self.api.grid(row=1, column=0, sticky="nsew")
         api_scroll = ttk.Scrollbar(self.api_page, command=self.api.yview)
-        api_scroll.grid(row=0, column=1, sticky="ns")
+        api_scroll.grid(row=1, column=1, sticky="ns")
         self.api.configure(yscrollcommand=api_scroll.set)
 
-        actions = ttk.Frame(root, padding=(20, 3, 20, 5))
+        actions = ttk.Frame(right, padding=(20, 12, 20, 16), style="Surface.TFrame")
         actions.grid(row=3, column=0, sticky="ew")
+        actions.columnconfigure(0, weight=1)
+        self.copy_hint = ttk.Label(actions, style="SurfaceMuted.TLabel", wraplength=560)
+        self.copy_hint.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 8))
         self.copy_button = ttk.Button(
             actions,
-            text="コピーして閉じる  Enter",
+            text="コピー  Enter",
             style="Primary.TButton",
             command=self.copy_selected,
         )
-        self.copy_button.pack(side="left", padx=(0, 8))
-        self.keep_button = ttk.Button(
-            actions,
-            text="コピーして続ける  Ctrl+Enter",
-            command=lambda: self.copy_selected(False),
-        )
-        self.keep_button.pack(side="left")
-        ttk.Button(actions, text="再読込  F5", command=self.reload).pack(side="right")
+        self.copy_button.grid(row=1, column=0, sticky="ew")
         self.source_button = ttk.Button(
             actions, text="保存場所  F4", command=self.reveal_source
         )
-        self.source_button.pack(side="right", padx=8)
-        bottom = ttk.Frame(root, padding=(20, 0, 20, 10))
-        bottom.grid(row=4, column=0, sticky="ew")
+        self.source_button.grid(row=1, column=1, padx=(8, 0))
+        self.copy_feedback = ttk.Label(actions, style="SurfaceMuted.TLabel", wraplength=560)
+        self.copy_feedback.grid(row=2, column=0, columnspan=2, sticky="w", pady=(8, 0))
+        bottom = ttk.Frame(root, padding=(24, 12, 24, 16))
+        bottom.grid(row=2, column=0, sticky="ew")
+        bottom.columnconfigure(0, weight=1)
         self.status = ttk.Label(bottom, style="Muted.TLabel")
-        self.status.pack(side="left")
+        self.status.grid(row=0, column=0, sticky="w")
+        ttk.Button(bottom, text="再読込  F5", command=self.reload).grid(row=0, column=2, padx=(16, 0))
         ttk.Label(
             bottom,
-            text="↑↓ 選択    Ctrl+L 検索    Ctrl+D ★    Esc 終了",
+            text="Ctrl+L 検索    F2 表示切替    Esc 終了",
             style="Muted.TLabel",
-        ).pack(side="right")
+        ).grid(row=0, column=1)
 
     def _bindings(self):
         self.query_var.trace_add("write", lambda *_: self.schedule_search())
@@ -359,9 +397,9 @@ class PaletteApp:
         self.scope.bind("<<ComboboxSelected>>", lambda _: self.populate())
         self.symbol.bind("<<ComboboxSelected>>", self.jump_to_symbol)
         self.tree.bind("<<TreeviewSelect>>", self.select)
-        self.tree.bind("<Double-1>", self.double_click)
-        self.root.bind("<Return>", lambda _: self.copy_selected())
-        self.root.bind("<Control-Return>", lambda _: self.copy_selected(False))
+        self.tree.bind("<Configure>", lambda _: self._fit_candidates())
+        self.root.bind("<Return>", self._activate_or_copy)
+        self.root.bind("<Control-Return>", lambda _: self.copy_selected())
         self.root.bind("<Control-l>", self.focus_search)
         self.root.bind("<Control-f>", lambda _: self.show_find())
         self.root.bind("<Control-d>", lambda _: self.toggle_favorite())
@@ -372,6 +410,7 @@ class PaletteApp:
         self.root.bind("<Shift-F3>", lambda _: self.find_next(-1))
         self.root.bind("<F4>", lambda _: self.reveal_source())
         self.root.bind("<F5>", lambda _: self.reload())
+        self.root.bind("<F6>", lambda _: self.show_navigator())
         for key, kind in [("1", ""), ("2", "File"), ("3", "Live")]:
             self.root.bind(f"<Alt-Key-{key}>", lambda _, k=kind: self.set_kind(k))
         for widget in (self.query, self.tree):
@@ -405,12 +444,20 @@ class PaletteApp:
         self.style.configure("TLabel", background=c["bg"], foreground=c["text"])
         self.style.configure("Muted.TLabel", foreground=c["muted"])
         self.style.configure("Accent.TLabel", foreground=c["accent"])
+        self.style.configure("Section.TLabel", font=("Yu Gothic UI", 13, "bold"))
+        self.style.configure("Surface.TFrame", background=c["panel"])
+        self.style.configure("Surface.TLabel", background=c["panel"])
+        self.style.configure("SurfaceMuted.TLabel", background=c["panel"], foreground=c["muted"])
+        self.style.configure("SurfaceError.TLabel", background=c["panel"], foreground=c["error"])
+        self.style.configure("Badge.TLabel", background=c["selected"], foreground=c["accent"],
+                             padding=(8, 4), font=("Yu Gothic UI", 10, "bold"))
         self.style.configure(
             "TButton", background=c["panel"], padding=(10, 7), borderwidth=1
         )
         self.style.map(
             "TButton",
             background=[("active", c["selected"])],
+            bordercolor=[("focus", c["accent"])],
             foreground=[("disabled", c["muted"])],
         )
         self.style.configure("Small.TButton", padding=(7, 2), font=("Yu Gothic UI", 9))
@@ -434,6 +481,7 @@ class PaletteApp:
             insertcolor=c["accent"],
             padding=5,
         )
+        self.style.map("TEntry", bordercolor=[("focus", c["accent"])])
         self.style.configure(
             "TCombobox",
             fieldbackground=c["input"],
@@ -459,12 +507,15 @@ class PaletteApp:
             "Filter.TRadiobutton",
             background=[("selected", c["selected"]), ("active", c["input"])],
         )
+        self.tree_font.configure(size=self.preferences.font_size)
+        self.tree.column("kind", width=max(62, self.tree_font.measure("コード") + 12))
         self.style.configure(
             "Treeview",
             background=c["panel"],
             fieldbackground=c["panel"],
             foreground=c["text"],
-            rowheight=53,
+            rowheight=self.tree_font.metrics("linespace") * 2 + 20,
+            font=self.tree_font,
             borderwidth=0,
         )
         self.style.map(
@@ -509,7 +560,6 @@ class PaletteApp:
         self.gutter.configure(foreground=c["muted"])
         self.preview.configure(font=("Consolas", self.preferences.font_size))
         self.gutter.configure(font=("Consolas", self.preferences.font_size))
-        self.api.configure(font=("Yu Gothic UI", 10))
         for tag in ("keyword", "string", "comment", "number"):
             self.preview.tag_configure(tag, foreground=c[tag])
         self.preview.tag_configure("hit", background=c["hit"])
@@ -518,22 +568,112 @@ class PaletteApp:
             "current_find", background=c["accent"], foreground="#102b26"
         )
         self.preview.tag_configure("jump", background=c["selected"])
-        self.api.tag_configure(
-            "heading",
-            foreground=c["accent"],
-            font=("Yu Gothic UI", 11, "bold"),
-            spacing1=12,
-            spacing3=5,
-        )
-        self.api.tag_configure(
-            "signature", foreground=c["accent"], font=("Consolas", 11), spacing1=7
-        )
-        self.api.tag_configure("muted", foreground=c["muted"])
+        for widget in self._document_widgets():
+            self._style_document(widget)
         self.theme_button.configure(
             text="ライト" if self.preferences.theme == "dark" else "ダーク"
         )
-        if self.current:
-            self.render_api(self.current)
+        if self.navigator:
+            self.navigator.apply_theme()
+        self._fit_candidates()
+
+    def _resize_details(self, event):
+        width = max(180, event.width - 40)
+        for label in (self.detail, self.title, self.copy_hint, self.copy_feedback):
+            label.configure(wraplength=width)
+
+    def _activate_or_copy(self, event):
+        if isinstance(event.widget, (ttk.Button, tk.Button, ttk.Radiobutton)):
+            event.widget.invoke()
+        elif not isinstance(event.widget, ttk.Combobox):
+            self.copy_selected()
+        return "break"
+
+    def _fit_candidates(self):
+        """候補の名前と用途が列の途中で切れないよう、実際の幅で省略する。"""
+        width = max(60, self.tree.column("#0", "width") - 28)
+
+        def fit(text):
+            if self.tree_font.measure(text) <= width:
+                return text
+            low, high = 0, len(text)
+            while low < high:
+                mid = (low + high + 1) // 2
+                if self.tree_font.measure(text[:mid] + "…") <= width:
+                    low = mid
+                else:
+                    high = mid - 1
+            return text[:low] + "…"
+
+        for row, hit in zip(self.tree.get_children(), self.hits):
+            entry = hit.entry
+            favorite = "★ " if entry.key in self.preferences.favorites else ""
+            summary = entry.description.splitlines()[0] if entry.description else entry.category
+            self.tree.item(row, text=fit(favorite + entry.name) + "\n" + fit(summary))
+
+    def show_navigator(self):
+        if self.navigator is None:
+            self.navigator = PurposeBrowser(self)
+        else:
+            self.navigator.window.deiconify()
+            self.navigator.window.lift()
+            self.navigator.focus_search()
+        return "break"
+
+    def _document_widgets(self):
+        self.document_views = [w for w in self.document_views if w.winfo_exists()]
+        return [self.api, *self.document_views]
+
+    def _style_document(self, widget):
+        """API・ガイド・ヘルプで同じ文字階層と配色を使う。"""
+        c, size = self.colors, self.preferences.font_size
+        widget.configure(
+            font=("Yu Gothic UI", size), background=c["code"], foreground=c["text"],
+            insertbackground=c["accent"], selectbackground=c["selected"],
+            selectforeground=c["text"], spacing1=2, spacing2=3, spacing3=4,
+        )
+        for tag, extra in [("heading1", 7), ("heading", 4), ("subheading", 1)]:
+            widget.tag_configure(
+                tag, font=("Yu Gothic UI", size + extra, "bold"),
+                foreground=c["accent"], spacing1=18, spacing3=8,
+            )
+        widget.tag_configure("lead", font=("Yu Gothic UI", size + 1, "bold"), spacing3=10)
+        widget.tag_configure(
+            "signature", font=("Consolas", size + 1, "bold"),
+            foreground=c["signature"], background=c["panel"],
+            spacing1=18, spacing3=8, lmargin1=8, lmargin2=8, rmargin=8,
+        )
+        widget.tag_configure("strong", font=("Yu Gothic UI", size, "bold"))
+        widget.tag_configure(
+            "label", font=("Yu Gothic UI", size, "bold"), foreground=c["accent"]
+        )
+        widget.tag_configure(
+            "complexity", font=("Consolas", size, "bold"), foreground=c["number"]
+        )
+        widget.tag_configure(
+            "inline", font=("Consolas", size),
+            background=c["input"], foreground=c["signature"],
+        )
+        widget.tag_configure(
+            "example", font=("Consolas", size), background=c["panel"],
+            lmargin1=12, lmargin2=12, rmargin=12, spacing1=0, spacing2=2, spacing3=0,
+        )
+        widget.tag_configure("code_first", spacing1=8)
+        widget.tag_configure("code_last", spacing3=10)
+        widget.tag_configure("bullet", lmargin1=4, lmargin2=22, spacing3=7)
+        widget.tag_configure(
+            "table_title", font=("Yu Gothic UI", size + 1, "bold"),
+            spacing1=12, spacing3=6,
+        )
+        widget.tag_configure("table_field", lmargin1=12, lmargin2=12)
+        widget.tag_configure("muted", foreground=c["muted"])
+        widget.tag_configure("link", foreground=c["accent"], underline=True)
+        for tag in ("keyword", "string", "comment", "number"):
+            widget.tag_configure(tag, foreground=c[tag])
+        widget.tag_raise("sel")
+        widget.bind(
+            "<Control-MouseWheel>", lambda e: self.resize_font(1 if e.delta > 0 else -1)
+        )
 
     def _update_groups(self):
         values = sorted(
@@ -581,23 +721,18 @@ class PaletteApp:
         for i, hit in enumerate(self.hits):
             e = hit.entry
             favorite = "★ " if e.key in self.preferences.favorites else ""
-            summary = (
-                ("旧API · " if e.legacy else "") + e.description.splitlines()[0]
-                if e.description
-                else e.category
-            )
-            if len(summary) > 42:
-                summary = summary[:41] + "…"
+            summary = e.description.splitlines()[0] if e.description else e.category
             self.tree.insert(
                 "",
                 "end",
                 iid=str(i),
                 text=f"{favorite}{e.name}\n{summary}",
-                values=(e.kind,),
+                values=("File\nコード" if e.kind == "File" else "Live\n略語",),
             )
             if e.key == old:
                 chosen = str(i)
-        self.count.configure(text=f"{len(self.hits)} / {len(self.entries)} 件")
+        self._fit_candidates()
+        self.count.configure(text=f"{len(self.hits)}件")
         if self.hits:
             self.empty.place_forget()
             self.tree.selection_set(chosen)
@@ -608,6 +743,7 @@ class PaletteApp:
             self.current = None
             self.rendered_key = None
             self.title.configure(text="候補なし")
+            self.kind_badge.configure(text="未選択")
             self.detail.configure(text="検索語や絞り込みを変更してください")
             for widget in (self.preview, self.gutter, self.api):
                 self._text(widget, "")
@@ -640,17 +776,19 @@ class PaletteApp:
         hit = self.hits[int(selected[0])]
         e = self.current = hit.entry
         self.title.configure(text=e.name)
-        action = (
+        self.kind_badge.configure(text="Live · PyCharmで展開" if e.kind == "Live" else "File · コード全体")
+        self.copy_hint.configure(text=(
             f"略語「{e.abbreviation}」をコピー → PyCharmでTab"
             if e.kind == "Live"
-            else "ファイル全体をコピー → mainより上に貼り付け"
-        )
+            else "コピーしたコードは、解答のmainより上に貼り付けます。"
+        ))
         lines = len(e.code.splitlines())
         self.detail.configure(
-            text=f"{e.kind} · {e.category} · {lines:,}行 · {hit.reason or '登録済み'}\n{action}"
+            text=f"{e.category} · {lines:,}行 · {hit.reason or '登録済み'}\n{e.description.splitlines()[0] if e.description else ''}"
         )
         render_key = (e.key, self.query_var.get())
         if self.rendered_key != render_key:
+            self.copy_feedback.configure(text="", style="SurfaceMuted.TLabel")
             self._text(self.preview, e.code)
             self._text(self.gutter, "\n".join(map(str, range(1, lines + 1))))
             self.preview.xview_moveto(0)
@@ -717,19 +855,39 @@ class PaletteApp:
         if first:
             self.preview.see(first)
 
-    def _markdown(self, widget, text):
-        pattern = re.compile(r"\[([^\]]+)\]\(([^)]+)\)|`([^`]+)`")
+    def _prose(self, widget, text, tags=()):
+        start = widget.index("end-1c")
+        widget.insert("end", text, tags)
+        label = re.match(
+            r"(?:入力|引数|戻り値|返り値|計算量|時間計算量|空間計算量|前提条件|前提|注意|"
+            r"目的|使うもの|選ぶ条件|検索語|対象|使用例|実行例)[：:]", text,
+        )
+        if label:
+            widget.tag_add("label", start, f"{start}+{label.end()}c")
+        # log(N+1)など、括弧が入れ子になる計算量もひとまとまりで強調する。
+        for match in re.finditer(r"(?<![A-Za-z0-9_])O\(", text):
+            depth = 1
+            end = match.end()
+            while end < len(text) and depth:
+                depth += (text[end] == "(") - (text[end] == ")")
+                end += 1
+            if not depth:
+                widget.tag_add("complexity", f"{start}+{match.start()}c", f"{start}+{end}c")
+
+    def _markdown(self, widget, text, tags=()):
+        """インラインのリンク・コード・太字。元の本文とリンク先は保持する。"""
+        pattern = re.compile(
+            r"\[([^\]\n]+)\]\(([^)\n]+)\)|`([^`\n]+)`|"
+            r"(?<![\w)\]])\*\*(?!\s)(.+?)(?<!\s)\*\*"
+        )
         start = 0
         for match in pattern.finditer(text):
-            widget.insert("end", text[start : match.start()])
-            label, target, code = match.groups()
+            self._prose(widget, text[start : match.start()], tags)
+            label, target, code, strong = match.groups()
             if target:
                 self.link_number += 1
                 tag = f"link_{self.link_number}"
-                widget.insert("end", label, tag)
-                widget.tag_configure(
-                    tag, foreground=self.colors["accent"], underline=True
-                )
+                self._markdown(widget, label, (*tags, "link", tag))
                 widget.tag_bind(
                     tag, "<Button-1>", lambda _, t=target: self.open_link(t)
                 )
@@ -739,10 +897,101 @@ class PaletteApp:
                 widget.tag_bind(
                     tag, "<Leave>", lambda _, w=widget: w.configure(cursor="xterm")
                 )
+            elif code is not None:
+                widget.insert("end", code, (*tags, "inline"))
             else:
-                widget.insert("end", code)
+                self._markdown(widget, strong, (*tags, "strong"))
             start = match.end()
-        widget.insert("end", text[start:])
+        self._prose(widget, text[start:], tags)
+
+    def _code_block(self, widget, code, *, python=True):
+        start = widget.index("end-1c")
+        widget.insert("end", code, "example")
+        widget.tag_add("code_first", start, f"{start} lineend")
+        widget.tag_add("code_last", "end-2c linestart", "end-1c")
+        if not python:
+            return
+        try:
+            for token in tokenize.generate_tokens(io.StringIO(code).readline):
+                tag = {
+                    tokenize.STRING: "string", tokenize.COMMENT: "comment",
+                    tokenize.NUMBER: "number",
+                }.get(token.type)
+                if token.type == tokenize.NAME and keyword.iskeyword(token.string):
+                    tag = "keyword"
+                if tag:
+                    indices = [
+                        f"{start}+{row - 1} lines+{col}c"
+                        for row, col in (token.start, token.end)
+                    ]
+                    widget.tag_add(tag, *indices)
+        except (tokenize.TokenError, IndentationError, SyntaxError):
+            pass
+
+    def _document(self, widget, content, *, anchor="", docstring=False):
+        """同梱文書の見出し・リスト・表・コード例をTextの書式へ変換する。"""
+        # 逆引き表のセルにある分類メタデータは表示しない。
+        lines = re.sub(r"<!-- navigator: .+? -->[ \t]*", "", content).splitlines()
+        target_index = None
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            if line.startswith("```"):
+                language = line[3:].strip().lower()
+                i += 1
+                block = []
+                while i < len(lines) and not lines[i].startswith("```"):
+                    block.append(lines[i])
+                    i += 1
+                self._code_block(
+                    widget, "\n".join(block) + "\n",
+                    python=language in ("", "py", "python"),
+                )
+            elif docstring and line.startswith("    "):
+                block = [line]
+                while i + 1 < len(lines) and (
+                    lines[i + 1].startswith("    ") or not lines[i + 1].strip()
+                ):
+                    i += 1
+                    block.append(lines[i])
+                self._code_block(widget, textwrap.dedent("\n".join(block)).rstrip() + "\n")
+            elif match := re.match(r"^(#{1,6})\s+(.+)", line):
+                level, heading = match.groups()
+                if anchor and heading.replace(" ", "-") == anchor:
+                    target_index = widget.index("end-1c")
+                tag = {1: "heading1", 2: "heading"}.get(len(level), "subheading")
+                self._markdown(widget, heading + "\n", (tag,))
+            elif line.startswith("|"):
+                rows = []
+                while i < len(lines) and lines[i].startswith("|"):
+                    row = lines[i]
+                    if not re.fullmatch(r"[|:\- ]+", row):
+                        rows.append([cell.strip() for cell in row.strip("| ").split("|")])
+                    i += 1
+                # 狭い画面でも列の意味が分かるよう、1行を項目名付きのまとまりで表示。
+                headers = rows[0] if rows else []
+                for row in rows[1:]:
+                    self._markdown(widget, row[0] + "\n", ("table_title",))
+                    for j, cell in enumerate(row[1:], 1):
+                        label = headers[j] + "： " if j < len(headers) else ""
+                        self._markdown(widget, label, ("table_field", "label"))
+                        self._markdown(
+                            widget, cell.replace("<br>", "\n") + "\n", ("table_field",)
+                        )
+                    widget.insert("end", "\n")
+                continue
+            elif re.fullmatch(r"(?:---+|\*\*\*+)", line.strip()):
+                widget.insert("end", "\n")
+            elif match := re.match(r"^\s*(?:[-*]|(\d+)\.)\s+(.+)", line):
+                number, body = match.groups()
+                marker = number + ". " if number else "• "
+                self._markdown(widget, marker + body + "\n", ("bullet",))
+            elif docstring and re.match(r"^(?:使い方|使用例|実行例)(?:[：:（]|$)", line):
+                self._markdown(widget, line + "\n", ("subheading",))
+            else:
+                self._markdown(widget, line + "\n")
+            i += 1
+        return target_index
 
     def render_api(self, entry):
         self.api.configure(state="normal")
@@ -750,25 +999,31 @@ class PaletteApp:
         for tag in self.api.tag_names():
             if tag.startswith(("link_", "definition_")):
                 self.api.tag_delete(tag)
-        self.api.insert("end", entry.description + "\n")
+        self.api.insert("end", entry.description + "\n", "lead")
         if entry.kind == "Live":
             self.api.insert(
                 "end",
                 "userグループ / Python用のLive Template。Enterは略語をコピーします。\n",
                 "muted",
             )
-        if entry.legacy:
-            self.api.insert(
-                "end",
-                "旧APIの互換用です。新規コードはsegtree.pyのSegTree(op,e,v)を使います。\n",
-                "muted",
-            )
+        if entry.module_doc:
+            self.api.insert("end", "使い方・実行例\n", "heading")
+            self._document(self.api, entry.module_doc, docstring=True)
+        if entry.source_symbol:
+            self.api.insert("end", "選んだ機能の入力・使い方\n", "heading")
+            for name, signature, _, doc in entry.outline:
+                if name == entry.source_symbol or name.startswith(entry.source_symbol + "."):
+                    self.api.insert("end", signature + "\n", "signature")
+                    if doc:
+                        self._document(self.api, doc, docstring=True)
+            relative = Path(entry.source_path).relative_to(core.ROOT).as_posix()
+            self._markdown(self.api, f"[元Fileの使用例・関連機能を見る]({relative})\n")
         if entry.key not in self.docs_cache:
             self.docs_cache[entry.key] = core.documentation(entry)
         sections = self.docs_cache[entry.key]
         for heading, body in sections:
             self.api.insert("end", heading + "\n", "heading")
-            self._markdown(self.api, body + "\n")
+            self._document(self.api, body + "\n")
         if any(title == "verify問題" for title, _ in sections):
             self.api.insert(
                 "end", "※検証先の候補です。オンラインAC実績ではありません。\n", "muted"
@@ -791,11 +1046,13 @@ class PaletteApp:
                 tag, "<Leave>", lambda _: self.api.configure(cursor="xterm")
             )
             if doc:
-                self.api.insert("end", doc.strip() + "\n")
+                self._document(self.api, doc.strip(), docstring=True)
         self.api.insert("end", "関連ドキュメント\n", "heading")
         self._markdown(
             self.api,
-            "[ACL形式のAPI](ACL_API.md)　[全verify問題](VERIFY_PROBLEMS.md)　[ライブラリガイド](LIBRARY_GUIDE.md)\n",
+            "[目的から探す逆引き](LIBRARY_GUIDE.md#目的から探す逆引き)　"
+            "[全アルゴリズムの解説](ALGORITHMS.md)　"
+            "[ACL形式のAPI](ACL_API.md)　[全verify問題](VERIFY_PROBLEMS.md)\n",
         )
         self.api.configure(state="disabled")
         self.api.yview_moveto(0)
@@ -818,7 +1075,6 @@ class PaletteApp:
         state = "normal" if self.current else "disabled"
         for button in (
             self.copy_button,
-            self.keep_button,
             self.favorite,
             self.source_button,
         ):
@@ -827,39 +1083,38 @@ class PaletteApp:
             starred = self.current.key in self.preferences.favorites
             self.favorite.configure(text="★ 登録済み" if starred else "☆ お気に入り")
             what = "略語" if self.current.kind == "Live" else "コード"
-            self.copy_button.configure(text=f"{what}をコピーして閉じる  Enter")
+            self.copy_button.configure(text=f"{what}をコピー  Enter")
+        else:
+            self.copy_button.configure(text="候補を選んでコピー")
+            self.copy_hint.configure(text="左の候補を選ぶと、ここからコピーできます。")
+            self.copy_feedback.configure(text="")
 
     def _clipboard(self, text):
         self.root.clipboard_clear()
         self.root.clipboard_append(text)
         self.root.update_idletasks()
 
-    def copy_selected(self, close=True):
+    def copy_selected(self):
         if self.pending is not None:
             self.populate(preserve=False)
         if not self.current:
             return "break"
-        entry = self.current
+        self.copy_entry(self.current)
+        return "break"
+
+    def copy_entry(self, entry):
+        """一覧・目的ナビ共通。コピー後も両方の画面を開いたままにする。"""
         try:
             mode = "abbrev" if entry.kind == "Live" else "code"
             self._clipboard(core.prepare_code(entry, mode))
         except (tk.TclError, ValueError) as error:
             self.status.configure(text=f"コピーできませんでした: {error}")
+            self.copy_feedback.configure(text=self.status.cget("text"), style="SurfaceError.TLabel")
             return "break"
         self.preferences.record(entry)
-        if close:
-            self.close()
-        else:
-            suffix = f" / {self.preferences.error}" if self.preferences.error else ""
-            self.status.configure(text=f"コピーしました：{entry.name}{suffix}")
-        return "break"
-
-    def double_click(self, event):
-        row = self.tree.identify_row(event.y)
-        if row:
-            self.tree.selection_set(row)
-            self.select()
-            return self.copy_selected()
+        suffix = f" / {self.preferences.error}" if self.preferences.error else ""
+        self.status.configure(text=f"コピーしました：{entry.name}{suffix}")
+        self.copy_feedback.configure(text=self.status.cget("text"), style="SurfaceMuted.TLabel")
         return "break"
 
     def toggle_favorite(self):
@@ -968,6 +1223,8 @@ class PaletteApp:
         self.preferences.font_size = max(9, min(20, self.preferences.font_size + delta))
         for widget in (self.preview, self.gutter):
             widget.configure(font=("Consolas", self.preferences.font_size))
+        for widget in self._document_widgets():
+            self._style_document(widget)
         self.preferences.save()
         return "break"
 
@@ -991,6 +1248,8 @@ class PaletteApp:
         self.rendered_key = None
         self._update_groups()
         self.populate()
+        if self.navigator:
+            self.navigator.reload()
         self.status.configure(
             text=f"再読込しました：{len(entries)}件 / 警告{len(warnings)}件"
         )
@@ -1013,9 +1272,35 @@ class PaletteApp:
         if target.startswith(("https://", "http://")):
             webbrowser.open(target)
         else:
-            path = (core.ROOT / target.split("#", 1)[0]).resolve()
+            filename, _, anchor = target.partition("#")
+            path = (core.ROOT / filename).resolve()
             if path.suffix == ".md" and path.is_relative_to(core.ROOT):
-                self.show_document(path)
+                self.show_document(path, anchor)
+            elif path.suffix == ".py" and path.is_relative_to(core.ROOT):
+                entry = next(
+                    (
+                        e
+                        for e in self.entries
+                        if e.kind == "File" and Path(e.path).resolve() == path
+                    ),
+                    None,
+                )
+                if entry is None:
+                    self.status.configure(
+                        text="対象のFileが見つかりません。F5で再読み込みしてください。"
+                    )
+                    return "break"
+                self.search_for("@file " + entry.name)
+                for i, hit in enumerate(self.hits):
+                    if hit.entry.key == entry.key:
+                        self.tree.selection_set(str(i))
+                        self.tree.focus(str(i))
+                        self.tree.see(str(i))
+                        self.select()
+                        break
+                self.tabs.select(self.api_page)
+                self.root.lift()
+                self.query.focus_set()
         return "break"
 
     def text_window(self, title):
@@ -1039,97 +1324,89 @@ class PaletteApp:
         scroll = ttk.Scrollbar(window, command=text.yview)
         scroll.grid(row=0, column=1, sticky="ns")
         text.configure(yscrollcommand=scroll.set)
-        ttk.Button(window, text="閉じる", command=window.destroy).grid(
-            row=1, column=0, sticky="e", padx=12, pady=8
-        )
+        self.document_views.append(text)
+        self._style_document(text)
+        footer = ttk.Frame(window, padding=(12, 8))
+        footer.grid(row=1, column=0, columnspan=2, sticky="ew")
+        ttk.Label(footer, text="Ctrl＋ホイールで拡大・縮小", style="Muted.TLabel").pack(side="left")
+        for label, delta in [("−", -1), ("＋", 1)]:
+            ttk.Button(
+                footer, text=label, width=3, command=lambda d=delta: self.resize_font(d)
+            ).pack(side="left", padx=3)
+        ttk.Button(footer, text="閉じる", command=window.destroy).pack(side="right")
         window.bind("<Escape>", lambda _: window.destroy())
         return window, text
 
-    def show_document(self, path):
+    def show_document(self, path, anchor=""):
         try:
             content = Path(path).read_text(encoding="utf8")
         except OSError as error:
             self.status.configure(text=f"説明を開けません: {error}")
             return
         _, text = self.text_window(Path(path).stem)
-        text.tag_configure(
-            "heading",
-            foreground=self.colors["accent"],
-            font=("Yu Gothic UI", 13, "bold"),
-            spacing1=10,
-            spacing3=5,
-        )
-        text.tag_configure("code", font=("Consolas", 10))
-        in_code = False
-        for line in content.splitlines():
-            if line.startswith("```"):
-                in_code = not in_code
-                text.insert("end", "\n")
-            elif in_code:
-                text.insert("end", line + "\n", "code")
-            elif line.startswith("#"):
-                text.insert("end", line.lstrip("# ") + "\n", "heading")
-            elif line.startswith("|"):
-                if re.fullmatch(r"[|:\- ]+", line):
-                    continue
-                cells = [cell.strip() for cell in line.strip("| ").split("|")]
-                self._markdown(text, "\n".join(cells).replace("<br>", "\n") + "\n\n")
-            else:
-                self._markdown(text, line + "\n")
+        target_index = self._document(text, content, anchor=anchor)
         text.configure(state="disabled")
+        if target_index is not None:
+            text.see(target_index)
 
     def show_help(self):
         window, text = self.text_window("使い方・読み込み状況")
         message = """検索して、↑↓で選び、Enterでコピー。\n\n
-File：コード全体をコピーします。解答のmainより上へ貼り付けます。
-Live：user/Pythonの略語をコピーします。PyCharmへ貼り付けてTabで展開します。
+**File**：コード全体をコピーします。解答のmainより上へ貼り付けます。
+**Live**：user/Pythonの略語をコピーします。PyCharmへ貼り付けてTabで展開します。
 コードの一部だけが必要なら、プレビューを選択してCtrl+Cを使えます。
 
-Enter                  コピーして閉じる（検索欄・一覧どちらからでも）
-Ctrl+Enter             コピーして続ける
-Ctrl+L                 検索欄へ戻って全選択
-↑ / ↓                  候補を移動
-PageUp / PageDown      候補を8件ずつ移動
-Ctrl+D                 選択した候補をお気に入りに登録・解除
-Alt+1 / Alt+2 / Alt+3   すべて / File / Live
-F2                     コードとAPI・verifyを切り替え
-Ctrl+F                 コード内検索
-F3 / Shift+F3          コード内の次 / 前の一致
-F4                     元ファイルの保存場所を開く
-F5                     設定・スニペット・テンプレートを再読込
-Esc                    終了（コード内検索中は検索欄を閉じる）
-Ctrl+マウスホイール     コードの文字サイズを変更
+## キー操作
+- **Enter / Ctrl+Enter**：コピー（画面を開いたまま、検索欄・一覧どちらからでも）
+- **Ctrl+L**：検索欄へ戻って全選択
+- **↑ / ↓**：候補を移動
+- **PageUp / PageDown**：候補を8件ずつ移動
+- **Ctrl+D**：選択した候補をお気に入りに登録・解除
+- **Alt+1 / Alt+2 / Alt+3**：すべて / File / Live
+- **F2**：使い方・解説・APIとコードを切り替え（最初は使い方を表示）
+- **Ctrl+F**：コード内検索
+- **F3 / Shift+F3**：コード内の次 / 前の一致
+- **F4**：元ファイルの保存場所を開く
+- **F5**：設定・スニペット・テンプレートを再読込
+- **F6**：対象・目的・条件を順に選んで候補を絞る
+- **Esc**：終了（コード内検索中は検索欄を閉じる）
+- **Ctrl+マウスホイール / −・＋**：コード・解説・ガイドの文字サイズを変更
 
+## 検索のコツ
+左で検索して候補を選び、右で使い方を読み、右下のボタンからコピーします。
+Fileはコード全体、LiveはPyCharmでTab展開する略語です。
+機能別Live Templateはlis_lengthなどの名前です。重複する名前には元ファイル名を末尾に付けます。
 検索はスペース区切りでAND。引用符でフレーズ、-語で除外できます。
-例：range sum　 /　@file セグ木 -compat　 /　"heavy light"
+例：range sum　 /　@file セグ木 -lazy　 /　"heavy light"
 大文字小文字・全角英数字・名前の_の差を吸収します。
 通常の検索で候補がないときだけ、タイプミス・短い略記を探します。
 一致度を優先し、同点ならお気に入り・コピー履歴・Fileを上にします。
-旧API専用の_compatは通常の候補より後に表示します。
+名前が分からないときは右上の「目的から探す」（F6）へ。
+6分類から目的を選び、候補の条件・入力・計算量・使用例を確認できます。
+目的ナビではEnterはボタンの選択、Ctrl+Enterはコピー、Alt+←は戻る操作です。
+逆引きのAPIリンクからFileを選び、使い方を表示できます。
 
+## 保存される設定
 お気に入り・直近20件・テーマ・文字サイズ・ウィンドウサイズを保存します。
 検索語とコードの内容は履歴へ保存しません。
 
 """
-        self._markdown(
+        self._document(
             text,
-            message
-            + "[ACL形式のAPI](ACL_API.md)　[verify問題一覧](VERIFY_PROBLEMS.md)　[操作ガイド](LOCAL_USAGE.md)\n\n",
+            message + "## 関連ガイド\n[目的から探す逆引き](LIBRARY_GUIDE.md#目的から探す逆引き)　"
+            "[機能別Live Template](LIVE_TEMPLATES.md)　[ACL形式のAPI](ACL_API.md)　[verify問題一覧](VERIFY_PROBLEMS.md)　[操作ガイド](LOCAL_USAGE.md)\n\n",
         )
-        text.insert(
-            "end",
-            "Live Template読込先\n"
-            + "\n".join(str(p) for p in self.search_dirs)
-            + "\n\n",
-        )
+        text.insert("end", "Live Template読込先\n", "heading")
+        text.insert("end", "\n".join(str(p) for p in self.search_dirs) + "\n\n")
         text.insert("end", "表示設定: " + str(self.preferences.path) + "\n")
         if self.warnings:
-            text.insert("end", "\n読込警告\n" + "\n\n".join(self.warnings))
+            text.insert("end", "読込警告\n", "heading")
+            text.insert("end", "\n\n".join(self.warnings))
         if self.preferences.error:
             text.insert("end", "\n" + self.preferences.error)
         text.configure(state="disabled")
         ttk.Button(window, text="機能チェックリスト", command=self.show_checklist).grid(
-            row=1, column=0, sticky="w", padx=12, pady=8
+            row=2, column=0, sticky="w", padx=12, pady=(0, 8)
         )
         return "break"
 
@@ -1141,10 +1418,9 @@ Ctrl+マウスホイール     コードの文字サイズを変更
         )
         for item in core.wishlist_items(self.entries):
             status = "✓" if item["detected"] else "—"
-            text.insert(
-                "end",
-                f"{status} {item['name']}  /  {item.get('category', '')}\n    {item.get('description', '')}\n\n",
-            )
+            text.insert("end", f"{status} {item['name']}\n", "subheading")
+            text.insert("end", item.get("category", "") + "\n", "muted")
+            text.insert("end", item.get("description", "") + "\n\n")
         text.configure(state="disabled")
 
     def close(self):

@@ -24,7 +24,36 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N, M = NMI()
+    S = [SI() for _ in range(N)]
+    T = [SI() for _ in range(M)]
+    ans = [0] * N
+    for t in T:
+        L = []
+        ok = False
+        for i, s in enumerate(S):
+            if len(s) != len(t):
+                continue
+            if s == t:
+                ans[i] += 1
+                # print(s)
+                ok = True
+                break
+            c = 0
+            for ss, tt in zip(s, t):
+                if ss != tt:
+                    c += 1
+            if c == 1:
+                L.append(i)
+        if ok:
+            continue
+        if len(L) == 1:
+            ans[L[0]] += 1
+            # print(t, L[0])
+        else:
+            pass
+            # print("#", t)
+    print(*ans, sep="\n")
 
 
 if __name__ == "__main__":

@@ -8,9 +8,27 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import cp_palette as p
+from purpose_catalog import load_purposes
 
 
 class PaletteTest(unittest.TestCase):
+    def test_purpose_catalog_covers_shipped_files_and_routes(self):
+        catalog = load_purposes()
+        self.assertEqual(len(catalog), 234)
+        self.assertEqual(len({item.path[0] for item in catalog}), 6)
+        self.assertNotIn("その他", {item.path[0] for item in catalog})
+        expected = {path.resolve() for folder in ("library", "snippets")
+                    for path in (p.ROOT / folder).rglob("*.py")}
+        self.assertEqual({(p.ROOT / item.target).resolve() for item in catalog}, expected)
+        for query, target in [("一点 加算", "snippets/structures/BIT.py"),
+                              ("負コスト", "library/graphs/shortest_paths.py"),
+                              ("更新のない k番目", "library/structures/wavelet_matrix.py"),
+                              ("桁 倍数", "library/basic/digit_dp.py")]:
+            found = [item for item in catalog if item.matches(query)]
+            self.assertTrue(any(item.target == target for item in found), query)
+        bellman = next(item for item in catalog if item.api == "bellman_ford")
+        self.assertEqual(bellman.path, ("グラフ・木", "最短距離・経路を求める"))
+
     def setUp(self):
         # ユーザーの実テンプレートを読み込まず、テスト用XMLだけで検証する。
         mock_dirs = patch.object(p, "jetbrains_dirs", return_value=[])
@@ -100,7 +118,7 @@ class PaletteTest(unittest.TestCase):
                 "keywords": {},
             }
         )
-        self.assertGreaterEqual(sum(e.kind == "File" for e in items), 17)
+        self.assertGreaterEqual(sum(e.kind == "File" for e in items), 16)
         for e in items:
             self.assertEqual(e.provenance, "ai")
             compile(e.code, e.path, "exec")
@@ -115,12 +133,7 @@ class PaletteTest(unittest.TestCase):
             "ClosestPair",
         ):
             self.assertIn(n, yes)
-        compat = next(e for e in items if e.name == "SegTree_compat")
-        namespace = {}
-        exec(compile(compat.code, compat.path, "exec"), namespace)
-        tree = namespace["SegTree"]([3, 1, 4], min, float("inf"))
-        tree.update(1, 5)
-        self.assertEqual(tree.query(0, 3), 3)
+        self.assertFalse(any(e.name.endswith("_compat") for e in items))
 
     def test_eol_dollar_expansion(self):
         e = p.Entry("x", "Live", "Py", "", "a = $$\n$END$", "x", "x")
@@ -133,42 +146,42 @@ class PaletteTest(unittest.TestCase):
                 "File",
                 "structures",
                 "セグメント木",
-                "class SegTree: pass",
+                "class segtree: pass",
                 "segtree.py",
-                classes=("SegTree",),
+                classes=("segtree",),
             ),
             p.Entry(
-                "SegTree_compat",
+                "lazy_segtree",
                 "File",
                 "structures",
-                "旧API",
-                "class SegTree: pass",
-                "compat.py",
-                classes=("SegTree",),
+                "遅延セグメント木",
+                "class segtree: pass",
+                "lazy.py",
+                classes=("segtree",),
             ),
             p.Entry(
                 "segtree",
                 "Live",
                 "user",
                 "セグメント木",
-                "class SegTree: pass",
+                "class segtree: pass",
                 "user.xml",
                 "segtree",
-                classes=("SegTree",),
+                classes=("segtree",),
             ),
             p.Entry(
                 "other",
                 "File",
                 "graphs",
                 "heavy light",
-                "# SegTree is mentioned here",
+                "# segtree is mentioned here",
                 "other.py",
             ),
         ]
         for query in ("ＳｅｇＴｒｅｅ", "seg_tree", "セグ木", "segtreee"):
             with self.subTest(query=query):
                 self.assertIs(p.match_entries(entries, query)[0], entries[0])
-        self.assertEqual(p.match_entries(entries, "@file セグ木 -compat"), [entries[0]])
+        self.assertEqual(p.match_entries(entries, "@file セグ木 -lazy"), [entries[0]])
         self.assertEqual(p.match_entries(entries, '"heavy light"'), [entries[3]])
         self.assertEqual(p.match_entries(entries, "segtree", kind="Live"), [entries[2]])
         self.assertEqual(p.match_entries(entries, "", group="graphs"), [entries[3]])
@@ -203,8 +216,37 @@ class PaletteTest(unittest.TestCase):
         self.assertEqual(entry.outline[0][1], "A(n=0)")
         self.assertEqual(entry.outline[1][1], "A.size")
         docs = dict(p.documentation(entry))
-        self.assertIn("FenwickTree", docs["ACLの呼び出し方"])
+        self.assertIn("i & -i", docs["アルゴリズムの解説"])
+        self.assertNotIn("range_affine_sum_squares", docs["アルゴリズムの解説"])
+        self.assertIn("一点を加算して区間の合計", docs["目的から選ぶ"])
+        self.assertIn("一点加算 区間和", docs["目的から選ぶ"])
+        self.assertNotIn("主な公開クラス", docs["目的から選ぶ"])
+        self.assertIn("fenwick_tree", docs["ACLの呼び出し方"])
         self.assertIn("practice2_b", docs["verify問題"])
+        recipes = p.Entry(
+            "lazy_segtree_actions",
+            "File",
+            "structures",
+            "",
+            "",
+            str(p.ROOT / "library/structures/lazy_segtree_actions.py"),
+        )
+        recipe_docs = dict(p.documentation(recipes))
+        self.assertIn("a²*sum2", recipe_docs["アルゴリズムの解説"])
+        self.assertIn("range_affine_sum_squares", recipe_docs["セグ木の派生版・設計"])
+        self.assertIn("二乗和", recipe_docs["目的から選ぶ"])
+        abc = p.Entry(
+            "digit_dp",
+            "File",
+            "basic",
+            "",
+            "",
+            str(p.ROOT / "library/basic/digit_dp.py"),
+        )
+        abc_docs = dict(p.documentation(abc))
+        self.assertIn("started", abc_docs["アルゴリズムの解説"])
+        self.assertIn("count_digit_sum_mod", abc_docs["ABCでの使い分け"])
+        self.assertIn("ABC154 E", abc_docs["verify問題"])
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "state.json"
             prefs = p.Preferences(path)

@@ -1,11 +1,28 @@
 """二重Rolling Hashと一点更新版。出典: _Strings.py, ABC331F。
+
 文字列または整数列。0-indexed・半開区間。衝突はゼロにはならない。
 PyPy向け。Codonでも乗算が64bit内になる約10^9の法を使う（コンパイル未確認）。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    rh = RollingHash('abcabc')
+    rh.query(0, 3) == rh.query(3, 6)  # => True
+    dynamic = RollingHashSegTree('abc')
+    dynamic.set(1, 'x')
+    dynamic.query(0, 3) == RollingHash('axc').query(0, 3)  # => True
 """
 
 
 class RollingHash:
+    """文字列または整数列valuesの静的な二重Rolling Hash。構築O(n)、queryはO(1)。
+    異なるオブジェクト間ではbaseを揃える。比較時は長さも一致することを確認する。
+    ハッシュ一致は確率的な判定で、衝突の可能性がある。
+    入力: valuesはstrまたは整数列、baseはハッシュの基数の整数。n/N=len(values)。構築O(N)時間・空間。
+    問い合わせは0<=left<=right<=Nの半開区間、更新添字は0-indexed。
+    """
     def __init__(self, values, base=911382323):
+        """入力: valuesはstrまたは整数列、baseはハッシュの基数の整数。n/N=len(values)。構築O(N)時間・空間。
+        問い合わせは0<=left<=right<=Nの半開区間、更新添字は0-indexed。
+        """
         if not 1 < base < 1000000007:
             raise ValueError("base out of range")
         self.n = len(values)
@@ -22,6 +39,10 @@ class RollingHash:
             self.powers.append(p)
 
     def query(self, left, right):
+        """[left,right)のハッシュを2つの整数のtupleで返す。空区間は(0,0)。
+        位置には依存しないため、同じbaseで同じ長さの部分列同士を比較できる。
+        left/rightは整数の半開区間境界。時間・追加空間O(1)。
+        """
         if not 0 <= left <= right <= self.n:
             raise IndexError("invalid range")
         result = []
@@ -31,7 +52,16 @@ class RollingHash:
 
 
 class RollingHashSegTree:
+    """文字列または整数列valuesへの一点更新付き二重Rolling Hash。
+    構築O(n)、set/queryはO(log n)。baseを揃えればRollingHashとも比較可能。
+    比較時は部分列の長さも確認する。衝突の可能性は残る。
+    入力: valuesはstrまたは整数列、baseはハッシュの基数の整数。n/N=len(values)。構築O(N)時間・空間。
+    問い合わせは0<=left<=right<=Nの半開区間、更新添字は0-indexed。
+    """
     def __init__(self, values, base=911382323):
+        """入力: valuesはstrまたは整数列、baseはハッシュの基数の整数。n/N=len(values)。構築O(N)時間・空間。
+        問い合わせは0<=left<=right<=Nの半開区間、更新添字は0-indexed。
+        """
         if not 1 < base < 1000000007:
             raise ValueError("base out of range")
         self.n = len(values)
@@ -56,6 +86,9 @@ class RollingHashSegTree:
         )
 
     def set(self, index, value):
+        """0-indexedの位置indexをvalue（1文字または整数）に変更する。戻り値なし。
+        valueは1文字のstrまたは整数。indexは0..N-1。時間O(log(N+1))、追加空間O(1)。
+        """
         if not 0 <= index < self.n:
             raise IndexError(index)
         if isinstance(value, str):
@@ -68,6 +101,8 @@ class RollingHashSegTree:
             i >>= 1
 
     def query(self, left, right):
+        """[left,right)の二重ハッシュtuple。空区間は(0,0)。O(log n)。
+        """
         if not 0 <= left <= right <= self.n:
             raise IndexError("invalid range")
         left += self.size

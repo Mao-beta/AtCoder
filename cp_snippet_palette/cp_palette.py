@@ -57,18 +57,18 @@ STARTER_ORDER = {
 }
 # 表記揺れと、コンテスト中に入力しやすい短い呼び名。
 ALIASES = [
-    (("SegTree", "segtree"), "セグ木 せぐき セグメント木 segment tree"),
-    (("LazySegTree", "lazy_segtree"), "遅延セグ木 遅延評価 lazy segment tree"),
-    (("DSU", "UnionFind"), "uf union find unionfind disjoint set 連結判定 素集合"),
-    (("FenwickTree", "BIT"), "bit fenwick tree フェニック木 フェンウィック木 区間和"),
-    (("SCCGraph", "SCC"), "scc 強連結成分 強連結成分分解"),
-    (("TwoSAT", "two_sat"), "2sat 2-sat two sat 充足可能性"),
+    (("segtree", "segtree"), "セグ木 せぐき セグメント木 segment tree"),
+    (("lazy_segtree", "lazy_segtree"), "遅延セグ木 遅延評価 lazy segment tree"),
+    (("dsu", "UnionFind"), "uf union find unionfind disjoint set 連結判定 素集合"),
+    (("fenwick_tree", "BIT"), "bit fenwick tree フェニック木 フェンウィック木 区間和"),
+    (("scc", "SCC"), "scc 強連結成分 強連結成分分解"),
+    (("two_sat", "two_sat"), "2sat 2-sat two sat 充足可能性"),
     (
         ("dijkstra", "template_Dijkstra", "shortest_paths"),
         "最短路 さいたんろ ダイクストラ shortest path",
     ),
     (
-        ("polynomial", "FormalPowerSeries"),
+        ("polynomial", "FPS"),
         "fps ntt fft 形式的冪級数 多項式 畳み込み たたみこみ",
     ),
     (("Comb", "combinatorics"), "ncr nck combination 組合せ 組み合わせ 二項係数"),
@@ -76,8 +76,8 @@ ALIASES = [
     (("compress", "sequence"), "座圧 座標圧縮 ざひょうあっしゅく"),
     (("LowLink",), "low link 橋 関節点"),
     (("HLD",), "hl分解 重軽分解 heavy light decomposition"),
-    (("MFGraph",), "最大流 max flow dinic ディニック"),
-    (("MCFGraph",), "最小費用流 min cost flow"),
+    (("mf_graph",), "最大流 max flow dinic ディニック"),
+    (("mcf_graph",), "最小費用流 min cost flow"),
     (("suffix_array",), "sa suffix array 接尾辞配列 サフィックスアレイ"),
     (("rolling_hash", "RollingHash"), "ローリングハッシュ rolling hash rh"),
     (("WaveletMatrix",), "wm ウェーブレット行列 ウェーブレットマトリクス 区間k番目"),
@@ -140,6 +140,16 @@ def jetbrains_dirs():
     return found
 
 
+def template_source(description):
+    """このツールで登録したLive Templateの元File。説明末尾の印だけを使う。"""
+    match = re.search(r"\[cp-palette: ((?:library|snippets)/[^\]\n]+\.py)(?:#[A-Za-z_]\w*)?\]$", description)
+    if match:
+        path = (ROOT / match[1]).resolve()
+        if path.is_relative_to(ROOT):
+            return path
+    return None
+
+
 @dataclass
 class Entry:
     name: str
@@ -154,6 +164,8 @@ class Entry:
     provenance: str = "unknown"
     source_url: str = ""
     keywords: str = ""
+    source_path: str = ""  # 同梱Fileから登録したLive Templateの説明を結び付ける。
+    source_symbol: str = ""
 
     @property
     def key(self):
@@ -164,10 +176,6 @@ class Entry:
     @property
     def category(self):
         return CATEGORIES.get(self.group, self.group if self.group != "." else "その他")
-
-    @property
-    def legacy(self):
-        return self.name.endswith("_compat")
 
     @cached_property
     def search_fields(self):
@@ -203,6 +211,15 @@ class Entry:
         }
 
     @cached_property
+    def module_doc(self):
+        """ファイル冒頭の使い方を取得する。スニペットのコードは実行しない。"""
+        try:
+            tree = ast.parse(self.code.replace("$END$", ""))
+        except (SyntaxError, ValueError):
+            return ""
+        return ast.get_docstring(tree) or ""
+
+    @cached_property
     def outline(self):
         """(表示名, 呼び出し方, 行番号, docstring)。コードは実行しない。"""
         result = []
@@ -210,23 +227,34 @@ class Entry:
             tree = ast.parse(self.code.replace("$END$", ""))
         except (SyntaxError, ValueError):
             return result
+        classes = {n.name: n for n in tree.body if isinstance(n, ast.ClassDef)}
+
+        def constructor(node, seen=()):
+            if node.name in seen:
+                return None
+            for method in node.body:
+                if isinstance(method, ast.FunctionDef) and method.name == "__init__":
+                    return method
+            # 同じファイルで定義された親クラスのコンストラクタを表示する。
+            for base in node.bases:
+                if isinstance(base, ast.Name) and base.id in classes:
+                    inherited = constructor(classes[base.id], (*seen, node.name))
+                    if inherited:
+                        return inherited
+            return None
+
         for node in tree.body:
             if isinstance(node, ast.ClassDef) and not node.name.startswith("_"):
-                init = next(
-                    (
-                        n
-                        for n in node.body
-                        if isinstance(n, ast.FunctionDef) and n.name == "__init__"
-                    ),
-                    None,
-                )
+                init = constructor(node)
                 args = signature_args(init) if init else ""
                 result.append(
                     (
                         node.name,
                         f"{node.name}({args})",
                         node.lineno,
-                        ast.get_docstring(node) or "",
+                        ast.get_docstring(node)
+                        or (ast.get_docstring(init) if init else "")
+                        or "",
                     )
                 )
                 for method in node.body:
@@ -392,12 +420,17 @@ def load_entries(cfg=None, warnings=None):
                     seen_xml.add(signature)
                     ms, cs = inspect_python(code)
                     origin, url = metadata(name, path, cfg)
+                    description = item.get("description", "")
+                    source = template_source(description)
+                    feature = re.search(r"#([A-Za-z_]\w*)\]$", description) if source else None
+                    if source:
+                        description = description[:description.rfind("[cp-palette:")].rstrip()
                     entries.append(
                         Entry(
                             name,
                             "Live",
                             group,
-                            item.get("description", ""),
+                            description,
                             code,
                             str(path),
                             name,
@@ -405,7 +438,9 @@ def load_entries(cfg=None, warnings=None):
                             cs,
                             origin,
                             url,
-                            " ".join(cfg.get("keywords", {}).get(name, [])),
+                            " ".join(cfg.get("keywords", {}).get(source.stem if source else name, [])),
+                            str(source) if source else "",
+                            feature[1] if feature else "",
                         )
                     )
             except (ET.ParseError, OSError, UnicodeError) as exc:
@@ -585,7 +620,6 @@ def search_entries(
     hits.sort(
         key=lambda h: (
             -h.score,
-            h.entry.legacy,
             h.entry.key not in favorites if scope != "recent" else False,
             recent_order.get(h.entry.key, 100000),
             h.entry.kind != "File",
@@ -679,24 +713,52 @@ class Preferences:
 
 
 def documentation(entry):
-    """同梱するAPI/verify表の該当行だけを表示。問題コードは読み込まない。"""
+    """選択ファイルの解説と逆引き・API・verify表を表示。コードは実行しない。"""
     try:
-        rel = Path(entry.path).relative_to(ROOT).as_posix()
+        rel = Path(entry.source_path or entry.path).relative_to(ROOT).as_posix()
     except ValueError:
         return []
     sections = []
+    algorithms = ROOT / "ALGORITHMS.md"
+    if algorithms.exists():
+        marker = r"^対象: \[[^\n]+\]\(" + re.escape(rel) + r"\)\n"
+        for section in algorithms.read_text(encoding="utf8").split("\n## "):
+            match = re.search(marker, section, re.MULTILINE)
+            if match:
+                sections.append(
+                    ("アルゴリズムの解説", section[match.end() :].strip())
+                )
+                break
     for filename, title in [
+        ("LIBRARY_GUIDE.md", "目的から選ぶ"),
+        ("ABC_TOOLKIT.md", "ABCでの使い分け"),
+        ("SEGTREE_RECIPES.md", "セグ木の派生版・設計"),
         ("ACL_API.md", "ACLの呼び出し方"),
         ("VERIFY_PROBLEMS.md", "verify問題"),
     ]:
         path = ROOT / filename
         if not path.exists():
             continue
+        content = path.read_text(encoding="utf8")
+        purpose = title == "目的から選ぶ"
+        if purpose:
+            _, heading, content = content.partition("## 目的から探す逆引き\n")
+            if not heading:
+                continue
+            content = content.split("\n## ", 1)[0]
+            content = re.sub(r"<!-- navigator: .+? -->\s*", "", content)
         rows = []
-        for line in path.read_text(encoding="utf8").splitlines():
+        for line in content.splitlines():
             if f"]({rel})" in line and line.startswith("|"):
                 cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-                rows.append("\n".join(cells[1:]).replace("<br>", "\n"))
+                if purpose and len(cells) == 4:
+                    rows.append(
+                        f"目的：{cells[0]}\n使うもの：{cells[1]}\n"
+                        f"選ぶ条件：{cells[2]}\n検索語：{cells[3]}"
+                    )
+                elif not purpose:
+                    shown = cells if title == "ABCでの使い分け" else cells[1:]
+                    rows.append("\n".join(shown).replace("<br>", "\n"))
         if rows:
             sections.append((title, "\n\n".join(rows)))
     return sections

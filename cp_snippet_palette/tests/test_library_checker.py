@@ -231,18 +231,19 @@ class LibraryCheckerTests(unittest.TestCase):
                 if all((row & x).bit_count() % 2 == b for row, b in zip(rows, rhs))
             }
             answer = math["linear_equations_gf2"](rows, rhs, 3)
-            rank, old_solution = math["solve_gf2"](rows, rhs, 3)
+            particular = math["solve_gf2"](rows, rhs, 3)
             if not expected:
                 self.assertIsNone(answer)
-                self.assertIsNone(old_solution)
+                self.assertIsNone(particular)
             else:
+                rank, particular_solution = particular
                 solution, basis = answer
                 span = {solution}
                 for value in basis:
                     span |= {x ^ value for x in span}
                 self.assertEqual(span, expected)
                 self.assertEqual(rank, 3 - len(basis))
-                self.assertEqual(solution, old_solution)
+                self.assertEqual(solution, particular_solution)
         for n in (1, 2, 4, 8):
             a, b = (
                 [rng.randrange(-10, 10) for _ in range(n)],
@@ -262,6 +263,13 @@ class LibraryCheckerTests(unittest.TestCase):
         builder = runpy.run_path(str(ROOT / "verify" / "build.py"))
         count = 0
         for problem in builder["problems"]():
+            if problem not in {
+                "queue_operate_all_composite", "segment_add_get_min",
+                "biconnected_components", "assignment", "matrix_det", "matrix_rank",
+                "inverse_matrix", "system_of_linear_equations",
+                "system_of_linear_equations_mod_2", "bitwise_xor_convolution",
+            }:
+                continue  # 続編の50問はtest_library_checker_round2.pyで検証する。
             source = builder["bundle"](problem)
             self.assertNotIn("from cp_snippet_palette", source)
             for sample in sorted((ROOT / "verify" / "samples" / problem).glob("*.in")):

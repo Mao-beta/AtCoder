@@ -1,7 +1,19 @@
 """小さいグラフ向けの厳密解法。
+
 出典: AOJ/DPL_2_A.py, AOJ/DPL_2_B.py, yuki_0114.py,
 code_thanks_festival_2017_g.py, ARC171D。PyPy向け。整数bitsetは任意精度。
+
 大きなnに使用しない。指数配列の大きさは各関数の説明を参照。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+distanceは距離行列、edgesは(u,v,重み)、graphは隣接頂点のリスト。
+
+いずれも0-indexed。指数時間の処理なので頂点数・端点数が小さい場合に使う。
+    tsp_cycle([[0, 2, 4], [2, 0, 3], [4, 3, 0]])  # => 9
+    steiner_tree(3, [(0, 1, 2), (1, 2, 3)], [0, 2])  # => 5
+    chinese_postman(3, [(0, 1, 2), (1, 2, 3)])  # => 10
+    graph = [[1], [0, 2], [1]]
+    sorted(maximum_independent_set(graph)), chromatic_number(graph)  # => ([0, 2], 2)
 """
 
 from heapq import heapify, heappush, heappop
@@ -10,6 +22,8 @@ from heapq import heapify, heappush, heappop
 def tsp_cycle(distance, start=0, inf=1 << 60):
     """O(n²2^n)時間・O(n2^n)空間。全頂点を一度ずつ通りstartへ戻る最小コスト。
     到達不能の辺はinf。空グラフ・1頂点は0。解なしはinf。
+    入力: distanceはN×Nの整数費用行列。distance[u][v]はu→vの費用、辺なしはinf。startは0..N-1。n=N=len(distance)。
+    infは有限な巡回費用を超える整数。
     """
     n = len(distance)
     if n <= 1:
@@ -42,6 +56,9 @@ def tsp_cycle(distance, start=0, inf=1 << 60):
 def steiner_tree(n, edges, terminals, inf=1 << 60):
     """非負重み無向グラフ。O(3^t*n+2^t*(n+m)log n)、空間O(2^t*n)。
     多重辺可。端点が0/1個なら0。接続不能はinf。端点数tが小さい場合専用。
+    入力: nは頂点数、edges=[(u,v,weight),...]は無向辺を1本ずつ並べた列。0<=u,v<n、weightは非負整数。
+    m=len(edges)、infは有限な解を超える番兵。
+    terminalsは必ず接続する頂点番号の列。tは異なる端点数。
     """
     terminals = list(dict.fromkeys(terminals))
     if any(not 0 <= v < n for v in terminals):
@@ -81,6 +98,9 @@ def steiner_tree(n, edges, terminals, inf=1 << 60):
 def chinese_postman(n, edges, inf=1 << 60):
     """非負重み無向グラフの全辺を通る最短閉路。O(n³+k²2^k)、kは奇数次数頂点数。
     孤立点は無視。辺のある成分が非連結ならinf。空辺集合は0。
+    入力: nは頂点数、edges=[(u,v,weight),...]は無向辺を1本ずつ並べた列。0<=u,v<n、weightは非負整数。
+    m=len(edges)、infは有限な解を超える番兵。
+    空間O(n²+2^k)、kは奇数次数の頂点数。
     """
     dist = [[inf] * n for _ in range(n)]
     degree = [0] * n
@@ -121,7 +141,10 @@ def chinese_postman(n, edges, inf=1 << 60):
 
 
 def maximum_independent_set(graph):
-    """分枝探索、最悪O(2^n)。無向・自己ループなし。解の頂点リストを返す。"""
+    """分枝探索、最悪O(2^n)。無向・自己ループなし。解の頂点リストを返す。
+    入力: graphはgraph[u]=[v,...]の隣接リスト（長さNのlist of lists）。
+    頂点番号は0..N-1、N=len(graph)、M=sum(map(len,graph))。 無向辺を両方向へ格納し、自己ループは不可。n=N。
+    """
     n = len(graph)
     adjacency = [sum(1 << v for v in set(row)) for row in graph]
     if any(adjacency[u] & (1 << u) for u in range(n)):
@@ -147,6 +170,8 @@ def maximum_independent_set(graph):
 def chromatic_number(graph):
     """独立集合DP＋包除原理。O(n*2^n)回の整数演算、空間O(2^n)。
     無向・自己ループなし。巨大な中間整数を正確に扱うためPyPy専用。
+    入力: graphはgraph[u]=[v,...]の隣接リスト（長さNのlist of lists）。
+    頂点番号は0..N-1、N=len(graph)、M=sum(map(len,graph))。 無向辺を両方向へ格納し、自己ループは不可。n=N。
     """
     n = len(graph)
     adjacency = [sum(1 << v for v in set(row)) for row in graph]

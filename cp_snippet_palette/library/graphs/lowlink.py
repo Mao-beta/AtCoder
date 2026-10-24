@@ -2,12 +2,29 @@
 O(V+E)、非再帰、0-indexed。bridgesは入力辺ID、articulationは関節点集合。
 biconnected_components()で頂点二重連結成分、block_cut_tree()で所属関係の森。
 PyPy向け。Codonでは入力edgesを整数ペアのlistにする。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    low = LowLink(3, [(0, 1), (1, 2)])
+    sorted(low.bridges), sorted(low.articulation)  # => ([0, 1], [1])
+    sorted(sorted(c) for c in low.biconnected_components())  # => [[0, 1], [1, 2]]
+    len(low.block_cut_tree())  # 元頂点3 + 成分頂点2
+    # => 5
+    low.two_edge_connected_components()  # => [[0], [1], [2]]
 """
 
 
 class LowLink:
+    """n頂点の無向グラフedges=[(u,v),...]を解析する。0-indexed、非連結・多重辺可。
+    bridgesは橋の入力辺IDのlist、articulationは関節点のset。
+    頂点二重連結成分はbiconnected_components()で取得。構築O(V+E)、非再帰。
+    構築後の辺追加には対応しない。
+    入力: nは頂点数V、edgesは無向辺(u,v)を1本ずつ並べた列。E=len(edges)、0<=u,v<n。構築O(V+E)時間・空間。
+    """
     def __init__(self, n, edges):
+        """入力: nは頂点数V、edgesは無向辺(u,v)を1本ずつ並べた列。E=len(edges)、0<=u,v<n。構築O(V+E)時間・空間。
+        """
         edges = list(edges)
+        self._edges = edges
         graph = [[] for _ in range(n)]
         for eid, (u, v) in enumerate(edges):
             graph[u].append((v, eid))
@@ -93,3 +110,28 @@ class LowLink:
                 graph[vertex].append(n + i)
                 graph[n + i].append(vertex)
         return graph
+
+    def two_edge_connected_components(self):
+        """橋を全て除いた連結成分を頂点listのlistで返す。各頂点はちょうど1成分。
+        孤立点も含み、自己ループ・多重辺可。成分は最小頂点順、内部順は未指定。
+        橋を縮約木の辺として使える。O(V+E)、非再帰。
+        """
+        n = len(self.order)
+        graph, bridges = [[] for _ in range(n)], set(self.bridges)
+        for i, (u, v) in enumerate(self._edges):
+            if i not in bridges:
+                graph[u].append(v)
+                graph[v].append(u)
+        visited, result = [False] * n, []
+        for start in range(n):
+            if visited[start]:
+                continue
+            component = [start]
+            visited[start] = True
+            for u in component:
+                for v in graph[u]:
+                    if not visited[v]:
+                        visited[v] = True
+                        component.append(v)
+            result.append(component)
+        return result

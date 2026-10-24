@@ -24,7 +24,41 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N = NI()
+    # maxで長さ19
+    ans = 0
+    for a in range(1, 10**6+1):
+        for n in range(3, 20):
+            t = a
+            for i in range(n-1):
+                t *= a
+                if t > N:
+                    break
+            if t > N:
+                break
+
+            def judge(X):
+                now = a
+                v = a
+                for i in range(n-1):
+                    v += X
+                    now *= v
+                    if now > N:
+                        return False
+                return True
+
+            ok = 0
+            ng = 10**9
+            while abs(ok - ng) > 1:
+                X = (ok + ng) // 2
+                if judge(X):
+                    ok = X
+                else:
+                    ng = X
+
+            # print(ok)
+            ans += ok
+    print(ans)
 
 
 if __name__ == "__main__":

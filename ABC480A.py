@@ -24,7 +24,11 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    S = [SI() for _ in range(2)]
+    if sorted([S[0][0], S[1][1]]) == ["A", "D"] or sorted([S[0][1], S[1][0]]) == ["A", "D"]:
+        print("No")
+    else:
+        print("Yes")
 
 
 if __name__ == "__main__":

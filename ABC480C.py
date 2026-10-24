@@ -24,7 +24,21 @@ EI = lambda m: [NLI() for _ in range(m)]
 
 
 def main():
-    pass
+    N, K, T = NMI()
+    A = sorted(NLI() + [T])
+    now = 0
+    ans = 0
+    for a in A:
+        if a <= now:
+            now = max(now, a+K)
+        else:
+            x = (a - now + K-1) // K
+            ans += x
+            now = max(now + x*K, a+K)
+        # print(now)
+        if now >= T:
+            break
+    print(ans)
 
 
 if __name__ == "__main__":

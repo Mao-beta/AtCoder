@@ -1,6 +1,17 @@
 """隣接リスト・最短路。出典: _test.py, _Graph_Algorithm.py。
 0-indexed。重み付き隣接リストはgraph[u]=[(v,cost), ...]。
+
 到達不能はinf（指定可）。Codonでは有限距離と加算の途中を64bit以内にする。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    adjlist(3, [(1, 2), (2, 3)], first_index=1)  # => [[1], [0, 2], [1]]
+    g = weighted_adjlist(3, [(0, 1, 2), (1, 2, 3)], directed=True)
+    dist, parent = dijkstra(g, 0)
+    dist, restore_path(parent, 0, 2)  # => ([0, 2, 5], [0, 1, 2])
+    zero_one_bfs([[(1, 0)], [(2, 1)], []], 0)  # => [0, 0, 1]
+    bellman_ford(3, [(0, 1, -2), (1, 2, 3)], 0)  # => ([0, -2, 1], [False, False, False])
+    floyd_warshall(2, [(0, 1, 4)], directed=False)  # => [[0, 4], [4, 0]]
+    topological_sort([[1], [2], []])  # => [0, 1, 2]
 """
 
 from heapq import heappush, heappop
@@ -8,6 +19,11 @@ from collections import deque
 
 
 def adjlist(n, edges, directed=False, first_index=0):
+    """edges=[(u,v),...]から長さnの隣接リストを作る。
+    directed=Falseは両方向、Trueはu→vのみ。first_index=1なら入力の頂点番号から1を引く。
+    結果の頂点番号は常に0-indexed。
+    nは頂点数の非負整数。E=len(edges)。時間・出力空間O(n+E)。first_indexは入力の頂点番号の開始値（0または1）。
+    """
     graph = [[] for _ in range(n)]
     for u, v in edges:
         u -= first_index
@@ -21,6 +37,10 @@ def adjlist(n, edges, directed=False, first_index=0):
 
 
 def weighted_adjlist(n, edges, directed=False, first_index=0):
+    """edges=[(u,v,weight),...]からgraph[u]=[(v,weight),...]を作る。
+    directed=Falseは両方向。first_index=1で1-indexedの入力を0-indexedへ変換する。
+    nは頂点数の非負整数。E=len(edges)。時間・出力空間O(n+E)。first_indexは入力の頂点番号の開始値（0または1）。
+    """
     graph = [[] for _ in range(n)]
     for u, v, cost in edges:
         u -= first_index
@@ -34,7 +54,12 @@ def weighted_adjlist(n, edges, directed=False, first_index=0):
 
 
 def dijkstra(graph, source, inf=1 << 60):
-    """非負辺。O((V+E)log V)。距離配列と経路復元用の親配列を返す。"""
+    """graph[u]=[(v,非負重み),...]と始点sourceを受け取り(dist,parent)を返す。
+    未到達dist=inf、parent=-1。有限な最短距離の上限より大きなinfを指定する。
+    経路はrestore_path(parent,source,target)で復元。O((V+E)log(V+E+2))。
+    入力: graphはgraph[u]=[(v,cost),...]の重み付き隣接リスト。頂点番号は0..N-1、N=len(graph)、Mは格納した有向辺の総数。
+     sourceは始点。計算量のV/EはN/Mと同じ。追加空間はDijkstraがO(N+M)、0-1 BFSがO(N+M)以内。
+    """
     n = len(graph)
     if not 0 <= source < n:
         raise IndexError(source)
@@ -57,7 +82,10 @@ def dijkstra(graph, source, inf=1 << 60):
 
 
 def restore_path(parent, source, target):
-    """到達不能なら[]。source自身への経路は[source]。"""
+    """到達不能なら[]。source自身への経路は[source]。
+    入力: parentはDijkstraなどが返した長さNの親頂点配列（始点・未到達=-1）。source/targetは始点/終点の頂点番号。
+    時間・出力空間O(経路長)、最悪O(N)。
+    """
     path = []
     for _ in range(len(parent)):
         path.append(target)
@@ -70,7 +98,11 @@ def restore_path(parent, source, target):
 
 
 def zero_one_bfs(graph, source, inf=1 << 60):
-    """辺重み0/1専用。O(V+E)。距離配列を返す。"""
+    """graph[u]=[(v,重み),...]で全重みが0か1の場合の距離list。未到達はinf。
+    頂点は0-indexed、経路復元用の親は返さない。O(V+E)。
+    入力: graphはgraph[u]=[(v,cost),...]の重み付き隣接リスト。頂点番号は0..N-1、N=len(graph)、Mは格納した有向辺の総数。
+     sourceは始点。計算量のV/EはN/Mと同じ。追加空間はDijkstraがO(N+M)、0-1 BFSがO(N+M)以内。
+    """
     if not 0 <= source < len(graph):
         raise IndexError(source)
     dist = [inf] * len(graph)
@@ -93,7 +125,12 @@ def zero_one_bfs(graph, source, inf=1 << 60):
 
 
 def bellman_ford(n, edges, source, inf=1 << 60):
-    """O(VE)。distと、到達可能な負閉路の影響を受ける頂点のbool配列。"""
+    """有向辺edges=[(u,v,cost),...]と始点sourceから(dist,negative)を返す。O(VE)。
+    negative[v]は始点から到達可能な負閉路の影響を受けるか。Trueのdistは使わない。
+    未到達はinf。無向辺は両方向の辺を入力する。
+    nは頂点数、V=n、E=len(edges)。edgesのu/v/sourceは0-indexed、costは整数で負も可。infは全ての有限な最短距離より大きい番兵。
+    追加空間O(V+E)。
+    """
     if not 0 <= source < n:
         raise IndexError(source)
     dist = [inf] * n
@@ -123,7 +160,12 @@ def bellman_ford(n, edges, source, inf=1 << 60):
 
 
 def floyd_warshall(n, edges, directed=True, inf=1 << 60):
-    """O(V³)。多重辺対応。負閉路はdist[v][v]<0で判定。"""
+    """edges=[(u,v,cost),...]から全点対距離の二次元listを返す。O(V³)。
+    directed=Falseなら両方向を追加。未到達はinf、多重辺は最小重み。
+    dist[v][v]<0なら負閉路があり、影響を受ける距離を最短距離として使えない。
+    nは頂点数、V=n、E=len(edges)。edgesのu/v/sourceは0-indexed、costは整数で負も可。infは全ての有限な最短距離より大きい番兵。
+    空間O(V²)。directedは有向辺として扱うかを表すbool。
+    """
     dist = [[inf] * n for _ in range(n)]
     for v in range(n):
         dist[v][v] = 0
@@ -143,7 +185,11 @@ def floyd_warshall(n, edges, directed=True, inf=1 << 60):
 
 
 def topological_sort(graph):
-    """O(V+E)。閉路がある場合はValueError。"""
+    """有向隣接リストgraph[u]=[v,...]のトポロジカル順（頂点のlist）。O(V+E)。
+    閉路があればValueError。同順位の頂点間の辞書順最小性は保証しない。
+    入力: graphはgraph[u]=[v,...]の隣接リスト（長さNのlist of lists）。
+    頂点番号は0..N-1、N=len(graph)、M=sum(map(len,graph))。 計算量のV/EはN/M。追加空間O(N)。
+    """
     indegree = [0] * len(graph)
     for row in graph:
         for v in row:

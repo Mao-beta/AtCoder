@@ -1,5 +1,12 @@
 """非再帰AVL辞書。出典: _AVL_Tree.py。順位は0-indexed。更新・検索O(log n)。
-PyPy向け。Codon未確認。upper_boundは旧APIではx未満の最大値（通常の意味と異なる）。
+PyPy向け。Codon未確認。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    avl = AVLTree()
+    avl[20] = 'b'; avl[10] = 'a'
+    avl[10], avl.kth(0), avl.ge(15), avl.lt(20)  # => ('a', 10, 20, 10)
+    avl.get(99, 'missing')  # => 'missing'
+    avl.discard(10), 10 in avl, len(avl)  # => (True, False, 1)
 """
 
 
@@ -26,22 +33,24 @@ class _AVLNode:
 
 
 class AVLTree:
-    """非再帰AVL木
-    要素keyの挿入(insert)・削除(delete)・keyの存在確認(member)・keyから値の取得(get)
-    ・x以上かつ最小のkey(lower_bound)・x未満かつ最大のkey(upper_bound)
-    ・k番目(0-index)のkey取得(find_kth_element)　をO(logN)で行う。
-
-    Listのようにavl[0] = 10などができる。in演算子も使える。
-
-    Attributes:
-        root (Node): 根ノード。初期値はNone。
-
+    """比較可能なキーを昇順に保持する辞書。AVLTree()は空。
+    avl[key]=valueまたはset(key,val)で追加・上書き。avl[key]は未登録ならKeyError。get(key,default=None)は未登録ならdefault。
+    kth(k)は小さい順0-indexedのキー、ge(x)はx以上の最小キー、lt(x)はx未満の最大キー。
+    挿入・削除・探索O(log n)。len(avl)はキー数。同じキーの重複は持たない。
+    引数なしで空の辞書をO(1)時間・空間で構築する。keyは相互に大小比較できるキー、valは任意の格納値。Nは現在のキー数。
+    全体の空間O(N)、通常の探索・変更はO(log(N+1))時間。
     """
 
     def __init__(self):
+        """引数なしで空の辞書をO(1)時間・空間で構築する。keyは相互に大小比較できるキー、valは任意の格納値。Nは現在のキー数。
+        全体の空間O(N)、通常の探索・変更はO(log(N+1))時間。
+        """
         self.root = None
 
-    def rotate_left(self, v):
+    def _rotate_left(self, v):
+        """内部用。部分木ノードvを左回転して新しい根ノードを返す。通常はset/discardを使う。
+        vは内部ノードオブジェクト（キーや順位ではない）。内部補助処理でO(1)時間・空間。
+        """
         u = v.rch
         u.size = v.size
         v.size -= u.rch.size + 1 if u.rch is not None else 1
@@ -54,7 +63,10 @@ class AVLTree:
             v.bias = -1
         return u
 
-    def rotate_right(self, v):
+    def _rotate_right(self, v):
+        """内部用。部分木ノードvを右回転して新しい根ノードを返す。通常はset/discardを使う。
+        vは内部ノードオブジェクト（キーや順位ではない）。内部補助処理でO(1)時間・空間。
+        """
         u = v.lch
         u.size = v.size
         v.size -= u.lch.size + 1 if u.lch is not None else 1
@@ -67,7 +79,10 @@ class AVLTree:
             v.bias = 1
         return u
 
-    def rotateLR(self, v):
+    def _rotate_lr(self, v):
+        """内部用。vに左・右の二重回転を適用し、新しい根ノードを返す。
+        vは内部ノードオブジェクト（キーや順位ではない）。内部補助処理でO(1)時間・空間。
+        """
         u = v.lch
         t = u.rch
         t.size = v.size
@@ -77,10 +92,13 @@ class AVLTree:
         t.lch = u
         v.lch = t.rch
         t.rch = v
-        self.update_bias_double(t)
+        self._update_bias_double(t)
         return t
 
-    def rotateRL(self, v):
+    def _rotate_rl(self, v):
+        """内部用。vに右・左の二重回転を適用し、新しい根ノードを返す。
+        vは内部ノードオブジェクト（キーや順位ではない）。内部補助処理でO(1)時間・空間。
+        """
         u = v.rch
         t = u.lch
         t.size = v.size
@@ -90,10 +108,13 @@ class AVLTree:
         t.rch = u
         v.rch = t.lch
         t.lch = v
-        self.update_bias_double(t)
+        self._update_bias_double(t)
         return t
 
-    def update_bias_double(self, v):
+    def _update_bias_double(self, v):
+        """内部用。二重回転に必要な平衡係数を更新する。利用者からは呼ばない。
+        vは内部ノードオブジェクト（キーや順位ではない）。内部補助処理でO(1)時間・空間。
+        """
         if v.bias == 1:
             v.rch.bias = -1
             v.lch.bias = 0
@@ -105,7 +126,7 @@ class AVLTree:
             v.lch.bias = 0
         v.bias = 0
 
-    def insert(self, key, val):
+    def set(self, key, val):
         """挿入
 
         指定したkeyに値valを挿入する。
@@ -117,7 +138,7 @@ class AVLTree:
 
         Note:
             同じキーがあった場合に上書きする。
-
+        時間O(log(N+1))、追加空間O(log(N+1))以内。Nは現在のキー数。
         """
         if self.root is None:
             self.root = _AVLNode(key, val)
@@ -155,16 +176,16 @@ class AVLTree:
             if b == 2:
                 u = v.lch
                 if u.bias == -1:
-                    new_v = self.rotateLR(v)
+                    new_v = self._rotate_lr(v)
                 else:
-                    new_v = self.rotate_right(v)
+                    new_v = self._rotate_right(v)
                 break
             if b == -2:
                 u = v.rch
                 if u.bias == 1:
-                    new_v = self.rotateRL(v)
+                    new_v = self._rotate_rl(v)
                 else:
-                    new_v = self.rotate_left(v)
+                    new_v = self._rotate_left(v)
                 break
 
         if new_v is not None:
@@ -182,7 +203,7 @@ class AVLTree:
             p, pdir = history.pop()
             p.size += 1
 
-    def delete(self, key):
+    def discard(self, key):
         """削除
 
         指定したkeyの要素を削除する。
@@ -190,10 +211,11 @@ class AVLTree:
 
         Args:
             key (any): キー。
+            default: 未登録のときに返す値（省略時None）。
 
         Return:
             bool: 指定したキーが存在するならTrue、しないならFalse。
-
+        時間O(log(N+1))、追加空間O(log(N+1))以内。Nは現在のキー数。
         """
         v = self.root
         history = []
@@ -243,15 +265,15 @@ class AVLTree:
             b = p.bias
             if b == 2:
                 if p.lch.bias == -1:
-                    new_p = self.rotateLR(p)
+                    new_p = self._rotate_lr(p)
                 else:
-                    new_p = self.rotate_right(p)
+                    new_p = self._rotate_right(p)
 
             elif b == -2:
                 if p.rch.bias == 1:
-                    new_p = self.rotateRL(p)
+                    new_p = self._rotate_rl(p)
                 else:
-                    new_p = self.rotate_left(p)
+                    new_p = self._rotate_left(p)
 
             elif b != 0:
                 break
@@ -274,17 +296,18 @@ class AVLTree:
 
         return True
 
-    def member(self, key):
+    def __contains__(self, key):
         """キーの存在チェック
 
         指定したkeyがあるかどうか判定する。
 
         Args:
             key (any): キー。
+            default: 未登録のときに返す値（省略時None）。
 
         Return:
             bool: 指定したキーが存在するならTrue、しないならFalse。
-
+        時間O(log(N+1))、追加空間O(log(N+1))以内。Nは現在のキー数。
         """
         v = self.root
         while v is not None:
@@ -296,18 +319,19 @@ class AVLTree:
                 return True
         return False
 
-    def get(self, key):
+    def get(self, key, default=None):
         """値の取り出し
 
         指定したkeyの値を返す。
-        keyが存在しない場合はNoneを返す。
+        keyが存在しない場合はdefaultを返す。
 
         Args:
             key (any): キー。
+            default: 未登録のときに返す値（省略時None）。
 
         Return:
-            any: 指定したキーが存在するならその値、存在しないならNone。
-
+            any: 指定したキーが存在するならその値、存在しないならdefault。
+        時間O(log(N+1))、追加空間O(log(N+1))以内。Nは現在のキー数。
         """
         v = self.root
         while v is not None:
@@ -317,9 +341,9 @@ class AVLTree:
                 v = v.rch
             else:
                 return v.val
-        return None
+        return default
 
-    def lower_bound(self, key):
+    def ge(self, key):
         """下限つき探索
 
         指定したkey以上で最小のキーを見つける。
@@ -329,7 +353,7 @@ class AVLTree:
 
         Return:
             any: 条件を満たすようなキー。そのようなキーが一つも存在しないならNone。
-
+        時間O(log(N+1))、追加空間O(log(N+1))以内。Nは現在のキー数。
         """
         # ret = float('inf')
         ret = None
@@ -343,7 +367,7 @@ class AVLTree:
                 v = v.rch
         return ret
 
-    def upper_bound(self, key):
+    def lt(self, key):
         """上限つき探索
 
         指定したkey未満で最大のキーを見つける。
@@ -353,7 +377,7 @@ class AVLTree:
 
         Return:
             any: 条件を満たすようなキー。そのようなキーが一つも存在しないならNone。
-
+        時間O(log(N+1))、追加空間O(log(N+1))以内。Nは現在のキー数。
         """
         # ret = -float('inf')
         ret = None
@@ -367,12 +391,11 @@ class AVLTree:
                 v = v.lch
         return ret
 
-    def find_kth_element(self, k):
-        """小さい方からk番目の要素を見つける
-
-        Args:
-            k (int): 何番目の要素か(0オリジン)。
+    def kth(self, k):
+        """小さい順0-indexedのk番目のキー。範囲外はIndexError。O(log n)。
         """
+        if not 0 <= k < len(self):
+            raise IndexError(k)
         v = self.root
         s = 0
         while v is not None:
@@ -386,32 +409,23 @@ class AVLTree:
                 v = v.lch
         return None
 
-    def __contains__(self, key):
-        return self.member(key)
 
     def __getitem__(self, key):
-        return self.get(key)
+        missing = object()
+        value = self.get(key, missing)
+        if value is missing:
+            raise KeyError(key)
+        return value
 
     def __setitem__(self, key, val):
-        return self.insert(key, val)
+        return self.set(key, val)
 
     def __delitem__(self, key):
-        return self.delete(key)
+        if not self.discard(key):
+            raise KeyError(key)
 
     def __bool__(self):
         return self.root is not None
 
     def __len__(self):
         return self.root.size if self.root is not None else 0
-
-    def kth(self, index):
-        """0-indexed。範囲外ならIndexError。"""
-        if not 0 <= index < len(self):
-            raise IndexError(index)
-        return self.find_kth_element(index)
-
-    def ge(self, key):
-        return self.lower_bound(key)
-
-    def lt(self, key):
-        return self.upper_bound(key)

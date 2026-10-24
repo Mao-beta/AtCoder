@@ -2,11 +2,24 @@
 0-indexed・[l,r)。add(l,r,first,step)でa[i]+=first+(i-l)*step。
 assignは同じ式で代入。各操作O(log n)、再帰深さO(log n)。PyPy向け。
 Codonでは係数×添字和などの中間積も64bit以内にする。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    seg = ArithmeticSegmentTree([0] * 5)
+    seg.add(1, 4, first=2, step=3)  # [0,2,5,8,0]
+    seg.sum(0, 5)  # => 15
+    seg.assign(2, 4, first=10, step=-1)  # [0,2,10,9,0]
+    seg.sum(0, 5)  # => 21
 """
 
 
 class ArithmeticSegmentTree:
+    """初期数列valuesに対する等差数列の区間加算・代入と区間和。
+    0-indexed、[l,r)。構築O(n)、各操作O(log n)。元のvaluesは変更しない。
+    入力: valuesは初期整数列、N=len(values)。構築O(N)時間・空間。0<=l<=r<=Nは整数境界。firstは区間左端の値/加算量、stepは公差でともに整数。
+    """
     def __init__(self, values):
+        """入力: valuesは初期整数列、N=len(values)。構築O(N)時間・空間。0<=l<=r<=Nは整数境界。firstは区間左端の値/加算量、stepは公差でともに整数。
+        """
         self.n = len(values)
         self.size = 1 << max(0, (self.n - 1).bit_length())
         self.data = [0] * (2 * self.size)
@@ -60,10 +73,18 @@ class ArithmeticSegmentTree:
             raise IndexError("invalid range")
 
     def add(self, l, r, first, step=0):
+        """[l,r)の各A[i]にfirst+(i-l)*stepを加える。firstは位置lの加算量。
+        step=0で通常の区間加算。戻り値なし。
+        時間O(log(N+1))、探索の追加空間O(log(N+1))以内。
+        """
         self._check(l, r)
         self._update(l, r, step, first - l * step, False, 1, 0, self.size)
 
     def assign(self, l, r, first, step=0):
+        """[l,r)の各A[i]をfirst+(i-l)*stepへ置換する。firstは位置lの値。
+        step=0で区間代入。戻り値なし。
+        時間O(log(N+1))、探索の追加空間O(log(N+1))以内。
+        """
         self._check(l, r)
         self._update(l, r, step, first - l * step, True, 1, 0, self.size)
 
@@ -79,5 +100,8 @@ class ArithmeticSegmentTree:
         )
 
     def sum(self, l, r):
+        """[l,r)の現在の和を返す。空区間は0。0<=l<=r<=n。
+        時間O(log(N+1))、探索の追加空間O(log(N+1))以内。
+        """
         self._check(l, r)
         return self._sum(l, r, 1, 0, self.size)

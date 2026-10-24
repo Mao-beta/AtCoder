@@ -3,7 +3,7 @@
     "name": "UnionFind",
     "category": "データ構造",
     "identifiers": [
-      "DSU"
+      "dsu"
     ],
     "description": "連結判定・併合・集合サイズ"
   },
@@ -23,7 +23,7 @@
     "name": "segtree",
     "category": "データ構造",
     "identifiers": [
-      "SegTree"
+      "segtree"
     ],
     "description": "区間集約とmax_right/min_left"
   },
@@ -43,7 +43,7 @@
     "name": "BIT",
     "category": "データ構造",
     "identifiers": [
-      "FenwickTree"
+      "fenwick_tree"
     ],
     "description": "1点更新・累積和・lower_bound"
   },
@@ -132,12 +132,13 @@
     "name": "SCC",
     "category": "グラフ",
     "identifiers": [
-      "StronglyConnectedComponents"
+      "StronglyConnectedComponents",
+      "scc"
     ],
     "description": "強連結成分分解"
   },
   {
-    "name": "TwoSAT",
+    "name": "two_sat",
     "category": "グラフ",
     "description": "2-SAT",
     "identifiers": []
@@ -167,7 +168,7 @@
     "category": "グラフ",
     "description": "最大流",
     "identifiers": [
-      "MFGraph"
+      "mf_graph"
     ]
   },
   {
@@ -175,7 +176,7 @@
     "category": "グラフ",
     "description": "最小費用流",
     "identifiers": [
-      "MCFGraph"
+      "mcf_graph"
     ]
   },
   {

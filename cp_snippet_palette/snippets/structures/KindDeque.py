@@ -1,4 +1,12 @@
-"""競プロ用スニペット。単体で貼り付け可能。2026-10-17版。"""
+"""競プロ用スニペット。単体で貼り付け可能。2026-10-17版。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    q = KindDeque([1, 2, 1])
+    q.kind, q.count(1), len(q)  # => (2, 2, 3)
+    q.popleft(), q.popleft(), q.kind  # => (1, 2, 1)
+    q.append(3)
+    list(q), q.kind  # => ([1, 3], 2)
+"""
 
 from collections import Counter, deque
 
@@ -11,9 +19,12 @@ class KindDeque:
     kind: 現在の異なる値の種類数
 
     要素はハッシュ可能であること。両端操作・count・kind は償却 O(1)。
+    入力: iterableはhashableな要素の列。Nは初期要素数。構築O(N)期待時間・O(N)空間。xは任意のhashable値、kは符号付き整数の回転量。
     """
 
     def __init__(self, iterable=()):
+        """入力: iterableはhashableな要素の列。Nは初期要素数。構築O(N)期待時間・O(N)空間。xは任意のhashable値、kは符号付き整数の回転量。
+        """
         self.D = deque(iterable)
         self.C = Counter(self.D)
         self._k = len(self.C)
@@ -41,12 +52,18 @@ class KindDeque:
         return self.C.get(x, 0)
 
     def append(self, x):
+        """右端へhashableなxを1個追加し、出現数・種類数を更新する。戻り値なし。
+        償却O(1)回のdeque/辞書操作（期待時間）。
+        """
         self.D.append(x)
         if self.C[x] == 0:
             self._k += 1
         self.C[x] += 1
 
     def appendleft(self, x):
+        """左端へhashableなxを1個追加し、出現数・種類数を更新する。戻り値なし。
+        償却O(1)回のdeque/辞書操作（期待時間）。
+        """
         self.D.appendleft(x)
         if self.C[x] == 0:
             self._k += 1
@@ -72,19 +89,28 @@ class KindDeque:
         return x
 
     def extend(self, iterable):
+        """iterableを順に右端へ追加する。O(k)。
+        """
         for x in iterable:
             self.append(x)
 
     def extendleft(self, iterable):
-        """deque と同じく、入力の順番を反転して左側へ追加する。"""
+        """deque と同じく、入力の順番を反転して左側へ追加する。
+        iterableは追加要素の列、Kはその個数。時間O(K)期待、追加要素の空間O(K)。
+        """
         for x in iterable:
             self.appendleft(x)
 
     def rotate(self, k=1):
-        """右に k 個回転する。出現数は不変。"""
+        """右に k 個回転する。出現数は不変。
+        現在の要素数N、t=k mod Nに対しO(1+min(t,N-t))時間・O(1)追加空間。空の場合O(1)。
+        """
         self.D.rotate(k)
 
     def clear(self):
+        """全要素と出現数を消し、kindを0にする。戻り値なし。
+        時間O(N)、追加空間O(1)。
+        """
         self.D.clear()
         self.C.clear()
         self._k = 0

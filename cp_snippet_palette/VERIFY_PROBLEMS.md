@@ -1,12 +1,12 @@
 # ライブラリ別verify問題一覧
 
-確認日：2026-10-17。提出用の全71ファイル（library 54、snippets 17）を対象に、AtCoder公式問題文とLibrary Checkerの公式問題リポジトリから選んだ。問題数は重複を除いて133問。
+確認日：2026-10-18。提出用の全92ファイル（library 76、snippets 16）を対象に、AtCoder公式問題文とLibrary Checkerの公式問題リポジトリから選んだ。問題数は重複を除いて170問。
 
-**問題の推薦表であり、オンラインジャッジでのAC実績表ではない。** 今回は問題の内容・出力形式とAPIを照合した。提出、全ケースの実行、最大制約での速度確認は行っていない。APIの統一内容は[ACL_API.md](ACL_API.md)、一般の使い方は[LIBRARY_GUIDE.md](LIBRARY_GUIDE.md)を参照。
+**問題の推薦表であり、オンラインジャッジでのAC実績表ではない。** 今回は問題の内容・出力形式とAPIを照合した。提出・公式全ケースの実行は行っていない。別途、対応済み60問では公式サンプルと一部の大規模代表入力をローカルで確認した。APIの統一内容は[ACL_API.md](ACL_API.md)、一般の使い方は[LIBRARY_GUIDE.md](LIBRARY_GUIDE.md)を参照。
 
 パレットではF2の「API・verify」に選択中のファイルの行を表示する。FPSなどの関数ごとの追加問題は、この文書の「同梱機能の追加問題」を参照する。画面内の「全verify問題」からこの文書を開ける。
 
-青以上の用途を優先した追加対応では、下表のうち10問題に提出用の1ファイル生成と公式サンプル入力の検査を用意した。対応済みの問題・コマンド・今後の候補は[Library Checker対応状況](verify/README.md)を参照。オンラインAC済みという意味ではない。
+青以上の用途を優先した追加対応では、合計60問題に提出用の1ファイル生成と公式サンプル入力の検査を用意した。対応済みの問題・コマンド・今後の候補は[Library Checker対応状況](verify/README.md)を参照。オンラインAC済みという意味ではない。
 
 - **直接**：主処理をそのAPIで実装できる。入出力の読み書きと番号変換は必要。
 - **応用／補助**：そのAPIを使うが、問題固有の変換や別の処理も必要。
@@ -19,12 +19,12 @@
 
 | API | 最初の1問 | 次に確認する内容 |
 |---|---|---|
-| DSU | [practice2 A Disjoint Set Union](https://atcoder.jp/contests/practice2/tasks/practice2_a) | mergeの戻り値、size/groupsはローカルでも確認 |
-| FenwickTree | [practice2 B Fenwick Tree](https://atcoder.jp/contests/practice2/tasks/practice2_b) | 空区間・負の加算 |
-| SegTree | [practice2 J Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_j) | [Point Set Range Composite](https://judge.yosupo.jp/problem/point_set_range_composite)で順序依存の集約 |
-| LazySegTree | [practice2 K Range Affine Range Sum](https://atcoder.jp/contests/practice2/tasks/practice2_k) | [practice2 L Lazy Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_l)で反転と転倒数 |
-| SCCGraph / TwoSAT | [practice2 G SCC](https://atcoder.jp/contests/practice2/tasks/practice2_g) / [2 Sat](https://judge.yosupo.jp/problem/two_sat) | 成分順・充足不能・空グラフ |
-| MFGraph / MCFGraph | [practice2 D Maxflow](https://atcoder.jp/contests/practice2/tasks/practice2_d) / [practice2 E MinCostFlow](https://atcoder.jp/contests/practice2/tasks/practice2_e) | 流量からの復元・非負費用への変換 |
+| dsu | [practice2 A Disjoint Set Union](https://atcoder.jp/contests/practice2/tasks/practice2_a) | mergeの戻り値、size/groupsはローカルでも確認 |
+| fenwick_tree | [practice2 B Fenwick Tree](https://atcoder.jp/contests/practice2/tasks/practice2_b) | 空区間・負の加算 |
+| segtree | [practice2 J Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_j) | [Point Set Range Composite](https://judge.yosupo.jp/problem/point_set_range_composite)で順序依存の集約 |
+| lazy_segtree | [practice2 K Range Affine Range Sum](https://atcoder.jp/contests/practice2/tasks/practice2_k) | [practice2 L Lazy Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_l)で反転と転倒数 |
+| scc / two_sat | [practice2 G SCC](https://atcoder.jp/contests/practice2/tasks/practice2_g) / [2 Sat](https://judge.yosupo.jp/problem/two_sat) | 成分順・充足不能・空グラフ |
+| mf_graph / mcf_graph | [practice2 D Maxflow](https://atcoder.jp/contests/practice2/tasks/practice2_d) / [practice2 E MinCostFlow](https://atcoder.jp/contests/practice2/tasks/practice2_e) | 流量からの復元・非負費用への変換 |
 | floor_sum / convolution | [practice2 C Floor Sum](https://atcoder.jp/contests/practice2/tasks/practice2_c) / [practice2 F Convolution](https://atcoder.jp/contests/practice2/tasks/practice2_f) | mod、空列、負入力をAPIの契約内で確認 |
 | suffix_array / lcp_array / z_algorithm | [Suffix Array](https://judge.yosupo.jp/problem/suffixarray) / [practice2 I Number of Substrings](https://atcoder.jp/contests/practice2/tasks/practice2_i) / [Z Algorithm](https://judge.yosupo.jp/problem/zalgorithm) | 整数列とupper指定はローカルで補う |
 
@@ -59,25 +59,25 @@
 | [structures/slope_trick.py](library/structures/slope_trick.py) | [ABC127 F Absolute Minima](https://atcoder.jp/contests/abc127/tasks/abc127_f) | 応用：add_abs(a)、add_constant(b)、argminと最小値。shift・prefix_min・suffix_minはこの問題では確認できない。 |
 | [structures/sorted_set.py](library/structures/sorted_set.py) | [Ordered Set](https://judge.yosupo.jp/problem/ordered_set)<br>[ABC241 D Sequence Query](https://atcoder.jp/contests/abc241/tasks/abc241_d) | SortedSetはLCで直接、SortedMultisetはABC241 Dで重複と順位を確認。LCの順位とローカルの0-indexed順位を変換。 |
 | [structures/sqrt_decomposition.py](library/structures/sqrt_decomposition.py) | [Point Add Range Sum](https://judge.yosupo.jp/problem/point_add_range_sum) | 部分確認：add(p,p+1,x)とsum(l,r)。長い区間への加算とバケット境界は既存ローカルテストで補う。 |
-| [structures/wavelet_matrix.py](library/structures/wavelet_matrix.py) | [Range Kth Smallest](https://judge.yosupo.jp/problem/range_kth_smallest)<br>[Static Range Frequency](https://judge.yosupo.jp/problem/static_range_frequency) | 直接：kth_smallest(l,r,k)はLCと同じ0-indexed。頻度はrange_rankを利用。旧quantile/selectは1-indexedなので使い分ける。 |
+| [structures/wavelet_matrix.py](library/structures/wavelet_matrix.py) | [Range Kth Smallest](https://judge.yosupo.jp/problem/range_kth_smallest)<br>[Static Range Frequency](https://judge.yosupo.jp/problem/static_range_frequency) | 直接：kth_smallest(l,r,k)はLCと同じ0-indexed。kth_smallest/kth_largest/selectも順位0始まり。頻度はcountを利用。 |
 
 ## グラフ・木
 
 | ファイル | 問題 | 検証範囲・合わせ方 |
 |---|---|---|
 | [graphs/assignment.py](library/graphs/assignment.py) | [Assignment Problem](https://judge.yosupo.jp/problem/assignment) | 直接：assignment(cost)の最適費用と割当列を出力。負費用可。長方形n≤mは独自拡張で、LCは正方行列。提出アダプターあり。 |
-| [graphs/bipartite_matching.py](library/graphs/bipartite_matching.py) | [Matching on Bipartite Graph](https://judge.yosupo.jp/problem/bipartitematching) | 直接：左右のマッチ配列からサイズと辺を出力。O(L*E)なので最大制約での速度は別途確認。 |
+| [graphs/bipartite_matching.py](library/graphs/bipartite_matching.py) | [Matching on Bipartite Graph](https://judge.yosupo.jp/problem/bipartitematching) | 直接：左右のマッチ配列からサイズと辺を出力。非再帰Hopcroft–Karp、O((V+E)√V)。長い増加路の代表入力を確認済み。 |
 | [graphs/centroid_decomposition.py](library/graphs/centroid_decomposition.py) | [ABC291 Ex Balanced Tree](https://atcoder.jp/contests/abc291/tasks/abc291_h) | 直接：重心分解木の親配列。根は-1、他は1-indexedに戻す。基本操作そのものだがABC Exであり難度は高い。 |
 | [graphs/exponential.py](library/graphs/exponential.py) | [ABC180 E Traveling Salesman among Aerial Cities](https://atcoder.jp/contests/abc180/tasks/abc180_e)<br>[Minimum Steiner Tree](https://judge.yosupo.jp/problem/minimum_steiner_tree)<br>[Maximum Independent Set](https://judge.yosupo.jp/problem/maximum_independent_set)<br>[Chromatic Number](https://judge.yosupo.jp/problem/chromatic_number) | TSPは距離行列を作る応用、最大独立集合・彩色数は直接。Steiner問題は辺集合も出力するため費用のみの現APIは部分確認。Chinese Postmanは今回未選定。全て指数時間。 |
-| [graphs/hld.py](library/graphs/hld.py) | [Vertex Add Path Sum](https://judge.yosupo.jp/problem/vertex_add_path_sum)<br>[Vertex Set Path Composite](https://judge.yosupo.jp/problem/vertex_set_path_composite) | 応用：HLD順の配列を構築しセグ木に載せる。非可換な関数合成はBiSegTreeとpath_fold_noncommで向きも確認。 |
-| [graphs/lowlink.py](library/graphs/lowlink.py) | [Two-Edge-Connected Components](https://judge.yosupo.jp/problem/two_edge_connected_components)<br>[ABC075 C Bridge](https://atcoder.jp/contests/abc075/tasks/abc075_c)<br>[Biconnected Components](https://judge.yosupo.jp/problem/biconnected_components) | 橋を除く成分分解は追加DFS、ABC075 Cは橋の個数。頂点二重連結成分は追加したbiconnected_components()で直接出力。孤立点・多重辺に対応し、提出アダプターあり。block_cut_tree()は別途ローカル確認。 |
+| [graphs/hld.py](library/graphs/hld.py) | [Vertex Add Path Sum](https://judge.yosupo.jp/problem/vertex_add_path_sum)<br>[Vertex Set Path Composite](https://judge.yosupo.jp/problem/vertex_set_path_composite) | 応用：HLD順の配列を構築しセグ木に載せる。非可換な関数合成はBiSegTreeとpath_prodで向きも確認。 |
+| [graphs/lowlink.py](library/graphs/lowlink.py) | [Two-Edge-Connected Components](https://judge.yosupo.jp/problem/two_edge_connected_components)<br>[ABC075 C Bridge](https://atcoder.jp/contests/abc075/tasks/abc075_c)<br>[Biconnected Components](https://judge.yosupo.jp/problem/biconnected_components) | 橋を除く成分分解はtwo_edge_connected_components()で直接取得。ABC075 Cは橋の個数。頂点二重連結成分は追加したbiconnected_components()で直接出力。孤立点・多重辺に対応し、提出アダプターあり。block_cut_tree()は別途ローカル確認。 |
 | [graphs/max_flow.py](library/graphs/max_flow.py) | [practice2 D Maxflow](https://atcoder.jp/contests/practice2/tasks/practice2_d)<br>[Matching on Bipartite Graph](https://judge.yosupo.jp/problem/bipartitematching) | 応用：source→左→右→sink、容量1。flowに加えedgesからマッチを復元。min_cut/change_edgeは別途ローカル確認。 |
 | [graphs/min_cost_flow.py](library/graphs/min_cost_flow.py) | [practice2 E MinCostFlow](https://atcoder.jp/contests/practice2/tasks/practice2_e) | 応用：利得をC-aの非負コストに変換し、選択数を含めて利得を復元。負費用の辺をそのまま入れない。flowとslopeは同じ個体で併用しない。 |
 | [graphs/mst.py](library/graphs/mst.py) | [Minimum Spanning Tree](https://judge.yosupo.jp/problem/minimum_spanning_tree) | 直接：コスト・採用辺IDを出力。入力が連結なため、非連結のminimum_spanning_forestはローカルで補う。 |
 | [graphs/rerooting.py](library/graphs/rerooting.py) | [DP V Subtree](https://atcoder.jp/contests/dp/tasks/dp_v) | 応用：merge=積 mod M、identity=1、lift=(x+1) mod M。全頂点分の答えを確認。Mが素数とは限らない。 |
-| [graphs/scc.py](library/graphs/scc.py) | [practice2 G SCC](https://atcoder.jp/contests/practice2/tasks/practice2_g)<br>[2 Sat](https://judge.yosupo.jp/problem/two_sat) | 直接：SCCGraph.scc()の成分順、TwoSAT.satisfiable()/answer()。DIMACS形式の±変数番号を(abs(x)-1,x>0)にする。 |
+| [graphs/scc.py](library/graphs/scc.py) | [practice2 G SCC](https://atcoder.jp/contests/practice2/tasks/practice2_g)<br>[2 Sat](https://judge.yosupo.jp/problem/two_sat) | 直接：scc(N,edges)の成分順、two_sat(n,clause)。DIMACS形式の±変数番号を(abs(x)-1,x>0)にする。 |
 | [graphs/shortest_paths.py](library/graphs/shortest_paths.py) | [Shortest Path](https://judge.yosupo.jp/problem/shortest_path)<br>[ABC176 D Wizard in Maze](https://atcoder.jp/contests/abc176/tasks/abc176_d)<br>[ABC061 D Score Attack](https://atcoder.jp/contests/abc061/tasks/abc061_d)<br>[ABC012 D バスと避けられない運命](https://atcoder.jp/contests/abc012/tasks/abc012_4)<br>[DP G Longest Path](https://atcoder.jp/contests/dp/tasks/dp_g) | 順にDijkstra+経路復元、0-1 BFS、Bellman–Ford、Floyd–Warshall、トポロジカル順の応用。Floydでは各頂点の最大距離を最小化、DP Gでは得られた順序上で最長路DPを行う。ABC061 Dは符号反転と、終点へ到達できる頂点への制限が必要。 |
-| [graphs/tree.py](library/graphs/tree.py) | [典型90 003 Longest Circular Road](https://atcoder.jp/contests/typical90/tasks/typical90_c)<br>[Vertex Add Subtree Sum](https://judge.yosupo.jp/problem/vertex_add_subtree_sum)<br>[ABC255 F Pre-order and In-order](https://atcoder.jp/contests/abc255/tasks/abc255_f) | 重みなし直径+1を典型90 003へ出力。LC Tree Diameterは重み付きなので現APIの直接verifyにはしない。部分木和はEuler TourとFenwickTreeを組み合わせる。ABC255 Fは走査順からの復元の応用で、子配列と入力妥当性検査の追加が必要。tree_centersは直径パスからローカル確認。 |
+| [graphs/tree.py](library/graphs/tree.py) | [典型90 003 Longest Circular Road](https://atcoder.jp/contests/typical90/tasks/typical90_c)<br>[Vertex Add Subtree Sum](https://judge.yosupo.jp/problem/vertex_add_subtree_sum)<br>[ABC255 F Pre-order and In-order](https://atcoder.jp/contests/abc255/tasks/abc255_f) | 重みなし直径+1を典型90 003へ出力。LC Tree Diameterは追加したweighted_tree_diameterで直接対応。部分木和はEuler Tourとfenwick_treeを組み合わせる。ABC255 Fは走査順からの復元の応用で、子配列と入力妥当性検査の追加が必要。tree_centersは直径パスからローカル確認。 |
 
 ## 文字列
 
@@ -92,13 +92,13 @@
 
 | ファイル | 問題 | 検証範囲・合わせ方 |
 |---|---|---|
-| [math/bit_transforms.py](library/math/bit_transforms.py) | [Rank of Matrix (Mod 2)](https://judge.yosupo.jp/problem/matrix_rank_mod_2)<br>[ABC141 F Xor Sum 3](https://atcoder.jp/contests/abc141/tasks/abc141_f)<br>[ABC281 F Xor Minimization](https://atcoder.jp/contests/abc281/tasks/abc281_f)<br>[Bitwise And Convolution](https://judge.yosupo.jp/problem/bitwise_and_convolution)<br>[System of Linear Equations (Mod 2)](https://judge.yosupo.jp/problem/system_of_linear_equations_mod_2)<br>[Bitwise Xor Convolution](https://judge.yosupo.jp/problem/bitwise_xor_convolution) | rankはsolve_gf2のrhs=0。linear_equations_gf2は特解と基底まで返し、文字列の左から変数0になるようbit順を変換する。xor_convolutionはFWHTによる直接対応。この2問は提出アダプターあり。AND畳み込みはsubset_zetaの添字反転・積・逆変換を組み合わせる。 |
+| [math/bit_transforms.py](library/math/bit_transforms.py) | [Rank of Matrix (Mod 2)](https://judge.yosupo.jp/problem/matrix_rank_mod_2)<br>[ABC141 F Xor Sum 3](https://atcoder.jp/contests/abc141/tasks/abc141_f)<br>[ABC281 F Xor Minimization](https://atcoder.jp/contests/abc281/tasks/abc281_f)<br>[Bitwise And Convolution](https://judge.yosupo.jp/problem/bitwise_and_convolution)<br>[System of Linear Equations (Mod 2)](https://judge.yosupo.jp/problem/system_of_linear_equations_mod_2)<br>[Bitwise Xor Convolution](https://judge.yosupo.jp/problem/bitwise_xor_convolution) | rankはsolve_gf2のrhs=0。linear_equations_gf2は特解と基底まで返し、文字列の左から変数0になるようbit順を変換する。xor_convolutionはFWHTによる直接対応。この2問は提出アダプターあり。AND畳み込みは追加したand_convolutionで直接対応。 |
 | [math/combinatorics.py](library/math/combinatorics.py) | [ABC034 C 経路](https://atcoder.jp/contests/abc034/tasks/abc034_c)<br>[ABC084 D 2017-like Number](https://atcoder.jp/contests/abc084/tasks/abc084_d)<br>[ABC180 C Cream puff](https://atcoder.jp/contests/abc180/tasks/abc180_c)<br>[Binomial Coefficient (Prime Mod)](https://judge.yosupo.jp/problem/binomial_coefficient_prime_mod) | 二項係数・篩と累積和・約数の基本問題。LCでもn<modが保証されるため最大nまで前計算して使えるが、大きい前計算のメモリ・時間は別確認。permutation/homogeneousはローカルで補う。 |
-| [math/factorize64.py](library/math/factorize64.py) | [Primality Test](https://judge.yosupo.jp/problem/primality_test)<br>[Factorize](https://judge.yosupo.jp/problem/factorize) | 直接：素数判定／素因数分解。factorizeの辞書を重複度分展開して昇順出力。試し割り版は同じ問題の小入力比較用。 |
-| [math/linear_recurrence.py](library/math/linear_recurrence.py) | [Find Linear Recurrence](https://judge.yosupo.jp/problem/find_linear_recurrence)<br>[Kth term of Linearly Recurrent Sequence](https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence) | 直接：BM係数と第k項。係数は直前の項からの順。linear_recurrenceはO(d² log k)なのでLC大入力のTLEに注意。高速版はpolynomialのBostan–Moriを使う。 |
+| [math/factorize64.py](library/math/factorize64.py) | [Primality Test](https://judge.yosupo.jp/problem/primality_test)<br>[Factorize](https://judge.yosupo.jp/problem/factorize) | 直接：素数判定／素因数分解。prime_factのCounterを重複度分展開して昇順出力。試し割り版は同じ問題の小入力比較用。 |
+| [math/linear_recurrence.py](library/math/linear_recurrence.py) | [Find Linear Recurrence](https://judge.yosupo.jp/problem/find_linear_recurrence)<br>[Kth term of Linearly Recurrent Sequence](https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence) | 直接：BM係数と第k項。係数は直前の項からの順。linear_recurrenceはO(d² log k)なのでLC大入力のTLEに注意。LC提出アダプターはpolynomial.linear_recurrence_nttによるBostan–Moriを使う。 |
 | [math/linear_algebra.py](library/math/linear_algebra.py) | [Determinant of Matrix](https://judge.yosupo.jp/problem/matrix_det)<br>[Rank of Matrix](https://judge.yosupo.jp/problem/matrix_rank)<br>[Inverse Matrix](https://judge.yosupo.jp/problem/inverse_matrix)<br>[System of Linear Equations](https://judge.yosupo.jp/problem/system_of_linear_equations) | 直接：素数mod=998244353。逆行列・方程式のNoneは-1。方程式では基底の本数が解空間の次元。0行/0列のrankにも対応。4問とも提出アダプターあり。合成数modの行列式は未対応。 |
 | [math/number_theory.py](library/math/number_theory.py) | [practice2 C Floor Sum](https://atcoder.jp/contests/practice2/tasks/practice2_c)<br>[ABC193 E Oversleeping](https://atcoder.jp/contests/abc193/tasks/abc193_e)<br>[ABC186 E Throne](https://atcoder.jp/contests/abc186/tasks/abc186_e)<br>[Discrete Logarithm](https://judge.yosupo.jp/problem/discrete_logarithm_mod)<br>[Sqrt Mod](https://judge.yosupo.jp/problem/sqrt_mod) | floor_sumは直接、CRTと逆元はABCの応用、離散対数・平方根は直接。pow_modとinv_gcdは補助関数としてローカル境界確認。 |
-| [math/polynomial.py](library/math/polynomial.py) | [practice2 F Convolution](https://atcoder.jp/contests/practice2/tasks/practice2_f)<br>[Convolution](https://judge.yosupo.jp/problem/convolution_mod) | convolution(998244353,a,b)で直接確認。FPSなど同梱する他機能は下の専用表に分ける。 |
+| [math/polynomial.py](library/math/polynomial.py) | [practice2 F Convolution](https://atcoder.jp/contests/practice2/tasks/practice2_f)<br>[Convolution](https://judge.yosupo.jp/problem/convolution_mod) | FFT(998244353).convolution(a,b)で直接確認。FPSなど同梱する他機能は下の専用表に分ける。 |
 | [math/scalar.py](library/math/scalar.py) | [ABC156 D Bouquet](https://atcoder.jp/contests/abc156/tasks/abc156_d)<br>[ABC168 E ∙ (Bullet)](https://atcoder.jp/contests/abc168/tasks/abc168_e) | ModintはABC156 Dで冪・四則・逆元を組み合わせる応用。ABC168 Eはベクトル正規化にFractionを使う補助例（垂直・零ベクトルは分岐）。modint専用のジャッジではない。 |
 
 ## 幾何・探索
@@ -112,21 +112,20 @@
 | [search/heuristics.py](library/search/heuristics.py) | [鉄則本 A46 Heuristic 1](https://atcoder.jp/contests/tessoku-book/tasks/tessoku_book_at) | TSPの近似解作成の用途例。nearest_neighbor→two_optを使い、出発点へ戻る出力を補う。スコア評価であり最適性のverifyではない。beam_search/negamaxの状態遷移は別途ローカル確認。 |
 | [search/numeric.py](library/search/numeric.py) | 未選定 | 未選定：normal_cdfとkmeansには今回適切なAtCoder基本問題／LCの正誤ジャッジを見つけられなかった。CDFの対称性・既知値、k-meansの分離した点群を固定seedで確認。最適クラスタの保証はしない。 |
 
-## 従来の構造スニペット（12ファイル）
+## 同梱の構造スニペット（11ファイル）
 
 | ファイル | 問題 | 検証範囲・合わせ方 |
 |---|---|---|
 | [structures/make_grid.py](snippets/structures/make_grid.py) | [ABC075 B Minesweeper](https://atcoder.jp/contests/abc075/tasks/abc075_b) | 補助：盤面の作成と隣接マス処理。配列の行が共有されないことはローカルで確認。 |
 | [structures/KindDeque.py](snippets/structures/KindDeque.py) | [ABC210 C Colorful Candies](https://atcoder.jp/contests/abc210/tasks/abc210_c) | 応用：長さKの窓をappend/popleftしkindプロパティで種類数。rotateは対象外。 |
-| [structures/UnionFind.py](snippets/structures/UnionFind.py) | [practice2 A Disjoint Set Union](https://atcoder.jp/contests/practice2/tasks/practice2_a) | 直接：DSU.merge/same。groups/size/leaderはローカルでも確認。UnionFindは旧名の別名。 |
-| [structures/WeightedUnionFind.py](snippets/structures/WeightedUnionFind.py) | [ABC087 D People on a Line](https://atcoder.jp/contests/abc087/tasks/arc090_b) | 応用：w=weight[y]-weight[x]でunite(x,y,w)。矛盾の判定を行う。ACLの通常DSUと違う構造なので重み引数を保持。 |
+| [structures/UnionFind.py](snippets/structures/UnionFind.py) | [practice2 A Disjoint Set Union](https://atcoder.jp/contests/practice2/tasks/practice2_a) | 直接：dsu.merge/same。groups/size/leaderはローカルでも確認。クラス名はdsu。 |
+| [structures/WeightedUnionFind.py](snippets/structures/WeightedUnionFind.py) | [ABC087 D People on a Line](https://atcoder.jp/contests/abc087/tasks/arc090_b) | 応用：w=potential[b]-potential[a]でmerge(a,b,w)。代表元を返す。矛盾の判定を行う。ACLの通常dsuと違う構造なので重み引数を保持。 |
 | [structures/segtree.py](snippets/structures/segtree.py) | [practice2 J Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_j)<br>[Point Set Range Composite](https://judge.yosupo.jp/problem/point_set_range_composite) | 直接：set/prod/max_right。非可換の合成はLCで確認。AtCoder側の1-indexed・閉区間を変換。 |
-| [structures/SegTree_compat.py](snippets/structures/SegTree_compat.py) | [practice2 J Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_j) | 旧API用：SegTree(v,op,e)、update/query。新規コードはsegtree.pyのSegTree(op,e,v)を使う。この2ファイルを同時に貼らない。 |
-| [structures/lazy_segtree.py](snippets/structures/lazy_segtree.py) | [practice2 K Range Affine Range Sum](https://atcoder.jp/contests/practice2/tasks/practice2_k)<br>[practice2 L Lazy Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_l) | 直接：アフィン更新・区間和／0,1反転・転倒数。後者は非可換集約も確認できる。1点applyや境界探索はローカルで補う。 |
-| [structures/BIT.py](snippets/structures/BIT.py) | [practice2 B Fenwick Tree](https://atcoder.jp/contests/practice2/tasks/practice2_b) | 直接：FenwickTree.add/sum(l,r)。初期値はaddで入れるか配列拡張コンストラクタを使う。旧BIT.sum(i)とは区別。 |
-| [structures/LCATree.py](snippets/structures/LCATree.py) | [Lowest Common Ancestor](https://judge.yosupo.jp/problem/lca)<br>[Jump on Tree](https://judge.yosupo.jp/problem/jump_on_tree) | 直接：ただしこのクラスは1-indexed。入出力を±1変換し、jumpが-1ならそのまま出力。 |
+| [structures/lazy_segtree.py](snippets/structures/lazy_segtree.py) | [practice2 K Range Affine Range Sum](https://atcoder.jp/contests/practice2/tasks/practice2_k)<br>[practice2 L Lazy Segment Tree](https://atcoder.jp/contests/practice2/tasks/practice2_l) | 直接：アフィン更新・区間和／0,1反転・転倒数。後者は非可換集約も確認できる。apply_pointや境界探索はローカルで補う。 |
+| [structures/BIT.py](snippets/structures/BIT.py) | [practice2 B Fenwick Tree](https://atcoder.jp/contests/practice2/tasks/practice2_b) | 直接：fenwick_tree.add/sum(l,r)。初期値はaddで入れるか独自拡張fenwick_tree.from_list(values)を使う。 |
+| [structures/LCATree.py](snippets/structures/LCATree.py) | [Lowest Common Ancestor](https://judge.yosupo.jp/problem/lca)<br>[Jump on Tree](https://judge.yosupo.jp/problem/jump_on_tree) | 直接：頂点番号0..N-1、root=0。入出力の±1変換は不要。jumpのkは進む辺数で、範囲外は-1。 |
 | [structures/Deque.py](snippets/structures/Deque.py) | [Deque](https://judge.yosupo.jp/problem/deque) | 直接：両端追加削除・添字アクセス。永続性はないためpersistent_queueは対応問題にしない。 |
-| [structures/Heapq.py](snippets/structures/Heapq.py) | [ABC212 D Querying Multiset](https://atcoder.jp/contests/abc212/tasks/abc212_d) | 応用：全要素加算を外側のoffsetで処理し、push/top/pop。eraseと同じ値の再追加はローカルで補う。 |
+| [structures/Heapq.py](snippets/structures/Heapq.py) | [ABC212 D Querying Multiset](https://atcoder.jp/contests/abc212/tasks/abc212_d) | 応用：全要素加算を外側のoffsetで処理し、push/top/pop。discardと同じ値の再追加、空のtop/popがIndexErrorになることはローカルで補う。 |
 | [structures/SegmentTreeBeats.py](snippets/structures/SegmentTreeBeats.py) | [Range Chmin Chmax Add Range Sum](https://judge.yosupo.jp/problem/range_chmin_chmax_add_range_sum) | 直接：半開区間のchmin/chmax/add/sum。全操作を混在させる定番verify。 |
 
 ## 従来の幾何スニペット（5ファイル）
@@ -150,7 +149,7 @@
 | `polynomial.fps_power` | [Pow of Formal Power Series](https://judge.yosupo.jp/problem/pow_of_formal_power_series) | 直接：指数とsize=N。0乗・先頭の零係数を含む。 |
 | `polynomial.fps_sqrt` | [Sqrt of Formal Power Series](https://judge.yosupo.jp/problem/sqrt_of_formal_power_series) | 直接：size=N。解なしNoneを-1に変換。平方根はどちらの符号でも条件を満たせばよい。 |
 | `polynomial.bostan_mori / poly_coef` | [Kth term of Linearly Recurrent Sequence](https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence) | 応用：Q=[1,-c0,-c1,...]、P=(初期列*Q)の先頭d係数。第k係数を取得。 |
-| `polynomial.polynomial_interpolation` | [Polynomial Interpolation](https://judge.yosupo.jp/problem/polynomial_interpolation) | 直接：相異なるxとy。戻り値.polyをN係数に零埋めする。 |
+| `polynomial.polynomial_interpolation` | [Polynomial Interpolation](https://judge.yosupo.jp/problem/polynomial_interpolation) | 直接：相異なるxとy。戻り値.FuncをN係数に零埋めする。 |
 | `polynomial.polynomial_inverse` | [Inv of Polynomials](https://judge.yosupo.jp/problem/inv_of_polynomials) | 直接：法多項式を第2引数に渡す。失敗時の返り値は下の注意参照。 |
 | `polynomial.polynomial_gcd` | [Inv of Polynomials](https://judge.yosupo.jp/problem/inv_of_polynomials) | 部分確認：逆元の存在条件gcd=1を介して使う。一般の多項式GCDを単独で検証する問題としては扱わない。 |
 | `polynomial.subset_sum` | [#p Subset Sum](https://judge.yosupo.jp/problem/sharp_p_subset_sum) | 直接：重み列と上限を渡し、問題が求める次数1..Tだけ出力。0重みの独自拡張はローカル確認。 |
@@ -161,12 +160,12 @@
 
 ## 出力形式と取りこぼしの注意
 
-- 多項式はすべてmod 998244353。fps_*のsizeは係数数、旧FormalPowerSeriesのdegは最大次数。LCの長さNに合わせるならsize=N。
+- FPSと多項式補助関数はmod 998244353。FFTは素数の法を指定。fps_*のsizeとFPSのdegはどちらも係数数。LCの長さNに合わせるならsize=N。
 - polynomial_inverseは解なしNoneを-1に変換。解が[]なら零多項式として長さ0を出す。partition_function、bernoulli_number、stirling_first/secondは係数リストを返す。
 - stirling_firstは符号付きでLCと同じ。bernoulli_numberのB1は-1/2。符号を変える必要はない。
 - Manacherは位置iの奇数長を2*odd[i]-1、iとi+1の間の偶数長を2*even[i+1]とし、交互に並べる。
 - LC Static Convex Hullは重複点と辺の途中の共線点を除き、反時計回り。始点の回転は任意。
-- ACLのDSU/SCCは成分内の順序まで照合しない。TwoSATやマッチングは複数の正解があり得るので、サンプルと文字列が違うだけで失敗と判断しない。
+- ACLのdsu/SCCは成分内の順序まで照合しない。two_satやマッチングは複数の正解があり得るので、サンプルと文字列が違うだけで失敗と判断しない。
 - Mo、二部マッチング、行列、素数列挙、KD-tree、線形漸化式などは、アルゴリズムの計算量と各問題の最大制約を確認する。Python/PyPyでのTLEを正当性の失敗と混同しない。Codonは全ファイル未コンパイル。
 - 正規CDF・k-means・ビームサーチなどは、一般の正誤ジャッジ1問で品質や最適性まで確かめることはできない。幾何の退化ケース、負閉路、空集合、独自拡張も既存ローカルテストと併用する。
 
@@ -174,4 +173,63 @@ Library Checkerのタイトル・入力・出力は[公式problemリポジトリ
 
 ## ローカル確認
 
-ACL形式のコンストラクタ、半開区間、遅延更新の合成順、TwoSAT、upper付きSuffix Array、ModContext、modを先頭に取る畳み込みを既存テストへ追加した。実行結果とコマンドは[ライブラリガイドの検証](LIBRARY_GUIDE.md#検証)を参照。
+shakayami/ACL-for-pythonのコンストラクタ、半開区間、遅延更新の合成順、関数形式のSCC/2-SAT、フローの辺情報、String、FFT、FPSを既存テストで確認する。実行結果とコマンドは[ライブラリガイドの検証](LIBRARY_GUIDE.md#検証)を参照。
+
+## 第2弾の新規ファイルと追加API
+
+| ファイル | 問題 | 検証範囲・合わせ方 |
+|---|---|---|
+| [structures/rollback_dsu.py](library/structures/rollback_dsu.py) | [persistent_unionfind](https://judge.yosupo.jp/problem/persistent_unionfind) | 直接：版の木をDFSしmerge/undo。オフライン専用。snapshot/rollbackで任意の保存点へ戻せる。 |
+| [structures/persistent_queue.py](library/structures/persistent_queue.py) | [persistent_queue](https://judge.yosupo.jp/problem/persistent_queue) | 直接：版0が空、LCのt=-1は版0へ変換。appendは版番号、popleftは(版番号,削除値)。 |
+| [structures/aggregate_deque.py](library/structures/aggregate_deque.py) | [deque_operate_all_composite](https://judge.yosupo.jp/problem/deque_operate_all_composite) | 直接：op(f,g)=g∘f。appendleft/append/popleft/pop/prodを使用。 |
+| [structures/dynamic_sequence.py](library/structures/dynamic_sequence.py) | [dynamic_sequence_range_affine_range_sum](https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum) | 直接：insert/erase/reverse/apply/prod。0-indexed、半開区間、mod=998244353。mod=0で整数和。 |
+| [structures/fenwick_2d.py](library/structures/fenwick_2d.py) | [point_add_rectangle_sum](https://judge.yosupo.jp/problem/point_add_rectangle_sum) | 直接：全更新座標を事前登録。sum(left,bottom,right,top)は半開長方形。 |
+| [structures/offline_queries.py](library/structures/offline_queries.py) | [static_range_count_distinct](https://judge.yosupo.jp/problem/static_range_count_distinct) | 直接：range_count_distinct(values,queries)は各[l,r)の種類数を入力順に返す。 |
+| [graphs/cycle.py](library/graphs/cycle.py) | [cycle_detection_undirected](https://judge.yosupo.jp/problem/cycle_detection_undirected) | 直接：find_cycleは(頂点列,辺ID列)、なしNone。有向版はdirected=True。自己ループ・多重辺可。 |
+| [math/gf2_matrix.py](library/math/gf2_matrix.py) | [inverse_matrix_mod_2](https://judge.yosupo.jp/problem/inverse_matrix_mod_2) | 直接：bit jが列j。inverse_matrix_gf2、matrix_rank_gf2、matrix_product_gf2。入力文字列の左右に注意。 |
+| [graphs/hld.py](library/graphs/hld.py) | [jump_on_tree](https://judge.yosupo.jp/problem/jump_on_tree) | 直接：jump(u,v,k)は経路上k辺先、範囲外-1。kth_ancestor(u,k)で祖先も取得。 |
+| [graphs/lowlink.py](library/graphs/lowlink.py) | [two_edge_connected_components](https://judge.yosupo.jp/problem/two_edge_connected_components) | 直接：two_edge_connected_components()。頂点二重連結成分とは別のAPI。 |
+| [graphs/tree.py](library/graphs/tree.py) | [tree_diameter](https://judge.yosupo.jp/problem/tree_diameter) | 直接：weighted_tree_diameter(graph)。非負の辺重みと直径経路。 |
+| [math/polynomial.py](library/math/polynomial.py) | [division_of_polynomials](https://judge.yosupo.jp/problem/division_of_polynomials) | 直接：polynomial_divmodは(商list,余りlist)。多項式逆元の定数法にも対応。 |
+| [math/polynomial.py](library/math/polynomial.py) | [kth_term_of_linearly_recurrent_sequence](https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence) | 直接：linear_recurrence_ntt。O(M(d)log k)、法998244353。 |
+| [math/bit_transforms.py](library/math/bit_transforms.py) | [bitwise_and_convolution](https://judge.yosupo.jp/problem/bitwise_and_convolution) | 直接：and_convolution(a,b)、等長2^k。 |
+| [strings/suffix_array.py](library/strings/suffix_array.py) | [longest_common_substring](https://judge.yosupo.jp/problem/longest_common_substring) | 直接：longest_common_substringは両文字列の半開区間4添字を返す。 |
+| [structures/dynamic_sequence.py](library/structures/dynamic_sequence.py) | [range_reverse_range_sum](https://judge.yosupo.jp/problem/range_reverse_range_sum) | 直接：DynamicSequence(a,mod=0)で剰余なしの反転・和。 |
+| [graphs/cycle.py](library/graphs/cycle.py) | [cycle_detection](https://judge.yosupo.jp/problem/cycle_detection) | 直接：directed=True、出力では戻り値の辺ID列を使う。 |
+| [math/gf2_matrix.py](library/math/gf2_matrix.py) | [matrix_rank_mod_2](https://judge.yosupo.jp/problem/matrix_rank_mod_2) | 直接：列数を明示。0行・0列を含む矩形行列。 |
+| [math/gf2_matrix.py](library/math/gf2_matrix.py) | [matrix_product_mod_2](https://judge.yosupo.jp/problem/matrix_product_mod_2) | 直接：aはN×M、bはM×K、columns=K。 |
+
+## セグ木の設定済み派生版
+
+| ファイル | 基本問題・verify候補 | 確認範囲 |
+|---|---|---|
+| [structures/segtree_monoids.py](library/structures/segtree_monoids.py) | [ABC343 F](https://atcoder.jp/contests/abc343/tasks/abc343_f)、[ABC223 F](https://atcoder.jp/contests/abc223/tasks/abc223_f)、[Point Set Range Composite](https://judge.yosupo.jp/problem/point_set_range_composite)、[Static RMQ](https://judge.yosupo.jp/problem/staticrmq) | range_top2、range_brackets、range_affine_composite、range_minで公式サンプルを確認。他の12種類は配列比較・モノイド則で確認。 |
+| [structures/lazy_segtree_actions.py](library/structures/lazy_segtree_actions.py) | [ABC322 F](https://atcoder.jp/contests/abc322/tasks/abc322_f)、[ABC357 F](https://atcoder.jp/contests/abc357/tasks/abc357_f)、[ABL E](https://atcoder.jp/contests/abl/tasks/abl_e)、[practice2 L](https://atcoder.jp/contests/practice2/tasks/practice2_l)、[Range Affine Range Sum](https://judge.yosupo.jp/problem/range_affine_range_sum)、[Range Affine Point Get](https://judge.yosupo.jp/problem/range_affine_point_get) | 反転連続長、二列加算と積の和、数字代入、反転転倒数、一次変換。全17種類を配列比較・作用則でも確認。 |
+
+詳細は[派生版の設計とverify一覧](SEGTREE_RECIPES.md#verifyに使う問題)。AtCoder6問・12サンプルの提出用1ファイルもローカル実行した。専用オンラインverifyのない機能と、既存問題では確認できない追加操作は同ページに区別して記載した。
+
+## ABC向け追加12ファイル
+
+下表は提出用アダプターと公式サンプル47件をローカルで確認した範囲。[使用例と選び方](ABC_TOOLKIT.md)を参照。その他の関数・操作は専用テストで確認した。
+
+次の17問は、入出力付きの提出用ファイルを生成できる。ABC15問・典型90の1問・EDPCの1問。公式サンプル47件をPyPyで実行した。解が複数あるABC271 DとABC396 Eは、制約・目標和・最適値を検査している。
+
+| ファイル | 問題 | 確認範囲 |
+| --- | --- | --- |
+| [functional_graph](library/graphs/functional_graph.py) | [ABC357 E](https://atcoder.jp/contests/abc357/tasks/abc357_e) | 全頂点の到達数 |
+| [functional_graph](library/graphs/functional_graph.py) | [ABC367 E](https://atcoder.jp/contests/abc367/tasks/abc367_e) | 0回・巨大回数の遷移 |
+| [xor_dsu](library/structures/xor_dsu.py) | [ABC396 E](https://atcoder.jp/contests/abc396/tasks/abc396_e) | XOR制約・矛盾・総和最小の復元 |
+| [fenwick_multiset](library/structures/fenwick_multiset.py) | [ABC281 E](https://atcoder.jp/contests/abc281/tasks/abc281_e) | スライド窓の小さい順K個の和 |
+| [dynamic_mex](library/structures/dynamic_mex.py) | [ABC330 E](https://atcoder.jp/contests/abc330/tasks/abc330_e) | 点変更後のmex |
+| [graph_recipes](library/graphs/graph_recipes.py) | [ABC211 D](https://atcoder.jp/contests/abc211/tasks/abc211_d) | 最短路数、到達不能 |
+| [intervals](library/basic/intervals.py) | [ABC214 E](https://atcoder.jp/contests/abc214/tasks/abc214_e) | 整数閉区間への異なる割当 |
+| [subarray_count](library/basic/subarray_count.py) | [ABC233 D](https://atcoder.jp/contests/abc233/tasks/abc233_d) | 負数を含む和Kの区間数 |
+| [subarray_count](library/basic/subarray_count.py) | [ABC247 E](https://atcoder.jp/contests/abc247/tasks/abc247_e) | 指定最小値・最大値の区間数 |
+| [digit_dp](library/basic/digit_dp.py) | [ABC154 E](https://atcoder.jp/contests/abc154/tasks/abc154_e) | 非零桁数を指定した桁DP |
+| [digit_dp](library/basic/digit_dp.py) | [EDPC S](https://atcoder.jp/contests/dp/tasks/dp_s) | 桁和の剰余、0を除く |
+| [knapsack_extra](library/basic/knapsack_extra.py) | [ABC271 D](https://atcoder.jp/contests/abc271/tasks/abc271_d) | 二択の和・選択復元 |
+| [subsequence](library/strings/subsequence.py) | [ABC211 C](https://atcoder.jp/contests/abc211/tasks/abc211_c) | 指定部分列の選び方 |
+| [subsequence](library/strings/subsequence.py) | [ABC386 F](https://atcoder.jp/contests/abc386/tasks/abc386_f) | K回以内の編集距離 |
+| [grid_search](library/basic/grid_search.py) | [ABC325 C](https://atcoder.jp/contests/abc325/tasks/abc325_c) | 8近傍の連結成分 |
+| [grid_search](library/basic/grid_search.py) | [典型90 043](https://atcoder.jp/contests/typical90/tasks/typical90_aq) | 最小方向転換回数 |
+| [integer_count](library/math/integer_count.py) | [ABC230 E](https://atcoder.jp/contests/abc230/tasks/abc230_e) | 分母が変わる除算の総和 |

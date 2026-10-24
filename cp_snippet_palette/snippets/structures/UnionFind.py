@@ -1,25 +1,36 @@
-"""競プロ用スニペット。単体で貼り付け可能。2026-10-17版。"""
+"""Union-Find。APIはshakayami/ACL-for-pythonのdsuに準拠。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    uf = dsu(4)
+    root = uf.merge(0, 1)  # 代表元を返す。統合の成否をboolで判定しない
+    uf.same(0, 1), uf.same(0, 2), uf.size(0)  # => (True, False, 2)
+    if not uf.same(1, 2):
+        uf.merge(1, 2)
+    uf.groups(), uf.group_count()  # => ([[0, 1, 2], [3]], 2)
+"""
 
 
-class DSU:
-    """素集合データ構造（Union by size + 経路圧縮）。頂点は 0..n-1。
-
-    find / leader: 代表元、unite: 異なる集合を統合したら True。
-    merge: 統合後の代表元（ACL 流）、is_same / same: 同じ集合か。
-    find / unite / size: 償却 O(α(N))。
-    groups / all_group_members: O(N α(N))、members(x): O(N α(N))。
+class dsu:
+    """dsu(N)。頂点0..N-1の集合を統合する。merge(a,b)は統合後の代表元。
+    leader/same/size/mergeは償却O(α(N))。groupsは代表元順、各集合は頂点番号順。
+    group_count/members/roots/all_group_membersは独自拡張。
+    入力: Nは非負整数の頂点数。構築O(N)時間・空間。a/b/xは0..N-1の頂点番号。α(N)は逆Ackermann関数。
     """
 
-    def __init__(self, n=0):
+    def __init__(self, N):
+        """入力: Nは非負整数の頂点数。構築O(N)時間・空間。a/b/xは0..N-1の頂点番号。α(N)は逆Ackermann関数。
+        """
+        n = N
         assert n >= 0
         self.n = n
-        self.par = [-1] * n  # 根では -サイズ、他では親の番号
+        self.parent_or_size = [-1] * n  # 根では -サイズ、他では親の番号
         self._group_count = n
 
-    def find(self, x):
-        """x の代表元を返す。非再帰。"""
+    def leader(self, a):
+        """頂点aの代表元。経路圧縮、非再帰、償却O(α(N))。"""
+        x = a
         assert 0 <= x < self.n
-        p = self.par
+        p = self.parent_or_size
         root = x
         while p[root] >= 0:
             root = p[root]
@@ -29,19 +40,18 @@ class DSU:
             x = nxt
         return root
 
-    leader = find
+    def same(self, a, b):
+        """a,bが同じ集合ならTrue。償却O(α(N))。"""
+        return self.leader(a) == self.leader(b)
 
-    def is_same(self, x, y):
-        return self.find(x) == self.find(y)
-
-    same = is_same
-
-    def merge(self, x, y):
-        """集合を統合して代表元を返す。既に同じ集合なら変更しない。"""
-        x, y = self.find(x), self.find(y)
+    def merge(self, a, b):
+        """集合を統合して代表元を返す。既に同じ集合なら変更しない。
+        償却O(α(N))時間、経路探索の追加空間O(1)。
+        """
+        x, y = self.leader(a), self.leader(b)
         if x == y:
             return x
-        p = self.par
+        p = self.parent_or_size
         if p[x] > p[y]:
             x, y = y, x
         p[x] += p[y]
@@ -49,28 +59,18 @@ class DSU:
         self._group_count -= 1
         return x
 
-    def unite(self, x, y):
-        """異なる集合を統合したら True、既に同じなら False。"""
-        x, y = self.find(x), self.find(y)
-        if x == y:
-            return False
-        p = self.par
-        if p[x] > p[y]:
-            x, y = y, x
-        p[x] += p[y]
-        p[y] = x
-        self._group_count -= 1
-        return True
-
-    def size(self, x):
-        return -self.par[self.find(x)]
+    def size(self, a):
+        """aが属する集合の頂点数を返す。償却O(α(n))。"""
+        return -self.parent_or_size[self.leader(a)]
 
     def members(self, x):
-        root = self.find(x)
-        return [i for i in range(self.n) if self.find(i) == root]
+        """xと同じ集合の全頂点を昇順listで返す。全頂点を走査するためO(n α(n))。"""
+        root = self.leader(x)
+        return [i for i in range(self.n) if self.leader(i) == root]
 
     def roots(self):
-        return [i for i, v in enumerate(self.par) if v < 0]
+        """現在の各集合の代表元をlistで返す。O(n)。"""
+        return [i for i, v in enumerate(self.parent_or_size) if v < 0]
 
     def group_count(self):
         """連結成分数。O(1)。"""
@@ -80,18 +80,18 @@ class DSU:
         """{代表元: 頂点リスト} を一度の走査で作る。O(N α(N))。"""
         res = {}
         for i in range(self.n):
-            res.setdefault(self.find(i), []).append(i)
+            res.setdefault(self.leader(i), []).append(i)
         return res
 
     def groups(self):
-        """全連結成分の頂点リストを返す（ACL 形式）。"""
-        return list(self.all_group_members().values())
+        """全連結成分の頂点リストを返す（ACL 形式）。
+        時間O(N α(N))、返すlistの空間O(N)。
+        """
+        members = self.all_group_members()
+        return [members[root] for root in sorted(members)]
 
     def __len__(self):
         return self.n
 
     def __repr__(self):
-        return f"UnionFind({self.groups()!r})"
-
-
-UnionFind = DSU  # 旧名。mergeは成否ではなく代表元を返す。
+        return f"dsu({self.groups()!r})"

@@ -2,7 +2,7 @@
 
 83用途を51ファイルに整理し、`library/`へ抽出した。右端のリンクが現在の実装。元ファイル数と元の定義名は調査時点の記録であり、抽出後のAPI名とは異なる場合がある。利用例・変更点・PyPy/Codonの扱いは [LIBRARY_GUIDE.md](LIBRARY_GUIDE.md) を参照。
 
-その後、[Library Checker対応の第1弾](verify/README.md)でSWAG・割当・線形代数の3ファイルを追加し、現在のlibrary/は54ファイル。既存のLi Chao・LowLink・bit_transformsも拡張した。以下の83用途・51抽出先の表は元コード調査の記録として残している。
+その後、[Library Checker対応の第1弾](verify/README.md)でSWAG・割当・線形代数の3ファイルを追加し、第2弾でさらに永続化・動的数列・二次元集約・閉路・GF(2)行列など8ファイルを追加し、設定済みセグ木の派生集2ファイルとABC向け12ファイルを追加して、現在のlibrary/は76ファイル。既存のLi Chao・LowLink・bit_transformsも拡張した。以下の83用途・51抽出先の表は元コード調査の記録として残している。
 
 2026-10-17に抽出先のリンクとファイル数を再照合した。表の「抽出時の確認点」は当時の検討事項を残したもので、未完了タスクの一覧ではない。現在の引数順・制限・検証結果は[ACL_API.md](ACL_API.md)と[LIBRARY_GUIDE.md](LIBRARY_GUIDE.md)を優先する。
 
@@ -12,7 +12,7 @@
 
 ## 現在のスニペットとの関係
 
-同梱17ファイルは構造系12・幾何系5。UnionFind、WeightedUnionFind、segtree、SegTree互換版、lazy_segtree、BIT、LCATree、Deque、KindDeque、Heapq、SegmentTreeBeats、make_gridと、Point/Line/Segment/Polygon/Circle/最近点対が利用できる。従来の17ファイルは互換性のため保持し、追加分はlibrary/に置いた。
+同梱スニペットは16ファイル（構造系11・幾何系5）。旧SegTree互換版は削除した。抽出・追加したライブラリはlibrary/に置く。現行APIは[ACL_API.md](ACL_API.md)を参照する。下表の定義名は抽出元にあった名前を記録したもので、現行の名前と異なる場合がある。
 
 `_cp_structures.py`は旧APIの統合版、`cp_snippet_palette/snippets/`は検索・貼り付け用。リポジトリ直下にも旧`snippets/`があるが、現在のパレット設定はそちらを読まない。検索対象はパレット内の`snippets/`と`library/`。新しい自作スニペットは[操作ガイド](LOCAL_USAGE.md#スニペットの追加)に従ってパレット内の`snippets/`へ置き、同じ実装を両方へ登録しない。
 
@@ -143,7 +143,7 @@ Rollback UnionFind、Sparse Table、Disjoint Sparse Table、Hilbert順序、永�
 
 - 解答ファイルをそのまま検索対象に登録するとmainや入出力までコピーされる。候補を確認し、必要な定義・import・定数を自己完結したファイルにしてから追加する。
 - MOD、INF、N、隣接リスト、再帰設定などのグローバル依存を確認する。入力を読むトップレベル処理やmainはスニペットに含めない。
-- 新しいデータ構造は原則0-indexed・半開区間で説明する。既存LCATreeは1-indexed、BIT.sum(i)はiを含むので、互換APIを黙って変えない。
+- 提出用に抽出したライブラリの頂点・添字・順位は0-indexedに統一する。LCATreeのrootは0、WaveletMatrixの各順位も0始まり。BITはfenwick_tree.sum(l,r)の半開区間APIを使う。旧1-indexed形式への互換は設けない。
 - 抽出した1機能について小さい実例と関連する既存テストで確認し、過去解答全体の書き換えは行わない。
 - 幾何5ファイルは必要なPoint等を各ファイル内に同梱している。複数を貼る場合は定義の重複に注意する。
 

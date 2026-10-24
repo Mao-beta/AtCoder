@@ -1,17 +1,31 @@
-"""静的な区間順位検索。区間は[l,r)。新API kth_smallestは0-indexed。
+"""静的な区間順位検索。添字・順位はすべて0-indexed、区間は[l,r)。
+
 抽出元: _WaveletMatrix.py。提出時はこのファイルをコピーする（ローカルimport不要）。
 PyPy向け。Codonでのコンパイルは未確認。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    wm = WaveletMatrix([5, 1, 5, 3])
+    wm.kth_smallest(0, 4, 1), wm.kth_largest(0, 4, 0)  # => (3, 5)
+    wm.count(0, 3, 5), wm.count_less(0, 4, 4), wm.select(5, 1)  # => (2, 2, 2)
+    wm.top(0, 4, 2), wm.sum(0, 4)  # => ([(5, 2), (1, 1)], 14)
+    bits = FullyIndexableDictionary(4)
+    bits.set(1, 1); bits.set(3, 1); bits.build()
+    bits.rank(3, 1), bits.select(1, 1)  # => (1, 3)
 """
 
 
 class FullyIndexableDictionary:
-    """
-    references:
-    https://judge.yosupo.jp/submission/33990
+    """長さNの静的bit列。初期値は全て0。set(i,bit)を済ませてbuild()を1回呼ぶ。
+    以後はget(index)/rank(index,bit)/select(bit,k)で参照する。添字・selectの順位は0-indexed。
+    WaveletMatrixの補助構造。build後のsetは非対応。
+    入力: Nは非負整数のbit数。構築O(ceil(N/32))時間・空間。
+    index/iは0-indexedの添字、bitは0/1、kは0-indexed順位、defaultは見つからない場合の返り値。
     """
 
     def __init__(self, N):
-        """長さ N の完備辞書生成する."""
+        """入力: Nは非負整数のbit数。構築O(ceil(N/32))時間・空間。
+        index/iは0-indexedの添字、bitは0/1、kは0-indexed順位、defaultは見つからない場合の返り値。
+        """
         self.N = N
         self.blocks = (N + 31) >> 5
         self.bit = [0] * self.blocks
@@ -30,7 +44,9 @@ class FullyIndexableDictionary:
         return self.N
 
     def set(self, index, bit):
-        """第 index 要素を bit に設定する."""
+        """第 index 要素を bit に設定する.
+        時間・追加空間O(1)（32bitブロックを使う）。
+        """
         if index < 0:
             index += self.N
         if not 0 <= index < self.N:
@@ -42,13 +58,17 @@ class FullyIndexableDictionary:
             self.bit[index >> 5] &= ~(1 << (index & 31))
 
     def build(self):
-        """データ構造を確定させる. ※ 以降, set の使用禁止"""
+        """データ構造を確定させる. ※ 以降, set の使用禁止
+        引数なし。時間O(ceil(N/32))、追加空間O(1)。
+        """
 
         for k in range(1, self.blocks):
             self.total[k] = self.total[k - 1] + self.__popcount(self.bit[k - 1])
 
-    def access(self, index):
-        """第 index 要素の値を求める."""
+    def get(self, index):
+        """第 index 要素の値を求める.
+        時間・追加空間O(1)（32bitブロックを使う）。
+        """
         if index < 0:
             index += self.N
         if not 0 <= index < self.N:
@@ -56,11 +76,13 @@ class FullyIndexableDictionary:
 
         return (self.bit[index >> 5] >> (index & 31)) & 1
 
-    __getitem__ = access
+    __getitem__ = get
 
     def rank(self, index, bit):
-        """[0, index) にある bit の数を求める."""
-        if index <= 0:
+        """[0, index) にある bit の数を求める.
+        時間・追加空間O(1)（32bitブロックを使う）。
+        """
+        if index <= 0 or self.N == 0:
             return 0
 
         index = min(index, self.N)
@@ -73,15 +95,18 @@ class FullyIndexableDictionary:
             alpha = self.total[-1] + self.__popcount(self.bit[-1])
         return alpha if bit else index - alpha
 
-    def select(self, k, bit, default=-1):
-        """先頭から k (1-indexed) 番目の bit の位置を求める."""
-        if k < 1 or self.rank(self.N, bit) < k:
+    def select(self, bit, k, default=-1):
+        """先頭からk番目のbitの位置を返す。k・返す位置は0-indexed。
+        k=0は最初の出現。k<0または出現個数以上ならdefaultを返す。
+        時間O(log(N+1))、追加空間O(1)。
+        """
+        if k < 0 or k >= self.rank(self.N, bit):
             return default
 
         l, r = 0, self.N
         while r - l > 1:
             m = (l + r) // 2
-            if self.rank(m, bit) >= k:
+            if self.rank(m, bit) > k:
                 r = m
             else:
                 l = m
@@ -89,33 +114,16 @@ class FullyIndexableDictionary:
 
 
 class WaveletMatrix:
+    """静的な整数列Xから区間順位・頻度を検索する。負数・重複も座標圧縮して扱う。
+    構築O(n log n)、基本的な検索はO(log σ)、σは異なる値の数。点更新は非対応。
+    区間は[l,r)、kth_smallest/kth_largest/selectの順位kはすべて0-indexed。
+    wm[i]で元の値、len(wm)で要素数を取得。sumは頻度列挙なので高速な区間和ではない。
+    入力: Xは整数列（負数・重複も可）。N=len(X)、σ=len(set(X))、B=σ.bit_length()。
+    構築O(N log(N+1))時間・O(N*(B+1))以内の空間。valueは元の整数値、各区間は0<=l<=r<=N。
+    """
     def __init__(self, X):
-        """X についての Wavelet 行列を作成する.
-        静的な整数列 X = ( X 0 , … , X N − 1 )  に対する様々な検索, 計算を得意とするデータ構造
-        construct O(NlogN)
-            W=Wavelet_Matrix(X)
-        access O(NlogN)
-            W.access(index) X[index]を求める.
-        rank O(logN)
-            W.rank(i, value) X[0:i]にあるvalueの個数を求める.
-        range_rank O(logN)
-            W.rank(l, r, value) X[l:r]にある value の個数を求める.
-        select O(logN)
-            W.select(value, k ,default=-1)
-            X[:]において,valueがk番目(1-indexed)に現れる整数列の添字を求める(存在しない場合は default が返り値).
-        quantile O(logN)
-            W.quantile(l, r, k)
-            X[l:r]のうち,k(1-indexed)に小さい値を求める.
-        kth_max O(logN)
-            W.kth_max(l, r, k)
-            X[l:r]のうち,k(1-indexed)に大きい値を求める. quantile の双対に当たる.
-        top O((r−l)logN)
-            W.top(l, r, k)
-            X[l:r]のうち, 出現回数が多い順にk個, (値, 回数) のタプルを生成する. 回数が同率の場合は値が小さい方が優先される.
-        intersect O((r1−l1)+(r2−l2))
-            W.intersect(l1, r1, l2, r2)
-            2つの部分列 X[l1:r1], X[l2:r2]に共通して出てくる要素vについて
-            (v, 1番目の区間にあるvの個数, 2番目の区間にあるvの個数)という形式のタプルを生成する.
+        """入力: Xは整数列（負数・重複も可）。N=len(X)、σ=len(set(X))、B=σ.bit_length()。
+        構築O(N log(N+1))時間・O(N*(B+1))以内の空間。valueは元の整数値、各区間は0<=l<=r<=N。
         """
 
         self.N = N = len(X)
@@ -150,19 +158,23 @@ class WaveletMatrix:
         for i in range(N - 1, -1, -1):
             self.begin[Y[i]] = i
 
-    def access(self, index):
+    def get(self, index):
         """index 番目の要素を求める.
 
         index: 番号
+        時間O(B+1)、追加空間O(1)。B=σ.bit_length()、σは異なる値数。
+        indexは0-indexedの要素位置（負添字も可）。
         """
 
         if index < 0:
             index += self.N
 
+        if not 0 <= index < self.N:
+            raise IndexError(index)
         p = 0
         for lv in range(self.bit_size):
             dic = self.dict[lv]
-            bit = dic.access(index)
+            bit = dic.get(index)
             p = (p << 1) | bit
 
             if bit:
@@ -171,27 +183,23 @@ class WaveletMatrix:
                 index = dic.rank(index, 0)
         return self.value_list[p]
 
-    __getitem__ = access
+    __getitem__ = get
 
     def __len__(self):
         return self.N
 
-    def rank(self, i, value):
-        """[0,i) にある value の個数を求める.
 
-        i: 右端 (第 i 要素を含まない)
-        value: 値
-        """
-        return self.range_rank(0, i, value)
-
-    def range_rank(self, l, r, value):
+    def count(self, l, r, value):
         """[l,r) にある value の個数を求める.
 
         l: 左端
         r: 右端 (第 r 項を含まない)
         value: 値
+        時間O(B+1)、追加空間O(1)。B=σ.bit_length()、σは異なる値数。
         """
 
+        if not 0 <= l <= r <= self.N:
+            raise IndexError("invalid range")
         value = self.value_dict.get(value, -1)
         if value == -1:
             return 0
@@ -208,39 +216,42 @@ class WaveletMatrix:
         return r - l
 
     def select(self, value, k, default=-1):
-        """k (1-indexed) 番目に登場する value の位置を求める."""
+        """先頭からk番目に登場するvalueの位置を返す。k・返す位置は0-indexed。
+        valueは元の整数値、k=0は最初の出現。k<0または出現個数以上ならdefault。
+        時間O((B+1)*log(N+1))、追加空間O(1)。
+        """
 
-        if k < 1 or k > self.range_rank(0, self.N, value):
+        if k < 0 or k >= self.count(0, self.N, value):
             return default
         value = self.value_dict.get(value, -1)
         if value == -1:
             return default
 
         p = self.begin[value]
-        index = p + k - 1
+        index = p + k
 
         for lv in range(self.bit_size):
             dic = self.dict[~lv]
             if (value >> lv) & 1:
-                index = dic.select(index - self.zero_count[~lv] + 1, 1, default)
+                index = dic.select(1, index - self.zero_count[~lv])
             else:
-                index = dic.select(index + 1, 0, default)
-
-            if index == default:
-                return default
+                index = dic.select(0, index)
         return index
 
-    def quantile(self, l, r, k):
-        """[l,r) における k (1-indexed) 番目に小さい値を求める."""
+    def kth_smallest(self, l, r, k):
+        """[l,r)の小さい方からk番目の値。kは0-indexed（0が最小）。
+        0<=k<r-l。範囲外はIndexError。
+        時間O(B+1)、追加空間O(1)。B=σ.bit_length()、σは異なる値数。
+        """
 
-        if not (0 <= l <= r <= self.N and 1 <= k <= r - l):
+        if not (0 <= l <= r <= self.N and 0 <= k < r - l):
             raise IndexError("invalid range or rank")
         p = 0
         for lv in range(self.bit_size):
             dic = self.dict[lv]
             alpha = dic.rank(r, 0) - dic.rank(l, 0)
             p <<= 1
-            if alpha < k:
+            if alpha <= k:
                 p |= 1
                 k -= alpha
                 l = dic.rank(l, 1) + self.zero_count[lv]
@@ -250,34 +261,36 @@ class WaveletMatrix:
                 r = dic.rank(r, 0)
         return self.value_list[p]
 
-    kth_min = quantile
 
-    def kth_smallest(self, left, right, k):
-        """0-indexedのk番目。O(log σ)。"""
-        return self.quantile(left, right, k + 1)
 
-    def count_less(self, left, right, value):
-        """[left,right)内でvalue未満の個数。O(log σ)。"""
+    def count_less(self, l, r, value):
+        """[l,r)内でvalue未満の個数。O(log σ)。
+        時間O(B+1)、追加空間O(1)。B=σ.bit_length()、σは異なる値数。
+        """
         from bisect import bisect_left
 
-        if not 0 <= left <= right <= self.N:
+        if not 0 <= l <= r <= self.N:
             raise IndexError("invalid range")
         bound = bisect_left(self.value_list, value)
         if bound == len(self.value_list):
-            return right - left
+            return r - l
         answer = 0
         for level, dic in enumerate(self.dict):
-            l0, r0 = dic.rank(left, 0), dic.rank(right, 0)
+            l0, r0 = dic.rank(l, 0), dic.rank(r, 0)
             if (bound >> (self.bit_size - level - 1)) & 1:
                 answer += r0 - l0
-                left = self.zero_count[level] + left - l0
-                right = self.zero_count[level] + right - r0
+                l = self.zero_count[level] + l - l0
+                r = self.zero_count[level] + r - r0
             else:
-                left, right = l0, r0
+                l, r = l0, r0
         return answer
 
-    def kth_max(self, l, r, k):
-        return self.quantile(l, r, r - l - k + 1)
+    def kth_largest(self, l, r, k):
+        """[l,r)の大きい方からk番目の値。kは0-indexed（0が最大）。
+        0<=k<r-l。範囲外はIndexError。
+        時間O(B+1)、追加空間O(1)。B=σ.bit_length()、σは異なる値数。
+        """
+        return self.kth_smallest(l, r, r - l - 1 - k)
 
     def top(self, l, r, k):
         """[l,r) にある出現回数が多い順から k 個 (値, 個数) のタプルを出力する (個数同率は値が小さい方が優先).
@@ -285,6 +298,8 @@ class WaveletMatrix:
         l: 左端
         r: 右端 (第 r 項を含まない)
         k: 採用する要素数
+        kは出力する異なる値の最大個数の非負整数。訪問する二分木ノード数をTとするとO(T log(T+1))時間・O(T)空間。
+        Tは最大O(σ*(B+1))以内で、kだけでは時間を決められない。
         """
         if not 0 <= l <= r <= self.N or k < 0:
             raise IndexError("invalid range or count")
@@ -318,13 +333,20 @@ class WaveletMatrix:
         return X
 
     def sum(self, l, r):
+        """[l,r)の値の総和。空なら0。
+        異なる値の頻度をtopで列挙して計算するためO(log σ)ではない。
+        和だけを多数問う場合は累積和を併用する。
+        topで訪問するノード数Tに対しO(T log(T+1))時間・O(T)空間。区間長にかかわらずO(log σ)になる実装ではない。
+        """
         X = 0
         for x, f in self.top(l, r, r - l):
             X += x * f
         return X
 
     def intersect(self, l1, r1, l2, r2):
-        """[l1, r1), [l2, r2) に共に存在する要素 v における (v, 1番目の区間にある v  の個数, 2番目の区間にある v  の個数) のリストを出力する."""
+        """[l1, r1), [l2, r2) に共に存在する要素 v における (v, 1番目の区間にある v  の個数, 2番目の区間にある v  の個数) のリストを出力する.
+        l1/r1とl2/r2はそれぞれ0<=l<=r<=Nの半開区間境界。訪問ノード数Tに対してO(T)時間・空間、Tは最大O(σ*(B+1))以内。
+        """
         X = [(l1, r1, l2, r2, 0)]
         for lv in range(self.bit_size):
             Y = X

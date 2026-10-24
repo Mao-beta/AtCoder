@@ -1,4 +1,4 @@
-"""Library Checker用のアダプターとライブラリを、提出可能な1ファイルにまとめる。"""
+"""Library Checker/AtCoder用のアダプターとライブラリを、提出可能な1ファイルにまとめる。"""
 
 import argparse
 import ast
@@ -6,35 +6,35 @@ from pathlib import Path
 
 ROOT = Path(__file__).absolute().parent
 PALETTE = ROOT.parent
-PREFIX = "cp_snippet_palette.library."
+PREFIX = "cp_snippet_palette."
 
 
-def problems():
-    return sorted(path.stem for path in (ROOT / "library_checker").glob("*.py"))
+def problems(atcoder=False):
+    folder = "atcoder" if atcoder else "library_checker"
+    return sorted(path.stem for path in (ROOT / folder).glob("*.py"))
 
 
-def bundle(problem):
-    if problem not in problems():
+def bundle(problem, atcoder=False):
+    if problem not in problems(atcoder):
         raise ValueError("unknown problem: " + problem)
-    driver = (ROOT / "library_checker" / (problem + ".py")).read_text(encoding="utf8")
+    folder = "atcoder" if atcoder else "library_checker"
+    driver = (ROOT / folder / (problem + ".py")).read_text(encoding="utf8")
     modules, remove = [], set()
     for node in ast.parse(driver).body:
-        if isinstance(node, ast.ImportFrom) and node.module.startswith(PREFIX):
+        if (
+            isinstance(node, ast.ImportFrom)
+            and node.module
+            and node.module.startswith(PREFIX)
+        ):
             if any(alias.asname or alias.name == "*" for alias in node.names):
                 raise ValueError(
                     "only explicit unaliased library imports are supported"
                 )
-            path = (
-                PALETTE
-                / "library"
-                / (node.module[len(PREFIX) :].replace(".", "/") + ".py")
-            )
+            path = PALETTE / (node.module[len(PREFIX) :].replace(".", "/") + ".py")
             if path not in modules:
                 modules.append(path)
             remove.update(range(node.lineno, node.end_lineno + 1))
-    pieces = [
-        f"# verification-helper: PROBLEM https://judge.yosupo.jp/problem/{problem}"
-    ]
+    pieces = [driver.splitlines()[0]]
     for path in modules:
         pieces.append(
             f"# Source: {path.relative_to(PALETTE).as_posix()}\n"
@@ -52,13 +52,20 @@ def bundle(problem):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("problem", nargs="?", choices=problems())
+    parser.add_argument("problem", nargs="?")
+    parser.add_argument(
+        "--atcoder", action="store_true", help="AtCoderのアダプターを使う"
+    )
     parser.add_argument("--list", action="store_true", help="対応する問題IDを表示")
     args = parser.parse_args()
     if args.list:
-        print("\n".join(problems()))
+        print("\n".join(problems(args.atcoder)))
     if args.problem:
-        source = bundle(args.problem)
+        if args.problem not in problems(args.atcoder):
+            parser.error(
+                "対象の問題IDを--listで確認してください。AtCoderは--atcoderを付けます。"
+            )
+        source = bundle(args.problem, args.atcoder)
         target = ROOT / "build" / (args.problem + ".py")
         target.parent.mkdir(exist_ok=True)
         target.write_text(source, encoding="utf8")

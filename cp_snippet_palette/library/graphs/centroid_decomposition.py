@@ -1,27 +1,25 @@
 """非再帰重心分解。無向木を入力し分解木を得る。O(n log n)。
+
 抽出元: ABC/ABC291/ABC291H.py。提出時はこのファイルをコピーする（ローカルimport不要）。
 PyPy向け。Codonでのコンパイルは未確認。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    cd = CentroidDecomposition(3, [[1], [0, 2], [1]])
+    cd.cd_parents  # => [1, -1, 1]
 """
 
 from collections import deque
 
 
 class CentroidDecomposition:
-    """
-    # 重心分解 O(NlogN)
-    # 1. 重心をみつける
-    #    - 適当な根からdfsし、各点における上下の部分木サイズの大きいほうが最小の点
-    # 2. 重心を取り除く
-    # 3. 取り除いた後の各連結成分に対して再帰的に1->2をおこなう(実装は非再帰)
-
-    CDtree = CentroidDecomposition(N, G).cd_parents
-    木構造として各点から見た親を返す。根(全体の重心)は親が-1
+    """N頂点の無向木の隣接リストG（0-indexed）を重心分解する。
+    cd_parents[v]は重心分解木での親。唯一の根は-1。元の木の親ではない。
+    構築O(N log N)、非再帰。分解後の距離集計などは呼び出し側で実装する。
+    入力: Nは頂点数、Gは長さNの隣接リストG[u]=[v,...]。0-indexedの連結無向木で各辺を両方向に入れる。構築O(N log(N+1))時間・O(N)空間。
     """
 
     def __init__(self, N, G):
-        """
-        :param N: 頂点数
-        :param G: 隣接グラフ(0-index)
+        """入力: Nは頂点数、Gは長さNの隣接リストG[u]=[v,...]。0-indexedの連結無向木で各辺を両方向に入れる。構築O(N log(N+1))時間・O(N)空間。
         """
         self.N = N
         self.G = G

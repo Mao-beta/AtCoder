@@ -1,75 +1,99 @@
 """逆元・CRT・floor_sum・離散対数・mod平方根。
+
 出典: _ACL_math.py, ABC270G, LC_Inv_of_Polynomials.py。
 PyPy向け。Codonでは乗算やCRTの法の積を64bit以内にする。
+
+使い方（このファイルを解答の先頭に貼り付けてから実行）
+    pow_mod(2, 10, 1000), inv_gcd(6, 15), inv_mod(3, 7)  # => (24, (3, 3), 5)
+    crt([2, 3], [3, 5])  # x=2 mod3、x=3 mod5 -> x=8 mod15
+    # => (8, 15)
+    crt([0, 1], [2, 2])  # 矛盾
+    # => (0, 0)
+    floor_sum(4, 3, 2, 1)  # => 4
+    discrete_log(2, 8, 13), sqrt_mod(4, 7)  # => (3, 2)
 """
 
 from math import gcd, isqrt
 
 
 def pow_mod(x, n, m):
-    """ACL形式。x**n mod m。n>=0、m>=1。"""
+    """ACL形式。x**n mod m。n>=0、m>=1。
+    xは整数の底、nは非負整数の指数、mは正整数の法。時間O(1+log(n+1))回の法乗算、追加空間O(1)個の整数。
+    """
     if n < 0 or m < 1:
         raise ValueError("n>=0 and m>=1 required")
     return pow(x, n, m)
 
 
-def inv_gcd(a, mod):
-    """(gcd(a,mod), x)。a*x≡gcd (mod mod)、0<=x<mod/gcd。"""
-    if mod <= 0:
-        raise ValueError("mod must be positive")
-    a %= mod
-    s, t, x, y = mod, a, 0, 1
+def inv_gcd(a, b):
+    """(gcd(a,b), x)。b>0、a*x≡gcd(a,b) (mod b)、0<=x<b/gcd(a,b)。
+    aは整数、bは正整数の法。時間O(log(b+1))回の除算、追加空間O(1)個の整数。
+    """
+    if b <= 0:
+        raise ValueError("b must be positive")
+    a %= b
+    s, t, x, y = b, a, 0, 1
     while t:
         q = s // t
         s, t = t, s - q * t
         x, y = y, x - q * y
-    return s, x % (mod // s)
+    return s, x % (b // s)
 
 
-def inv_mod(a, mod):
-    g, x = inv_gcd(a, mod)
+def inv_mod(x, m):
+    """x*y≡1 (mod m)となる逆元y（0<=y<m）を返す。m>0。
+    xとmが互いに素でなければValueError。素数でないmにも対応。O(log m)。
+    xは整数、mは正整数の法。追加空間O(1)個の整数。
+    """
+    g, x = inv_gcd(x, m)
     if g != 1:
         raise ValueError("inverse does not exist")
     return x
 
 
-def crt(remainders, moduli):
-    """O(k log M)。x≡r_i(mod m_i)。最小非負解と周期。解なしは(0,0)。"""
-    if len(remainders) != len(moduli):
+def crt(r, m):
+    """O(k log M)。x≡r_i(mod m_i)。最小非負解と周期。解なしは(0,0)。
+    rは剰余の整数列、mは同じ長さの正の法の整数列。k=len(r)、Mは途中で合成される法の最大値。追加空間O(1)個の整数（整数のbit長はMに依存）。
+    """
+    if len(r) != len(m):
         raise ValueError("length mismatch")
-    r, m = 0, 1
-    for value, mod in zip(remainders, moduli):
+    r0, m0 = 0, 1
+    for value, mod in zip(r, m):
         if mod <= 0:
-            raise ValueError("moduli must be positive")
+            raise ValueError("m must be positive")
         value %= mod
-        g, inverse = inv_gcd(m, mod)
-        if (value - r) % g:
+        g, inverse = inv_gcd(m0, mod)
+        if (value - r0) % g:
             return 0, 0
-        step = (value - r) // g * inverse % (mod // g)
-        r += m * step
-        m *= mod // g
-        r %= m
-    return r, m
+        step = (value - r0) // g * inverse % (mod // g)
+        r0 += m0 * step
+        m0 *= mod // g
+        r0 %= m0
+    return r0, m0
 
 
-def floor_sum(n, mod, a, b):
-    """sum((a*i+b)//mod for i in range(n))。a,bは負でもよい。O(log mod)。"""
-    if n < 0 or mod <= 0:
-        raise ValueError("n>=0 and mod>0 required")
+def floor_sum(n, m, a, b):
+    """sum((a*i+b)//m for i in range(n))。a,bは負でもよい。O(log m)。
+    nは項数の非負整数、mは正整数の除数、a/bは整数の一次式の係数/定数項。追加空間O(1)個の整数。
+    """
+    if n < 0 or m <= 0:
+        raise ValueError("n>=0 and m>0 required")
     answer = 0
     while True:
-        qa, a = divmod(a, mod)
-        qb, b = divmod(b, mod)
+        qa, a = divmod(a, m)
+        qb, b = divmod(b, m)
         answer += qa * (n * (n - 1) // 2) + qb * n
         top = a * n + b
-        if top < mod:
+        if top < m:
             return answer
-        n, b = divmod(top, mod)
-        mod, a = a, mod
+        n, b = divmod(top, m)
+        m, a = a, m
 
 
 def discrete_log(a, b, mod):
-    """最小x>=0でa^x≡b(mod mod)。解なし-1。互いに素でなくても可。O(sqrt(mod))。"""
+    """最小x>=0でa^x≡b(mod mod)。解なし-1。互いに素でなくても可。O(sqrt(mod))。
+    a/bは整数の底/目標値、modは正整数の法。追加空間O(sqrt(mod))個の整数。
+    """
     if mod <= 0:
         raise ValueError("mod must be positive")
     a %= mod
@@ -105,7 +129,9 @@ def discrete_log(a, b, mod):
 
 
 def sqrt_mod(a, prime):
-    """Tonelli–Shanks。primeは素数。小さい方の平方根、存在しなければ-1。"""
+    """Tonelli–Shanks。primeは素数。小さい方の平方根、存在しなければ-1。
+    aは平方根を求める整数、primeは素数の法。時間O(log² prime)程度の法乗算（非平方剰余の探索は別）、追加空間O(1)個の整数。
+    """
     if prime < 2:
         raise ValueError("prime must be >=2")
     a %= prime
